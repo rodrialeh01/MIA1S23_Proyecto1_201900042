@@ -1,0 +1,298 @@
+
+#=======================MKDISK==================================
+#Crea un disco de 3000 Kb en la carpeta home
+mkdisk >size=3000 >unit=K >path=/home/user/Disco1.dsk
+#No es necesario utilizar comillas para la ruta en este caso ya que la ruta no tiene ningún espacio en blanco
+mkdisk >path=/home/user/Disco2.dsk >unit=K >size=3000
+#Se ponen comillas la ruta de path ya que uno de sus elementos tiene espacios en blanco, se crea si no está o no existe
+mkdisk >size=5 >unit=M >path="/home/mis discos/Disco3.dsk"
+#Creará un disco de 10 Mb ya que no hay parámetro unit
+mkdisk >size=10 >path="/home/mis discos/Disco4.dsk"
+
+pause
+
+#======================FDISK====================================
+#Crea una partición primaria llamada Particion1 de 300 kb
+#con el peor ajuste en el disco Disco1.dsk
+fdisk >size=300 >path=/home/Disco1.dsk >name=Particion1
+#Crea una partición extendida dentro de Disco2 de 300 kb
+#Tiene el peor ajuste
+fdisk >type=E >path=/home/Disco2.dsk >unit=K >name=Particion2 >size=300
+#Crea una partición lógica con el mejor ajuste, llamada Partición 3,
+#de 1 Mb en el Disco3
+fdisk >size=1 >type=L >unit=M >fit=bf >path="/mis discos/Disco3.dsk" >name="Particion3"
+#Intenta crear una partición extendida dentro de Disco2 de 200 kb
+#Debería mostrar error ya que ya existe una partición extendida
+#dentro de Disco2
+fdisk >type=E >path=/home/Disco2.dsk >name=Part3 >unit=K >size=200
+#Elimina de forma rápida una partición llamada Partición 1
+fdisk >delete=full >name="Particion1" >path=/home/Disco1.dsk
+#Elimina de forma completa una partición llamada Partición 1
+fdisk >name=Particion1 >delete=full >path=/home/Disco1.dsk
+#Quitan 500 Kb de Partición 4 en Disco4.dsk
+#Ignora los demás parámetros (s)
+#Se toma como válido el primero que aparezca, en este caso add
+fdisk >add=-500 >size=10 >unit=K >path="/home/mis discos/Disco4.dsk" >name="Particion4"
+#Agrega 1 Mb a la partición Partición 4 del Disco4.dsk
+#Se debe validar que haya espacio libre después de la partición
+fdisk >add=1 >unit=M >path="/home/mis discos/Disco4.dsk" >name="Particion4"
+
+pause
+
+#=============================MOUNT===============================
+#Monta las particiones de Disco1.dsk, Disco2.dsk y Disco3.dsk,
+#Canet Ejemplo -> 201404106
+mount >path=/home/Disco1.dsk >name=Part1 #id=061Disco1
+mount >path=/home/Disco2.dsk >name=Part1 #id=061Disco2
+mount >name=Part2 >path=/home/Disco3.dsk #id=061Disco3
+mount >path=/home/Disco1.dsk >name=Part2 #id=062Disco1
+mount >path=/home/Disco2.dsk >name=Part2 #id=062Disco2
+mount >name=Part3 >path=/home/Disco3.dsk #id=062Disco3
+
+pause
+
+#===========================UNMOUNT===============================
+#Desmonta la partición con id 061Disco1(En Disco1.dsk)
+unmount >id=061Disco1
+#Si no existe, se debe mostrar error
+unmount >id=061XXX
+
+pause
+
+#===========================MKFS===================================
+#Realiza un formateo completo de la partición en el id 061Disco1 en ext2
+mkfs >type=full >id=061Disco1
+
+pause
+
+#===========================LOGIN==================================
+#Se loguea en el sistema como usuario root
+login >user=root >pass=123 >id=061Disco1
+#Debe dar error porque ya hay un usuario logueado
+login >user="mi usuario" >pass="mi pwd" >id=061Disco1
+
+pause
+
+#==========================LOGOUT==================================
+#Termina la sesión del usuario
+Logout
+#Si se vuelve a ejecutar deberá mostrar un error ya que no hay sesión actualmente
+Logout
+
+pause
+
+#==========================MKGRP===================================
+#Crea el grupo usuarios en la partición de la sesión actual
+mkgrp >name=usuarios
+
+pause
+
+#==========================RMGRP===================================
+#Elimina el grupo de usuarios en la partición de la sesión actual
+rmgrp >name=usuarios
+#Debe mostrar mensaje de error ya que el grupo no existe porque ya #fue eliminado
+rmgrp >name=usuarios
+
+pause
+
+#==========================MKUSR===================================
+#Crea usuario user1 en el grupo ‘usuarios’
+mkusr >user=user1 >pass=usuario >grp=usuarios
+#Debe mostrar mensaje de error ya que el usuario ya existe independientemente que esté en otro grupo
+mkusr >user=user1 >pass=usuario >grp=usuarios2
+
+pause
+
+#==========================RMUSR===================================
+#Elimina el usuario user1
+rmusr >user=user1
+#Debe mostrar mensaje de error porque el user1 ya no existe
+rmusr >user=user1
+
+pause
+
+#==========================MKFILE==================================
+#Crea el archivo a.txt, Si no existen las carpetas home user o docs se crean
+#El tamaño del archivo es de 15 bytes El contenido sería: 012345678901234
+mkfile>size=15 >path=/home/user/docs/a.txt >r
+#Crea "archivo 1.txt" la carpeta "mis documentos" ya debe existir el tamaño es de 0 bytes
+mkfile >path="/home/mis documentos/archivo 1.txt"
+#Crea el archivo b.txt, El contenido del archivo será el mismo que el archivo b.txt que se encuentra en el disco duro de la computadora.
+mkfile >path=/home/user/docs/b.txt >r >cont=/home/Documents/b.txt
+
+pause
+
+#==========================CAT=====================================
+#Lee el archivo a.txt
+cat >file1=/home/user/docs/a.txt
+#En la terminal debería mostrar el contenido, en este ejemplo
+#01234567890123
+#enlazara los archivos
+# a.txt (datos archivo a) # b.txt (01234567890123)
+# c.txt (0123) y debería mostrar el contenido
+# siguiente, cada archivo va separado por salto de línea # datos archivo a
+# 01234567890123
+# 0123
+cat >file1="/home/a.txt" >file2="/home/b.txt" >file3="/home/c.txt"
+
+pause
+
+#==========================REMOVE==================================
+#Elimina el archivo a.txt, b.txt muestra error si no tiene permiso
+remove >path=/home/user/docs/a.txt
+remove >path=/home/user/docs/b.txt
+#Error por permisos
+#Elimina la carpeta user y todo su contenido (docs, a.txt)
+#Si el usuario no tuviera permiso de escritura sobre b.txt
+#No debería eliminar las carpetas padres docs ni user, solo a.txt
+remove >path=/home/user
+remove >path=/home/user
+
+pause
+
+#===========================EDIT====================================
+#Modifica el archivo a.txt
+edit >path=/home/user/docs/a.txt >cont=/root/user/files/a.txt
+
+pause
+
+#===========================RENAME==================================
+#Cambia el nombre del archivo a.txt a b1.txt
+rename >path=/home/user/docs/a.txt >name=b1.txt
+#Deberá mostrar error ya que el archivo b1.txt ya existe
+rename >path=/home/user/docs/c.txt >name=b1.txt
+
+pause
+
+#===========================MKDIR===================================
+#Crea la carpeta usac
+#Si no existen las carpetas home user o docs se crean
+mkdir >r >path=/home/user/docs/usac
+#Crea la carpeta "archivos diciembre"
+#La carpeta padre ya debe existir
+mkdir >path="/home/mis documentos/archivos diciembre"
+
+pause
+
+#==============================COPY=================================
+#/
+# home #664
+#   user #664
+#       documents #664
+#           a.txt #664
+#           b.txt #224
+#       images  #664
+#Copia documents a images
+copy >path="/home/user/documents" >destino="/home/images"
+# b.txt no se copia debido a falta de permisos #/
+# home #664
+#   user #664
+#       documents #664
+#           a.txt #664
+#           b.txt #224
+#       images #664
+#       documents #664
+#           a.txt #664
+
+pause
+
+#=============================MOVE==================================
+#/
+# home #664
+#   user #664
+#       documents #664
+#           a.txt #664
+#           b.txt #224
+#       images #664
+#Copia documents a images
+move >path="/home/user/documents" >destino="/home/images"
+# mueve b.txt ya que solo se comprueban los permisos #/
+# home #664
+#   user #664
+#   images #664
+#       documents #664
+#           a.txt #664
+#           b.txt #224
+
+pause
+
+#============================FIND====================================
+find >path="/" >name=*
+#Arbol Actual
+# /
+# |_home #664
+#   |_user #664
+#   | |_a.txt #664
+#   | |_b.txt #420
+#   |_images #664
+#     |_a.txt #664
+#     |_abcd.txt #664
+find >path="/" >name="?.*"
+#El resultado del comando sería
+# /
+# |_home
+#   |_user
+#   | |_a.txt
+#   | |_b.txt
+#   |_images
+#     |_a.jpg
+
+pause
+
+#============================CHOWN====================================
+#Cambia el propietario de la carpeta home recursivamente
+chown >path=/home >r >user=user2
+#Cambia los permisos de la carpeta home
+Chown >path=/home >user=user1
+
+pause
+
+#============================CHGRP====================================
+#Cambia el grupo del user2
+chgrp >user=user2 >grp=grupo1
+#Cambia el grupo del user1
+chgrp >user=user1 >grp=grupo2
+
+pause
+
+#============================CHMOD====================================
+#Cambia los permisos de la carpeta home recursivamente
+#Todos los archivos o carpetas que tengan /home cambiarán
+#Por ejemplo si existiera /home/user/docs/a.txt
+#Cambiaría los permisos de las tres carpetas y del archivo
+chmod >path=/home >r >ugo=764
+#Cambia los permisos de la carpeta home
+#Se debe comprobar que la carpeta home pertenezca al usuario
+#actual, si no deberá mostrar un mensaje de error.
+chmod >path=/home >ugo=777
+
+pause
+
+#============================EXECUTE==================================
+execute >path=/home/Desktop/calificacion.eea
+
+pause
+
+#============================REP======================================
+#MBR y EBR Disco1.dsk
+rep >id=061Disco1 >path=/home/user/reports/reporte1.jpg >name=mbr
+
+rep >id=061Disco1 >path=/home/user/reports/report2.pdf >name=disk
+
+rep >id=061Disco1 >path=/home/user/reports/report3.jpg >name=inode
+
+rep >id=061Disco1 >path=/home/user/reports/report4.jpg >name=block
+
+rep >id=061Disco1 >path=/home/user/reports/report5.txt >name=bm_inode
+
+rep >id=061Disco1 >path=/home/user/reports/report6.txt >name=bm_block
+
+rep >id=061Disco1 >path=/home/user/reports/report7.jpg >name=tree
+
+#SuperBloque Partición 1 en Disco1.dsk
+rep >id=061Disco1 >path=/home/user/reports/report8.jpg >name=sb
+
+rep >id=061Disco1 >path=/home/user/reports/report9.txt >ruta=/home/a.txt >name=file
+
+rep >id=061Disco1 >path=/home/user/reports/report10.jpg >ruta=/ >name=ls
+
