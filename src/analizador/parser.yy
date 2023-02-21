@@ -13,6 +13,7 @@
 %code requires
 {
    class Driver;
+   class Mkdisk;
 }
 
 %{
@@ -21,13 +22,18 @@
    #include <stdio.h>
    #include "driver.h"
    #include <iostream>
-   using namespace std;
+   #include "../Comandos/Mkdisk.h"
+
+   std::string dsk_size = "";
+   std::string path = "";
+   std::string fit = "";
+   std::string unit = ""; 
 %}
 
 
 /******* TERMINALES ********/
 %token <std::string> MKDISK"mkdisk" RMDISK"rmdisk" FDISK"fdisk" MOUNT"mount" UNMOUNT"unmount" MKFS"mkfs" LOGIN"login" LOGOUT"logout" MKGRP"mkgrp" RMGRP"rmgrp" MKUSR"mkusr" RMUSR"rmusr" MKFILE"mkfile" CAT"cat" REMOVE"remove" EDIT"edit" RENAME"rename" MKDIR"mkdir" COPY"copy" MOVE"move" FIND"find" CHOWN"chown" CHGRP"chgrp" CHMOD"chmod" PAUSE"pause" EXECUTE"execute" REP"rep" FULL"full" BESTFIT"BestFit" FIRSTFIT"FirstFit" WORSTFIT"WorstFit" DOSFS"2fs" TRESFS"3fs" MBR"mbr" DISK"disk" INODE"inode" JOURNALING"journaling" BLOCK"block" BMINODE"bm_inode" BMBLOCK"bm_block" TREE"tree" SB"sb" FILE"file" LS"ls" IGUAL"=" R">r" SIZE">size" PATH">path" FIT">fit" UNIT">UNIT" NAME">name" TYPE">type" DELETE">delete" ADD">add" ID">id" FS">fs" USER">user" PASS">pass" GRP">grp" CONT">cont" DESTINO">destino" UGO">ugo" COMRUTA">ruta" FILEN"FILEN" BF"BF" FF"FF" WF"WF" K"K" M"M" B"B" P"P" E"E" L"L"  RUTA"RUTA" CADENA"CADENA"
-%token <float> NUM "NUM"                     
+%token <std::string> NUM "NUM"                     
 %token FIN 0 "eof"                    
 
 /******* NO TERMINALES ********/
@@ -47,7 +53,16 @@
    COMANDO 
       : MKDISK Lista_parametrosmkdisk
       {
-        std::cout << "COMANDO MKDISK:" << std::endl;
+         Mkdisk *nuevo_disco = new Mkdisk();
+         if(dsk_size != ""){
+            nuevo_disco->size = stoi(dsk_size);
+         }else{
+            nuevo_disco->size = 0;
+         }   
+         nuevo_disco->path = path;
+         nuevo_disco->fit = fit;
+         nuevo_disco->unit = unit;
+         nuevo_disco->CrearDisco(nuevo_disco);
       }
       | RMDISK PATH IGUAL RUTA
       {
@@ -241,30 +256,37 @@
     : SIZE IGUAL NUM
     {
         std::cout << "SIZE: " << $3 << std::endl;
+        dsk_size = $3;
     }
     | FIT IGUAL BF
     {
         std::cout << "FIT: BEST"<< std::endl;
+        fit = $3;
     }
     | FIT IGUAL FF
     {
         std::cout << "FIT: FIRST"<< std::endl;
+        fit = $3;
     }
     | FIT IGUAL WF
     {
         std::cout << "FIT: WORST"<< std::endl;
+        fit = $3;
     }
     | UNIT IGUAL K
     {
         std::cout << "UNIDADES: KILOBYTES" << std::endl;
+        unit = $3;
     }
     | UNIT IGUAL M 
     {
         std::cout << "UNIDADES: MEGABYTES" << std::endl;
+        unit = $3;
     }
     | PATH IGUAL RUTA
     {
         std::cout << "RUTA: "<< $3 << std::endl;
+        path = $3;
     }
    ;
 
@@ -548,5 +570,5 @@
 %%
 
 void yy::Parser::error( const std::string& error){
-  std::cout << error << std::endl;
+  std::cout << "XXXXXXXXXXXX ERROR EN EL COMANDO XXXXXXXXXXXXX" << std::endl;
 }

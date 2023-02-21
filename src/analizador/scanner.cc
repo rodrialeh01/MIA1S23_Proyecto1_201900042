@@ -1165,7 +1165,7 @@ YY_RULE_SETUP
 case 43:
 YY_RULE_SETUP
 #line 66 "lexico.l"
-{return yy::Parser::make_NUM(strtol (yytext, NULL, 10));}
+{return yy::Parser::make_NUM(yytext);}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
@@ -1336,7 +1336,7 @@ YY_RULE_SETUP
 case 77:
 YY_RULE_SETUP
 #line 105 "lexico.l"
-{printf("Caracter no reconocido: %s\n",yytext);}
+{printf("XXXXXXXXXXXX Caracter no reconocido: XXXXXXXXXXXX%s\n",yytext);}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 #line 106 "lexico.l"
@@ -2353,13 +2353,18 @@ void yyfree (void * ptr )
 #line 107 "lexico.l"
 
 
-void Driver::runScanner(){
+void Driver::runScannerFile(){
     yy_flex_debug = false;
     yyin = fopen (file.c_str (), "r");
     if(yyin == NULL){
-        printf("No se encontro el archivo de entrada");
+        std::cout<<"No se encontro el archivo de entrada"<<std::endl;
         exit(1);
     }
+}
+
+void Driver::runScanner(std:: string text){
+    yy_flex_debug = true;
+    YY_BUFFER_STATE buffer = yy_scan_string(text.c_str());
 }
 
 void Driver::closeFile(){

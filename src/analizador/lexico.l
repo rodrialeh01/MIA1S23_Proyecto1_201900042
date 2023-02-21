@@ -63,7 +63,7 @@ FILEN                   ">file"({DIGIT}+)
 "file"                  {return yy::Parser::make_FILE(yytext);}
 "ls"                    {return yy::Parser::make_LS(yytext);}
 {RUTA}                  {return yy::Parser::make_RUTA(yytext);}
-{NUM}                   {return yy::Parser::make_NUM(strtol (yytext, NULL, 10));}
+{NUM}                   {return yy::Parser::make_NUM(yytext);}
 
 ">r"		            {return yy::Parser::make_R(yytext);}
 ">size"		            {return yy::Parser::make_SIZE(yytext);}
@@ -102,17 +102,22 @@ FILEN                   ">file"({DIGIT}+)
 
 
 [[:blank:]]     {}
-.               {printf("Caracter no reconocido: %s\n",yytext);}
+.               {printf("XXXXXXXXXXXX Caracter no reconocido: XXXXXXXXXXXX%s\n",yytext);}
 <<EOF>>		      {return yy::Parser::make_FIN();}
 %%
 
-void Driver::runScanner(){
+void Driver::runScannerFile(){
     yy_flex_debug = false;
     yyin = fopen (file.c_str (), "r");
     if(yyin == NULL){
-        printf("No se encontro el archivo de entrada");
+        std::cout<<"No se encontro el archivo de entrada"<<std::endl;
         exit(1);
     }
+}
+
+void Driver::runScanner(std:: string text){
+    yy_flex_debug = true;
+    YY_BUFFER_STATE buffer = yy_scan_string(text.c_str());
 }
 
 void Driver::closeFile(){

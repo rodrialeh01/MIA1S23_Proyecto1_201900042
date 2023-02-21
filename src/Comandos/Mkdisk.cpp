@@ -1,0 +1,109 @@
+#include "Mkdisk.h"
+
+Mkdisk::Mkdisk() {
+}
+
+vector<string> Mkdisk::split(string texto, char parametro) {
+    stringstream text_to_split(texto);
+    string text2;
+    vector<string> resultado;
+    while(getline(text_to_split,text2,parametro)){
+        resultado.push_back(text2);
+    }
+    return resultado;
+}
+
+string Mkdisk::toLowerCase(string palabra){
+    int i = 0;
+    string retorno = "";
+    while(i<palabra.length()){
+        retorno += tolower(palabra[i]);
+        i++;
+    }
+    return retorno;
+}
+
+void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
+    //VALIDACION DEL SIZE
+    if (disco_nuevo->size <= 0){
+        cout << "No se ha ingresado un tamaño válido para el disco" << endl;
+        return;
+    }
+
+    //VALIDACION DEL PATH
+    if (disco_nuevo->path == ""){
+        cout << "No se ha ingresado la ruta para crear el disco" << endl;
+        return;
+    }
+
+    //MIRA SI INGRESA EL TIPO DE FIT EN EL DISCO
+    if (disco_nuevo->fit == ""){
+        disco_nuevo->fit = "ff";
+    }
+
+    //VALIDACION DEL FIT
+    if(toLowerCase(disco_nuevo->fit) != "bf" && toLowerCase(disco_nuevo->fit) != "ff" && toLowerCase(disco_nuevo->fit) != "wf"){
+        cout << "No se ha ingresado un fit válido para el disco" << endl;
+        return;
+    }
+
+    //MIRA SI INGRESA EL TIPO DE UNIT EN EL DISCO
+    if(disco_nuevo->unit == ""){
+        disco_nuevo->unit = "m";
+    }
+
+    //VALIDACION DE LA UNIDAD
+    if(toLowerCase(disco_nuevo->unit) != "m" && toLowerCase(disco_nuevo->unit) != "k"){
+        cout << "No se ha ingresado una unidad válida para el disco" << endl;
+        return;
+    }
+
+    //DEFINICION DEL TAMAÑO
+    if(toLowerCase(disco_nuevo->unit) == "k"){
+        disco_nuevo->size = disco_nuevo->size * 1024;
+    }else{
+        disco_nuevo->size = disco_nuevo->size * 1024 * 1024;
+    }
+
+    //CREACION DEL DISCO
+    //VALIDACION Y CREACION DE CARPETAS 
+    if(disco_nuevo->path[0] == '"' && disco_nuevo->path[disco_nuevo->path.length()-1] == '"'){
+        disco_nuevo->path = disco_nuevo->path.substr(1,disco_nuevo->path.length()-2);
+    }
+
+    vector<string> carpetas = split(disco_nuevo->path,'/');
+    string ruta = "";
+    for(int i = 0; i < carpetas.size()-1; i++){
+        if(carpetas[i]!= ""){
+            ruta += carpetas[i] + "/";
+        }
+    }
+    string comando_linux = "mkdir -p " + ruta;
+    system(comando_linux.c_str());
+    cout << "Creando el disco ..." << ruta << endl;
+    sleep(1);
+    
+    //CREACION DEL ARCHIVO
+    FILE *disco;
+    disco = fopen(disco_nuevo->path.c_str(),"wb");
+
+    //CREACION DEL MBR
+    MBR *mbr = new MBR();
+    mbr->mbr_tamano = disco_nuevo->size;
+    time_t fecha_hoy;
+    mbr->mbr_fecha_creacion = time(&fecha_hoy);
+    mbr->mbr_dsk_signature = rand();
+    mbr->disk_fit = disco_nuevo->fit[0];
+    mbr->mbr_particion_1.part_status = '0';
+    mbr->mbr_particion_2.part_status = '0';
+    mbr->mbr_particion_3.part_status = '0';
+    mbr->mbr_particion_4.part_status = '0';
+    fwrite(mbr,sizeof(MBR),1,disco);
+    for(int i = 0; i < disco_nuevo->size - sizeof(MBR); ++i){
+        char cero = '\0';
+        fwrite(&cero,1,1,disco);
+    }
+    fclose(disco);
+
+    cout << "El disco con el nombre " << carpetas[carpetas.size()-1] << " ha sido creado exitosamente" << endl;
+}

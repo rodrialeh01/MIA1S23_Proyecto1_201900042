@@ -48,8 +48,9 @@
 #line 14 "parser.yy"
 
    class Driver;
+   class Mkdisk;
 
-#line 53 "parser.tab.hh"
+#line 54 "parser.tab.hh"
 
 
 # include <cstdlib> // std::abort
@@ -184,7 +185,7 @@
 #endif
 
 namespace yy {
-#line 188 "parser.tab.hh"
+#line 189 "parser.tab.hh"
 
 
 
@@ -380,9 +381,6 @@ namespace yy {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
-      // "NUM"
-      char dummy1[sizeof (float)];
-
       // "mkdisk"
       // "rmdisk"
       // "fdisk"
@@ -458,7 +456,8 @@ namespace yy {
       // "L"
       // "RUTA"
       // "CADENA"
-      char dummy2[sizeof (std::string)];
+      // "NUM"
+      char dummy1[sizeof (std::string)];
     };
 
     /// The size of the largest semantic type.
@@ -733,10 +732,6 @@ namespace yy {
       {
         switch (this->kind ())
     {
-      case symbol_kind::S_NUM: // "NUM"
-        value.move< float > (std::move (that.value));
-        break;
-
       case symbol_kind::S_MKDISK: // "mkdisk"
       case symbol_kind::S_RMDISK: // "rmdisk"
       case symbol_kind::S_FDISK: // "fdisk"
@@ -812,6 +807,7 @@ namespace yy {
       case symbol_kind::S_L: // "L"
       case symbol_kind::S_RUTA: // "RUTA"
       case symbol_kind::S_CADENA: // "CADENA"
+      case symbol_kind::S_NUM: // "NUM"
         value.move< std::string > (std::move (that.value));
         break;
 
@@ -833,18 +829,6 @@ namespace yy {
 #else
       basic_symbol (typename Base::kind_type t)
         : Base (t)
-      {}
-#endif
-
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, float&& v)
-        : Base (t)
-        , value (std::move (v))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const float& v)
-        : Base (t)
-        , value (v)
       {}
 #endif
 
@@ -884,10 +868,6 @@ namespace yy {
         // Value type destructor.
 switch (yykind)
     {
-      case symbol_kind::S_NUM: // "NUM"
-        value.template destroy< float > ();
-        break;
-
       case symbol_kind::S_MKDISK: // "mkdisk"
       case symbol_kind::S_RMDISK: // "rmdisk"
       case symbol_kind::S_FDISK: // "fdisk"
@@ -963,6 +943,7 @@ switch (yykind)
       case symbol_kind::S_L: // "L"
       case symbol_kind::S_RUTA: // "RUTA"
       case symbol_kind::S_CADENA: // "CADENA"
+      case symbol_kind::S_NUM: // "NUM"
         value.template destroy< std::string > ();
         break;
 
@@ -1057,14 +1038,6 @@ switch (yykind)
 #else
       symbol_type (int tok)
         : super_type (token_kind_type (tok))
-#endif
-      {}
-#if 201103L <= YY_CPLUSPLUS
-      symbol_type (int tok, float v)
-        : super_type (token_kind_type (tok), std::move (v))
-#else
-      symbol_type (int tok, const float& v)
-        : super_type (token_kind_type (tok), v)
 #endif
       {}
 #if 201103L <= YY_CPLUSPLUS
@@ -2295,14 +2268,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_NUM (float v)
+      make_NUM (std::string v)
       {
         return symbol_type (token::NUM, std::move (v));
       }
 #else
       static
       symbol_type
-      make_NUM (const float& v)
+      make_NUM (const std::string& v)
       {
         return symbol_type (token::NUM, v);
       }
@@ -2710,10 +2683,6 @@ switch (yykind)
   {
     switch (this->kind ())
     {
-      case symbol_kind::S_NUM: // "NUM"
-        value.copy< float > (YY_MOVE (that.value));
-        break;
-
       case symbol_kind::S_MKDISK: // "mkdisk"
       case symbol_kind::S_RMDISK: // "rmdisk"
       case symbol_kind::S_FDISK: // "fdisk"
@@ -2789,6 +2758,7 @@ switch (yykind)
       case symbol_kind::S_L: // "L"
       case symbol_kind::S_RUTA: // "RUTA"
       case symbol_kind::S_CADENA: // "CADENA"
+      case symbol_kind::S_NUM: // "NUM"
         value.copy< std::string > (YY_MOVE (that.value));
         break;
 
@@ -2823,10 +2793,6 @@ switch (yykind)
     super_type::move (s);
     switch (this->kind ())
     {
-      case symbol_kind::S_NUM: // "NUM"
-        value.move< float > (YY_MOVE (s.value));
-        break;
-
       case symbol_kind::S_MKDISK: // "mkdisk"
       case symbol_kind::S_RMDISK: // "rmdisk"
       case symbol_kind::S_FDISK: // "fdisk"
@@ -2902,6 +2868,7 @@ switch (yykind)
       case symbol_kind::S_L: // "L"
       case symbol_kind::S_RUTA: // "RUTA"
       case symbol_kind::S_CADENA: // "CADENA"
+      case symbol_kind::S_NUM: // "NUM"
         value.move< std::string > (YY_MOVE (s.value));
         break;
 
@@ -2970,7 +2937,7 @@ switch (yykind)
 
 
 } // yy
-#line 2974 "parser.tab.hh"
+#line 2941 "parser.tab.hh"
 
 
 

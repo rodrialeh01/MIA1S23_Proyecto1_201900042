@@ -7,8 +7,10 @@ YY_DECL;
 
 class Driver {
   public:
-    void runScanner();
+    void runScannerFile();
     void closeFile();
-    void parse(const std::string& archivo);
+    void parseFile(const std::string& archivo);
+    void parse(const std::string texto);
+    void runScanner(std:: string texto);
     std::string file;
 };
