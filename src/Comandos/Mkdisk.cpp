@@ -24,6 +24,13 @@ string Mkdisk::toLowerCase(string palabra){
 }
 
 void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
+
+    cout << "=========================================" << endl;
+    cout << "Size: " << disco_nuevo->size << endl;
+    cout << "Path: " << disco_nuevo->path << endl;
+    cout << "Fit: " << disco_nuevo->fit << endl;
+    cout << "Unit: " << disco_nuevo->unit << endl;
+    bool ruta_complex = false;
     //VALIDACION DEL SIZE
     if (disco_nuevo->size <= 0){
         cout << "No se ha ingresado un tamaño válido para el disco" << endl;
@@ -68,22 +75,40 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
     //CREACION DEL DISCO
     //VALIDACION Y CREACION DE CARPETAS 
     if(disco_nuevo->path[0] == '"' && disco_nuevo->path[disco_nuevo->path.length()-1] == '"'){
+        ruta_complex = true;
         disco_nuevo->path = disco_nuevo->path.substr(1,disco_nuevo->path.length()-2);
     }
 
+    string path_temp =  disco_nuevo->path;
     vector<string> carpetas = split(disco_nuevo->path,'/');
     string ruta = "";
-    for(int i = 0; i < carpetas.size()-1; i++){
+    if(path_temp[0] == '/' && ruta_complex == false){
+        ruta = "/";
+    }else if(path_temp[0] == '/' && ruta_complex == true){
+        ruta = "\"/";
+    }
+    
+    for(int i = 0; i < carpetas.size()-1; ++i){
         if(carpetas[i]!= ""){
             ruta += carpetas[i] + "/";
         }
     }
+    if(ruta_complex == true){
+        ruta += "\"";
+    }
     string comando_linux = "mkdir -p " + ruta;
     system(comando_linux.c_str());
-    cout << "Creando el disco ..." << ruta << endl;
+    cout << "Creando el disco en " << ruta<< " ..." << endl;
     sleep(1);
     
     //CREACION DEL ARCHIVO
+    //VALIDACION SI EXISTE EL ARCHIVO
+    FILE *archivo;
+    if((archivo = fopen(disco_nuevo->path.c_str(),"rb"))){
+        cout << "El disco con el nombre " << carpetas[carpetas.size()-1] << " ya existe" << endl;
+        return;
+    }
+    fclose(archivo);
     FILE *disco;
     disco = fopen(disco_nuevo->path.c_str(),"wb");
 

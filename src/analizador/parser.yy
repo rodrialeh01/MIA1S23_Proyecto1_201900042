@@ -255,37 +255,30 @@
     parametromk
     : SIZE IGUAL NUM
     {
-        std::cout << "SIZE: " << $3 << std::endl;
         dsk_size = $3;
     }
     | FIT IGUAL BF
     {
-        std::cout << "FIT: BEST"<< std::endl;
         fit = $3;
     }
     | FIT IGUAL FF
     {
-        std::cout << "FIT: FIRST"<< std::endl;
         fit = $3;
     }
     | FIT IGUAL WF
     {
-        std::cout << "FIT: WORST"<< std::endl;
         fit = $3;
     }
     | UNIT IGUAL K
     {
-        std::cout << "UNIDADES: KILOBYTES" << std::endl;
         unit = $3;
     }
     | UNIT IGUAL M 
     {
-        std::cout << "UNIDADES: MEGABYTES" << std::endl;
         unit = $3;
     }
     | PATH IGUAL RUTA
     {
-        std::cout << "RUTA: "<< $3 << std::endl;
         path = $3;
     }
    ;
