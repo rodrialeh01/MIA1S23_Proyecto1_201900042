@@ -18,7 +18,6 @@ class Mkdisk {
         Mkdisk();
         int size = 0;
         string path = "";
-        string name = "";
         string unit = "";
         string fit = "";
         vector<string> split(string texto, char  parametro);
