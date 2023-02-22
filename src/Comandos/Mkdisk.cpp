@@ -79,8 +79,16 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
         disco_nuevo->path = disco_nuevo->path.substr(1,disco_nuevo->path.length()-2);
     }
 
+
     string path_temp =  disco_nuevo->path;
     vector<string> carpetas = split(disco_nuevo->path,'/');
+    //VERIFICA SI EXISTE EL ARCHIVO
+    FILE *archivo;
+    if((archivo = fopen(disco_nuevo->path.c_str(),"rb"))){
+        cout << "El disco con el nombre " << carpetas[carpetas.size()-1] << " ya existe" << endl;
+        fclose(archivo);
+        return;
+    }
     string ruta = "";
     if(path_temp[0] == '/' && ruta_complex == false){
         ruta = "/";
@@ -102,13 +110,6 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
     sleep(1);
     
     //CREACION DEL ARCHIVO
-    //VALIDACION SI EXISTE EL ARCHIVO
-    FILE *archivo;
-    if((archivo = fopen(disco_nuevo->path.c_str(),"rb"))){
-        cout << "El disco con el nombre " << carpetas[carpetas.size()-1] << " ya existe" << endl;
-        return;
-    }
-    fclose(archivo);
     FILE *disco;
     disco = fopen(disco_nuevo->path.c_str(),"wb");
 
