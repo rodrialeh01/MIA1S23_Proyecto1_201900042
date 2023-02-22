@@ -25,11 +25,6 @@ string Mkdisk::toLowerCase(string palabra){
 
 void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
 
-    cout << "=========================================" << endl;
-    cout << "Size: " << disco_nuevo->size << endl;
-    cout << "Path: " << disco_nuevo->path << endl;
-    cout << "Fit: " << disco_nuevo->fit << endl;
-    cout << "Unit: " << disco_nuevo->unit << endl;
     bool ruta_complex = false;
     //VALIDACION DEL SIZE
     if (disco_nuevo->size <= 0){

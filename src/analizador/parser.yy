@@ -14,6 +14,7 @@
 {
    class Driver;
    class Mkdisk;
+   class Rmdisk;
 }
 
 %{
@@ -23,6 +24,7 @@
    #include "driver.h"
    #include <iostream>
    #include "../Comandos/Mkdisk.h"
+   #include "../Comandos/Rmdisk.h"
 
    std::string dsk_size = "";
    std::string path = "";
@@ -63,11 +65,17 @@
          nuevo_disco->fit = fit;
          nuevo_disco->unit = unit;
          nuevo_disco->CrearDisco(nuevo_disco);
+         path = "";
+         fit = "";
+         unit = "";
+         dsk_size = "";
       }
       | RMDISK PATH IGUAL RUTA
       {
-         std::cout << "COMANDO RMDISK" << std::endl;
-         std::cout << "RUTA: "<< $4 << std::endl;
+         Rmdisk *disco = new Rmdisk();
+         disco->path = $4;
+         disco->EliminarDisco(disco);
+         path = "";
       }
       | FDISK Lista_fdisk
       {

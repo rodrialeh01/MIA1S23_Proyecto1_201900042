@@ -49,8 +49,9 @@
 
    class Driver;
    class Mkdisk;
+   class Rmdisk;
 
-#line 54 "parser.tab.hh"
+#line 55 "parser.tab.hh"
 
 
 # include <cstdlib> // std::abort
@@ -185,7 +186,7 @@
 #endif
 
 namespace yy {
-#line 189 "parser.tab.hh"
+#line 190 "parser.tab.hh"
 
 
 
@@ -2937,7 +2938,7 @@ switch (yykind)
 
 
 } // yy
-#line 2941 "parser.tab.hh"
+#line 2942 "parser.tab.hh"
 
 
 
