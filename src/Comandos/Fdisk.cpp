@@ -605,5 +605,156 @@ void Fdisk::EliminarParticion(Fdisk *particion){
 }
 
 void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
+    vector<Particion> particiones;
+    //OBTIENE LA INFORMACION DEL MBR
+    FILE *archivo;
+    archivo = fopen(particion->path.c_str(),"rb+");
+    MBR mbr;
+    fseek(archivo,0,SEEK_SET);
+    fread(&mbr,sizeof(MBR),1,archivo);
+    fclose(archivo);
+
+    //MUESTRO TEMPORALMENTE EL MBR
+    cout << "================MBR==================" << endl;
+    cout << "Tamaño: " << mbr.mbr_tamano << endl;
+    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
+    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
+    cout << "\t- Particion 1: "  << endl;
+    cout << "\t\t-Name: " << mbr.mbr_particion_1.part_name << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
+    cout << "\t- Particion 2: "  << endl;
+    cout << "\t\t-Name: " << mbr.mbr_particion_2.part_name << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
+    cout << "\t- Particion 3: "  << endl;
+    cout << "\t\t-Name: " << mbr.mbr_particion_3.part_name << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
+    cout << "\t- Particion 4: "  << endl;
+    cout << "\t\t-Name: " << mbr.mbr_particion_4.part_name << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
+    cout << "=====================================" << endl;
+
+    particiones.push_back(mbr.mbr_particion_1);
+    particiones.push_back(mbr.mbr_particion_2);
+    particiones.push_back(mbr.mbr_particion_3);
+    particiones.push_back(mbr.mbr_particion_4);
+
+    int extra = particion->add;
+    if(particion->unit == "K"){
+        extra = extra * 1024;
+    }else if(particion->unit == "M"){
+        extra = extra * 1024 * 1024;
+    }
+
+    //BUSCO LA PARTICION A LA CUAL VOY A AGREGAR O QUITAR EL ESPACIO
+    bool error = true;
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_name == particion->name){
+            //SI LA PARTICION ES PRIMARIA 
+            if(particiones[i].part_type == 'P'){
+                if(i != 3){
+                    if(particiones[i+1].part_start != -1){
+                        int nuevo_tamanio = particiones[i].part_s + extra;
+                        if(nuevo_tamanio > 0 && nuevo_tamanio < particiones[i+1].part_start){
+                            particiones[i].part_s = nuevo_tamanio;
+                            error = false;
+                            break;
+                        }else{
+                            cout << "No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso" << endl;
+                            return;
+                        }
+                    }else{
+                        int nuevo_tamanio = particiones[i].part_s + extra;
+                        if(nuevo_tamanio > 0 && nuevo_tamanio < mbr.mbr_tamano){
+                            particiones[i].part_s = nuevo_tamanio;
+                            error = false;
+                            break;
+                        }else{
+                            cout << "No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso" << endl;
+                            return;
+                        }
+                    }
+                }else{
+                    int nuevo_tamanio = particiones[i].part_s + extra;
+                    if(nuevo_tamanio > 0 && nuevo_tamanio < mbr.mbr_tamano){
+                        particiones[i].part_s = nuevo_tamanio;
+                        error = false;
+                        break;
+                    }else{
+                        cout << "No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso" << endl;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    if(error){
+        cout << "No se encontro la particion con el nombre: " << particion->name << endl;
+        return;
+    }
+
+    //ACTUALIZO EL DISCO
+    mbr.mbr_particion_1 = particiones[0];
+    mbr.mbr_particion_2 = particiones[1];
+    mbr.mbr_particion_3 = particiones[2];
+    mbr.mbr_particion_4 = particiones[3];    
+    FILE *archivo1;
+    archivo1 = fopen(path.c_str(),"rb+");
+    fseek(archivo1,0,SEEK_SET);
+    fwrite(&mbr,sizeof(MBR),1,archivo1);
+    fclose(archivo);
+
+    //MUESTRO TEMPORALMENTE EL MBR
+    cout << "================MBR==================" << endl;
+    cout << "Tamaño: " << mbr.mbr_tamano << endl;
+    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
+    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
+    cout << "\t- Particion 1: "  << endl;
+    cout << "\t\t-Name: " << mbr.mbr_particion_1.part_name << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
+    cout << "\t- Particion 2: "  << endl;
+    cout << "\t\t-Name: " << mbr.mbr_particion_2.part_name << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
+    cout << "\t- Particion 3: "  << endl;
+    cout << "\t\t-Name: " << mbr.mbr_particion_3.part_name << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
+    cout << "\t- Particion 4: "  << endl;
+    cout << "\t\t-Name: " << mbr.mbr_particion_4.part_name << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
+    cout << "=====================================" << endl;
+
+    cout << "La Particion fue modificada exitosamente" << endl;
     
 }
