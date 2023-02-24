@@ -246,6 +246,7 @@ void Fdisk::AgregarParticion(Fdisk *particion){
 
 //METODO PARA PODER APLICAR EL PRIMER AJUSTE
 void Fdisk::FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
+    //VERIFICA CUANDO COMIENZA A NO TENER 4 PARTICIONES EL DISCO QUE FUERON CREADAS ANTES
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_start == -1){
             if(i == 0){
@@ -274,6 +275,7 @@ void Fdisk::FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
         }
     }
 
+    //VERIFICA EN LAS PARTICIONES QUE ANTERIORMENTE FUERON ELIMINADAS
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_start != -1){
             if(cadenaVacia(particiones[i].part_name)){
@@ -295,11 +297,114 @@ void Fdisk::FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
 }
 
 void Fdisk::BestFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_start == -1){
+            if(i == 0){
+                particiones[i].part_start = sizeof(MBR);
+                particiones[i].part_s = particion->size;
+                particiones[i].part_type = particion->type[0];
+                particiones[i].part_fit = particion->fit[0];
+                strcpy(particiones[i].part_name , particion->name.c_str());
+                ActualizarDisco(particiones, mbr, particion->path);
+                return;
+            }else{
+                int tamanio_disponible = mbr.mbr_tamano - particiones[i-1].part_start - particiones[i-1].part_s;
+                if(tamanio_disponible >= particion->size){
+                    particiones[i].part_start = particiones[i-1].part_start + particiones[i-1].part_s;
+                    particiones[i].part_s = particion->size;
+                    particiones[i].part_type = particion->type[0];
+                    particiones[i].part_fit = particion->fit[0];
+                    strcpy(particiones[i].part_name , particion->name.c_str());
+                    ActualizarDisco(particiones, mbr, particion->path);
+                    return;
+                }else{
+                    cout << "ERROR: No hay espacio suficiente para crear la particion" << endl;
+                    return;
+                }
+            }
+        }
+    }
 
+    int espacio_pequeño = 100*1024*1024*1024;
+    int no_particion = 0;
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_start != -1){
+            if(cadenaVacia(particiones[i].part_name)){
+                if(particiones[i].part_s < espacio_pequeño){
+                    espacio_pequeño = particiones[i].part_s;
+                    no_particion = i;
+                }
+            }
+        }
+    }
+
+    if(espacio_pequeño == 100*1024*1024*1024){
+        cout << "ERROR: No se pudo crear la partición ya que no hay espacio" << endl;
+        return;
+    }else{
+        particiones[no_particion].part_s = particion->size;
+        particiones[no_particion].part_type = particion->type[0];
+        particiones[no_particion].part_fit = particion->fit[0];
+        strcpy(particiones[no_particion].part_name , particion->name.c_str());
+        ActualizarDisco(particiones, mbr, particion->path);
+    }
+
+    cout << "ERROR: No se pudo crear la partición" << endl;
 }
 
 void Fdisk::WorstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_start == -1){
+            if(i == 0){
+                particiones[i].part_start = sizeof(MBR);
+                particiones[i].part_s = particion->size;
+                particiones[i].part_type = particion->type[0];
+                particiones[i].part_fit = particion->fit[0];
+                strcpy(particiones[i].part_name , particion->name.c_str());
+                ActualizarDisco(particiones, mbr, particion->path);
+                return;
+            }else{
+                int tamanio_disponible = mbr.mbr_tamano - particiones[i-1].part_start - particiones[i-1].part_s;
+                if(tamanio_disponible >= particion->size){
+                    particiones[i].part_start = particiones[i-1].part_start + particiones[i-1].part_s;
+                    particiones[i].part_s = particion->size;
+                    particiones[i].part_type = particion->type[0];
+                    particiones[i].part_fit = particion->fit[0];
+                    strcpy(particiones[i].part_name , particion->name.c_str());
+                    ActualizarDisco(particiones, mbr, particion->path);
+                    return;
+                }else{
+                    cout << "ERROR: No hay espacio suficiente para crear la particion" << endl;
+                    return;
+                }
+            }
+        }
+    }
 
+    int espacio_grande = 0;
+    int no_particion = 0;
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_start != -1){
+            if(cadenaVacia(particiones[i].part_name)){
+                if(particiones[i].part_s > espacio_grande){
+                    espacio_grande = particiones[i].part_s;
+                    no_particion = i;
+                }
+            }
+        }
+    }
+
+    if(espacio_grande == 0){
+        cout << "ERROR: No se pudo crear la partición ya que no hay espacio" << endl;
+        return;
+    }else{
+        particiones[no_particion].part_s = particion->size;
+        particiones[no_particion].part_type = particion->type[0];
+        particiones[no_particion].part_fit = particion->fit[0];
+        strcpy(particiones[no_particion].part_name , particion->name.c_str());
+        ActualizarDisco(particiones, mbr, particion->path);
+    }
+    cout << "ERROR: No se pudo crear la partición" << endl;
 }
 
 void Fdisk::ActualizarDisco(vector<Particion> particiones,MBR mbr, string path){
