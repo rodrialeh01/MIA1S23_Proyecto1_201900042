@@ -13,6 +13,7 @@
 %code requires
 {
    class Driver;
+   class Execute;
    class Mkdisk;
    class Rmdisk;
    class Fdisk;
@@ -24,6 +25,7 @@
    #include <stdio.h>
    #include "driver.h"
    #include <iostream>
+   #include "../Comandos/Execute.h"
    #include "../Comandos/Mkdisk.h"
    #include "../Comandos/Rmdisk.h"
    #include "../Comandos/Fdisk.h"
@@ -273,8 +275,9 @@
       }
       | EXECUTE PATH IGUAL RUTA
       {
-        std::cout << "COMANDO EXECUTE" << std::endl;
-        std::cout << "RUTA: "<< $4 << std::endl;
+        Execute *exec = new Execute();
+        exec->path = $4;
+        exec->AnalizarArchivo(exec);
       }
       | REP Lista_rep
       {
