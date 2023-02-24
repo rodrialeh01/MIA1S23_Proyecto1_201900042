@@ -3,6 +3,7 @@
 #define FDISK_H
 
 #include "vector"
+#include <cstring>
 #include "string"
 #include "sstream"
 #include <iostream>
@@ -26,14 +27,19 @@ class Fdisk {
         int add = 0;
         vector<string> split(string texto, char  parametro);
         string toLowerCase(string palabra);
+        string toUpperCase(string palabra);
+        bool cadenaVacia(char cadena[]);
         void SistemaDeParticiones(Fdisk *particion);
         void AgregarParticion(Fdisk *particion);
-        void AgregarParticionPrimaria(Fdisk *particion, MBR *mbr_dsk);
-        void AgregarParticionExtendida(Fdisk *particion, MBR *mbr_dsk);
-        void AgregarParticionLogica(Fdisk *particion, MBR *mbr_dsk);
+        void AgregarParticionPrimaria(Fdisk *particion, MBR mbr_dsk);
+        void AgregarParticionExtendida(Fdisk *particion, MBR mbr_dsk);
+        void AgregarParticionLogica(Fdisk *particion, MBR mbr_dsk);
+        void ActualizarDisco(vector<Particion>,MBR mbr, string path);
+        void FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion);
+        void BestFit(vector<Particion> particiones, MBR mbr,Fdisk *particion);
+        void WorstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion);
         void EliminarParticion(Fdisk *particion);
-        void AumentarParticion(Fdisk *particion);
-        void ReducirParticion(Fdisk *particion);
+        void Cambiar_Tamanio_Particion(Fdisk *particion);
 };
 
 #endif

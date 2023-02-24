@@ -15,6 +15,7 @@
    class Driver;
    class Mkdisk;
    class Rmdisk;
+   class Fdisk;
 }
 
 %{
@@ -25,11 +26,17 @@
    #include <iostream>
    #include "../Comandos/Mkdisk.h"
    #include "../Comandos/Rmdisk.h"
+   #include "../Comandos/Fdisk.h"
 
    std::string dsk_size = "";
    std::string path = "";
    std::string fit = "";
    std::string unit = ""; 
+   std::string name = "";
+   std::string type = "";
+   std::string delete_ = "";
+   std::string add = "";
+
 %}
 
 
@@ -79,7 +86,32 @@
       }
       | FDISK Lista_fdisk
       {
-         std::cout << "COMANDO FDISK:" << std::endl;
+         Fdisk *particion = new Fdisk();
+         if(dsk_size != ""){
+            particion->size = stoi(dsk_size);
+         }else{
+            particion->size = 0;
+         }
+         particion->path = path;
+         particion->fit = fit;
+         particion->unit = unit;
+         particion->name = name;
+         particion->type = type;
+         particion->dsk_delete = delete_;
+         if(add != ""){
+            particion->add = stoi(add);
+         }else{
+            particion->add = 0;
+         }
+         particion->SistemaDeParticiones(particion);
+         path = "";
+         fit = "";
+         unit = "";
+         dsk_size = "";
+         name = "";
+         type = "";
+         delete_ = "";
+         add = "";
       }
       | MOUNT PATH IGUAL RUTA NAME IGUAL CADENA
       {
@@ -299,59 +331,59 @@
    parametrofdisk
       : SIZE IGUAL NUM
       {
-         std::cout << "SIZE: " << $3 << std::endl;
+         dsk_size = $3;
       }
       | PATH IGUAL RUTA
       {
-         std::cout << "PATH: " << $3 << std::endl;
+         path = $3;
       }
       | NAME IGUAL CADENA
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | UNIT IGUAL B
       {
-         std::cout << "UNIT: BYTES" << std::endl;
+         unit = $3;
       }
       | UNIT IGUAL K
       {
-         std::cout << "UNIT: KILOBYTES" << std::endl;
+         unit = $3;
       }
       | UNIT IGUAL M
       {
-         std::cout << "UNIT: MEGABYTES" << std::endl;
+         unit = $3;
       }
       | TYPE IGUAL P
       {
-         std::cout << "TYPE: PRIMARY"<< std::endl;
+         type = $3;
       }
       | TYPE IGUAL E
       {
-         std::cout << "TYPE: EXTEND" <<std::endl;
+         type = $3;
       }
       | TYPE IGUAL L
       {
-         std::cout << "TYPE: LOGIC" << std::endl;
+         type = $3;
       }
       | FIT IGUAL BF
       {
-         std::cout << "FIT: " << $3 << std::endl;
+         fit = $3;
       }
       | FIT IGUAL FF
       {
-         std::cout << "FIT: " << $3 << std::endl;
+         fit = $3;
       }
       | FIT IGUAL WF
       {
-         std::cout << "FIT: " << $3 << std::endl;
+         fit = $3;
       }
       | DELETE IGUAL FULL
       {
-         std::cout << "DELETE: " << $3 << std::endl;
+         delete_ = $3;
       }
       | ADD IGUAL NUM
       {
-         std::cout << "ADD: " << $3 << std::endl;
+         add = $3;
       }
    ;
 

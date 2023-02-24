@@ -109,22 +109,90 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
     disco = fopen(disco_nuevo->path.c_str(),"wb");
 
     //CREACION DEL MBR
-    MBR *mbr = new MBR();
-    mbr->mbr_tamano = disco_nuevo->size;
+    MBR mbr;
+    mbr.mbr_tamano = disco_nuevo->size;
     time_t fecha_hoy;
-    mbr->mbr_fecha_creacion = time(&fecha_hoy);
-    mbr->mbr_dsk_signature = rand();
-    mbr->disk_fit = disco_nuevo->fit[0];
-    mbr->mbr_particion_1.part_status = '0';
-    mbr->mbr_particion_2.part_status = '0';
-    mbr->mbr_particion_3.part_status = '0';
-    mbr->mbr_particion_4.part_status = '0';
-    fwrite(mbr,sizeof(MBR),1,disco);
+    mbr.mbr_fecha_creacion = time(&fecha_hoy);
+    mbr.mbr_dsk_signature = rand();
+    mbr.disk_fit = toupper(disco_nuevo->fit[0]);
+    //INICIALIZO LAS PARTICIONES
+    mbr.mbr_particion_1.part_status = '0';
+    mbr.mbr_particion_1.part_start = -1;
+    mbr.mbr_particion_1.part_s = 0;
+    for(int i = 0; i < 16; ++i){
+        mbr.mbr_particion_1.part_name[i] = '\0';
+    }
+    mbr.mbr_particion_1.part_type = '\0';
+    mbr.mbr_particion_1.part_fit = '\0';   
+    mbr.mbr_particion_2.part_status = '0';
+    mbr.mbr_particion_2.part_start = -1;
+    mbr.mbr_particion_2.part_s = 0;
+    for(int i = 0; i < 16; ++i){
+        mbr.mbr_particion_2.part_name[i] = '\0';
+    }
+    mbr.mbr_particion_2.part_type = '\0';
+    mbr.mbr_particion_2.part_fit = '\0';
+    mbr.mbr_particion_3.part_status = '0';
+    mbr.mbr_particion_3.part_start = -1;
+    mbr.mbr_particion_3.part_s = 0;
+    for(int i = 0; i < 16; ++i){
+        mbr.mbr_particion_3.part_name[i] = '\0';
+    }
+    mbr.mbr_particion_3.part_type = '\0';
+    mbr.mbr_particion_3.part_fit = '\0';
+    mbr.mbr_particion_4.part_status = '0';
+    mbr.mbr_particion_4.part_start = -1;
+    mbr.mbr_particion_4.part_s = 0;
+    for(int i = 0; i < 16; ++i){
+        mbr.mbr_particion_4.part_name[i] = '\0';
+    }
+    mbr.mbr_particion_4.part_type = '\0';
+    mbr.mbr_particion_4.part_fit = '\0';
+    fwrite(&mbr,sizeof(MBR),1,disco);
     for(int i = 0; i < disco_nuevo->size - sizeof(MBR); ++i){
         char cero = '\0';
         fwrite(&cero,1,1,disco);
     }
     fclose(disco);
+
+    //MUESTRO TEMPORALMENTE EL MBR
+    cout << "================MBR==================" << endl;
+    cout << "Tamaño: " << mbr.mbr_tamano << endl;
+    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
+    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
+    cout << "\t- Particion 1: "  << endl;
+    string name = "";
+    cout << "\t\t-Name: " << name.assign(mbr.mbr_particion_1.part_name,16) << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
+    cout << "\t- Particion 2: "  << endl;
+    name = "";
+    cout << "\t\t-Name: " << name.assign(mbr.mbr_particion_2.part_name,16) << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
+    cout << "\t- Particion 3: "  << endl;
+    name = "";
+    cout << "\t\t-Name: " << name.assign(mbr.mbr_particion_3.part_name,16) << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
+    cout << "\t- Particion 4: "  << endl;
+    name = "";
+    cout << "\t\t-Name: " << name.assign(mbr.mbr_particion_4.part_name,16) << endl;
+    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
+    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
+    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
+    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
+    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
+    cout << "=====================================" << endl;
 
     cout << "El disco con el nombre " << carpetas[carpetas.size()-1] << " ha sido creado exitosamente" << endl;
 }
