@@ -13,10 +13,10 @@
 %code requires
 {
    class Driver;
-   class Execute;
    class Mkdisk;
    class Rmdisk;
    class Fdisk;
+   class Execute;
 }
 
 %{
@@ -25,7 +25,8 @@
    #include <stdio.h>
    #include "driver.h"
    #include <iostream>
-   #include "../Comandos/Execute.h"
+   #include <fstream>
+   #include <vector>
    #include "../Comandos/Mkdisk.h"
    #include "../Comandos/Rmdisk.h"
    #include "../Comandos/Fdisk.h"
@@ -275,9 +276,19 @@
       }
       | EXECUTE PATH IGUAL RUTA
       {
-        Execute *exec = new Execute();
-        exec->path = $4;
-        exec->AnalizarArchivo(exec);
+         std::string filename($4);
+         std::string linea;
+
+         ifstream input_file(filename);
+         if (!input_file.is_open()) {
+            std::cout << "No se pudo abrir el archivo" << filename << "'" << endl;
+         }
+
+         while (getline(input_file, linea)){
+            Driver driver;
+            driver.parse(linea);
+         }
+         input_file.close();
       }
       | REP Lista_rep
       {
@@ -606,5 +617,5 @@
 %%
 
 void yy::Parser::error( const std::string& error){
-  std::cout << "XXXXXXXXXXXX ERROR EN EL COMANDO XXXXXXXXXXXXX" << std::endl;
+  
 }

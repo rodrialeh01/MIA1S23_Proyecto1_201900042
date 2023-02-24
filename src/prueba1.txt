@@ -1,0 +1,3 @@
+#=======================MKDISK==================================
+#Crea un disco de 5000 Kb en la carpeta home
+mkdisk >size=5000 >unit=K >path=/tmp/rodrialeh/Disco3.dsk >fit=wf
