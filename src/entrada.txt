@@ -14,7 +14,7 @@ pause
 #======================FDISK====================================
 #Crea una partición primaria llamada Particion1 de 300 kb
 #con el peor ajuste en el disco Disco1.dsk
-fdisk >size=300 >path=/tmp/rodrialeh/Disco1.dsk >name=Particion1
+fdisk >size=30 >path=/tmp/rodrialeh/Disco1.dsk >name=Particion1
 #Crea una partición extendida dentro de Disco2 de 300 kb
 #Tiene el peor ajuste
 fdisk >type=E >path=/tmp/Disco2.dsk >unit=K >name=Particion2 >size=300
@@ -26,7 +26,7 @@ fdisk >size=1 >type=L >unit=M >fit=bf >path="/mis discos/Disco3.dsk" >name="Part
 #dentro de Disco2
 fdisk >type=E >path=/tmp/Disco2.dsk >name=Part3 >unit=K >size=200
 #Elimina de forma rápida una partición llamada Partición 1
-fdisk >delete=full >name="Particion1" >path=/tmp/Disco1.dsk
+fdisk >delete=full >name="Particion1" >path=/tmp/rodrialeh/Disco1.dsk
 #Elimina de forma completa una partición llamada Partición 1
 fdisk >name=Particion1 >delete=full >path=/tmp/Disco1.dsk
 #Quitan 500 Kb de Partición 4 en Disco4.dsk

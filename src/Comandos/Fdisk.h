@@ -31,8 +31,7 @@ class Fdisk {
         bool cadenaVacia(char cadena[]);
         void SistemaDeParticiones(Fdisk *particion);
         void AgregarParticion(Fdisk *particion);
-        void AgregarParticionPrimaria(Fdisk *particion, MBR mbr_dsk);
-        void AgregarParticionExtendida(Fdisk *particion, MBR mbr_dsk);
+        void AgregarParticion(Fdisk *particion, MBR mbr_dsk);
         void AgregarParticionLogica(Fdisk *particion, MBR mbr_dsk);
         void ActualizarDisco(vector<Particion>,MBR mbr, string path);
         void FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion);
