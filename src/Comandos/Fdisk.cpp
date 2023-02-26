@@ -960,7 +960,7 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
         EBR ebr;
         ebr.part_status = '0';
         ebr.part_fit = particion->fit[0];
-        if(particion->fit[0] == 'f' || particion->fit[0] == 'F'){
+        if(particiones[particion_id].part_fit == 'f' || particiones[particion_id].part_fit == 'F'){
             ebr.part_fit = 'F';
             if(FirstFit_Logicas(logicas,particion->size,final) != -1){
                 ebr.part_start = FirstFit_Logicas(logicas,particion->size, final);
@@ -968,7 +968,7 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
                 cout << "ERROR: No se puede crear la particion logica, no hay espacio suficiente " << endl;
                 return;
             }
-        }else if(particion->fit[0] == 'b' || particion->fit[0] == 'B'){
+        }else if(particiones[particion_id].part_fit == 'b' || particiones[particion_id].part_fit == 'B'){
             ebr.part_fit = 'B';
             if(BestFit_Logicas(logicas,particion->size, final) != -1){
                 ebr.part_start = BestFit_Logicas(logicas,particion->size, final);
@@ -976,7 +976,7 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
                 cout << "ERROR: No se puede crear la particion logica, no hay espacio suficiente " << endl;
                 return;
             }
-        }else if(particion->fit[0] == 'w' || particion->fit[0] == 'W'){
+        }else if(particiones[particion_id].part_fit == 'w' || particiones[particion_id].part_fit == 'W'){
             ebr.part_fit = 'W';
             if(WorstFit_Logicas(logicas,particion->size, final) != -1){
                 ebr.part_start = WorstFit_Logicas(logicas,particion->size, final);
