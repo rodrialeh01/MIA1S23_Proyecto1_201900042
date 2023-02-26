@@ -17,6 +17,7 @@
    class Rmdisk;
    class Fdisk;
    class Execute;
+   class Mount;
 }
 
 %{
@@ -30,6 +31,7 @@
    #include "../Comandos/Mkdisk.h"
    #include "../Comandos/Rmdisk.h"
    #include "../Comandos/Fdisk.h"
+   #include "../Comandos/Mount.h"
 
    std::string dsk_size = "";
    std::string path = "";
@@ -118,15 +120,17 @@
       }
       | MOUNT PATH IGUAL RUTA NAME IGUAL CADENA
       {
-         std::cout << "COMANDO MOUNT" << std::endl;
-         std::cout << "RUTA: "<< $4 << std::endl;
-         std::cout << "NAME: "<< $7 << std::endl;
+         Mount *montar = new Mount();
+         montar->path = $4;
+         montar->name = $7;
+         montar->MontarDisco(montar);
       }
       | MOUNT NAME IGUAL CADENA PATH IGUAL RUTA
       {
-         std::cout << "COMANDO MOUNT" << std::endl;
-         std::cout << "RUTA: "<< $4 << std::endl;
-         std::cout << "NAME: "<< $7 << std::endl;
+         Mount *montar = new Mount();
+         montar->path = $7;
+         montar->name = $4;
+         montar->MontarDisco(montar);
       }
       | UNMOUNT ID IGUAL CADENA
       {

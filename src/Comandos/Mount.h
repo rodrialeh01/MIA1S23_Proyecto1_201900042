@@ -18,6 +18,8 @@ class Mount {
         string path = "";
         string name = "";
         void MontarParticion(Mount *montar);
+        string nombre_disco(string path);
+        vector<string> split(string texto, char  parametro);
 };
 
 #endif
