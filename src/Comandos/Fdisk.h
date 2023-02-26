@@ -32,13 +32,21 @@ class Fdisk {
         void SistemaDeParticiones(Fdisk *particion);
         void AgregarParticion(Fdisk *particion);
         void AgregarParticion(Fdisk *particion, MBR mbr_dsk);
-        void AgregarParticionLogica(Fdisk *particion, MBR mbr_dsk);
+        EBR retornarUlitmoEBR(vector<EBR> ebrs);
+        void ActualizarEBR(EBR ebr, string path);
+        vector<EBR> ListadoEBR(Particion extendida, string path);
+        void AgregarEBR(EBR ebr, string path);
+        void AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk *particion);
         void ActualizarDisco(vector<Particion>,MBR mbr, string path);
         void FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion);
         void BestFit(vector<Particion> particiones, MBR mbr,Fdisk *particion);
         void WorstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion);
         void EliminarParticion(Fdisk *particion);
         void Cambiar_Tamanio_Particion(Fdisk *particion);
+        void EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk *particion);
+        int FirstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe);
+        int BestFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe);
+        int WorstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe);
 };
 
 #endif
