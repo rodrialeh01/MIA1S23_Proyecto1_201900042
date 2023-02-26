@@ -218,8 +218,22 @@ void Fdisk::AgregarParticion(Fdisk *particion){
         if(particiones[i].part_name == particion->name){
             cout << "ERROR: Ya existe una particion con el mismo nombre" << endl;
             return;
+        }else if(particiones[i].part_type == 'E'){
+            //SI EXISTE UNA PARTICION EXTENDIDA SE DEBE DE BUSCAR EN SU EBR
+            int temp = particiones[i].part_start;
+            while(temp != -1){
+                EBR ebr;
+                fseek(archivo, temp, SEEK_SET);
+                fread(&ebr, sizeof(EBR), 1, archivo);
+                if(ebr.part_name == particion->name){
+                    cout << "ERROR: Ya existe una particion con el mismo nombre" << endl;
+                    return;
+                }
+                temp = ebr.part_next;
+            }
         }
     }
+
 
     //VALIDACION QUE LA PARTICION A CREAR NO SEA DE MAYOR TAMAÑO QUE EL DISCO
     if(particion->size > mbr.mbr_tamano){
