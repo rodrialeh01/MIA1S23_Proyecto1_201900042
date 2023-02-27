@@ -19,6 +19,7 @@
    class Execute;
    class Mount;
    class Unmount;
+   class Rep;
 }
 
 %{
@@ -34,6 +35,7 @@
    #include "../Comandos/Fdisk.h"
    #include "../Comandos/Mount.h"
    #include "../Comandos/Unmount.h"
+   #include "../Comandos/Rep.h"
 
    std::string dsk_size = "";
    std::string path = "";
@@ -43,6 +45,8 @@
    std::string type = "";
    std::string delete_ = "";
    std::string add = "";
+   std::string id = "";
+   std::string comruta = "";
 
 %}
 
@@ -299,7 +303,12 @@
       }
       | REP Lista_rep
       {
-         std::cout << "COMANDO REP" << std::endl;
+         Rep *reporte = new Rep();
+         reporte-> id = id;
+         reporte-> path = path;
+         reporte-> name = name;
+         reporte-> ruta = comruta;
+         reporte->controlReportes(reporte);
       }
       | PAUSE
       {
@@ -565,59 +574,59 @@
    param_rep
       : NAME IGUAL MBR
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL DISK
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL INODE
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL JOURNALING
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL BLOCK
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL BMINODE
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL BMBLOCK
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL TREE
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL SB
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL FILE
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | NAME IGUAL LS
       {
-         std::cout << "NAME: " << $3 << std::endl;
+         name = $3;
       }
       | PATH IGUAL RUTA
       {
-         std::cout << "PATH: " << $3 << std::endl;
+         path = $3;
       }
       | ID IGUAL CADENA
       {
-         std::cout << "ID: " << $3 << std::endl;
+         id = $3;
       }
       | COMRUTA IGUAL RUTA
       {
-         std::cout << "RUTA: " << $3 << std::endl;
+         comruta = $3;
       }
    ;
 

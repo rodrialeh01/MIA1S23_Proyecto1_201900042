@@ -106,6 +106,10 @@ void Fdisk::SistemaDeParticiones(Fdisk *particion){
         particion->dsk_delete = "FULL";
     }
 
+    if(particion->name[0] == '\"'){
+        particion->name = particion->name.substr(1,particion->name.length()-2);
+    }
+
     //VALIDACIONES PARA VER QUE ACCIONES QUIERE REALIZAR
     //CREAR PARTICION
     if(particion->size > 0){
