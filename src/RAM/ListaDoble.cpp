@@ -1,5 +1,7 @@
 #include "ListaDoble.h"
 
+ListaDoble lista_particiones_montadas; 
+
 ListaDoble::ListaDoble(){
     primero = NULL;
     ultimo = NULL;

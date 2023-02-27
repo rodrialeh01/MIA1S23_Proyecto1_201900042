@@ -26,11 +26,7 @@ class ListaDoble {
         int longitud;
 
     public:
-        ListaDoble(){
-            primero = NULL;
-            ultimo = NULL;
-            longitud = 0;
-        }
+        ListaDoble();
 
         void Insertar(string path, string name, string id, char type);
         void Mostrar();

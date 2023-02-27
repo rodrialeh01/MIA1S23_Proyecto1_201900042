@@ -52,8 +52,10 @@
    class Rmdisk;
    class Fdisk;
    class Execute;
+   class Mount;
+   class Unmount;
 
-#line 57 "parser.tab.hh"
+#line 59 "parser.tab.hh"
 
 
 # include <cstdlib> // std::abort
@@ -188,7 +190,7 @@
 #endif
 
 namespace yy {
-#line 192 "parser.tab.hh"
+#line 194 "parser.tab.hh"
 
 
 
@@ -2940,7 +2942,7 @@ switch (yykind)
 
 
 } // yy
-#line 2944 "parser.tab.hh"
+#line 2946 "parser.tab.hh"
 
 
 

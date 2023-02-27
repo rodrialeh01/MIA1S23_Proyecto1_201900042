@@ -221,20 +221,19 @@ void Fdisk::AgregarParticion(Fdisk *particion){
         }else if(particiones[i].part_type == 'E'){
             //SI EXISTE UNA PARTICION EXTENDIDA SE DEBE DE BUSCAR EN SU EBR
             int temp = particiones[i].part_start;
-            while(temp != -1){
-                EBR ebr;
-                fseek(archivo, temp, SEEK_SET);
-                fread(&ebr, sizeof(EBR), 1, archivo);
-                if(ebr.part_name == particion->name){
-                    cout << "ERROR: Ya existe una particion con el mismo nombre" << endl;
-                    return;
+            vector<EBR> ebrs = ListadoEBR(particiones[i],particion->path);
+            if(ebrs.size() > 0){
+                for(int j = 0; j < ebrs.size(); j++){
+                    if(ebrs[j].part_name == particion->name){
+                        cout << "ERROR: Ya existe una particion con el mismo nombre" << endl;
+                        return;
+                    }
                 }
-                temp = ebr.part_next;
             }
         }
     }
 
-
+    cout << "=====================================" << endl;
     //VALIDACION QUE LA PARTICION A CREAR NO SEA DE MAYOR TAMAÑO QUE EL DISCO
     if(particion->size > mbr.mbr_tamano){
         cout << "ERROR: El tamaño de la particion es mayor al tamaño del disco" << endl;
@@ -927,7 +926,6 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
 
     //ABRE EL ARCHIVO PARA VER SI HAY UN EBR
     vector<EBR> logicas = ListadoEBR(particiones[particion_id],particion->path);
-
     if(logicas.size()  == 0){
         //CREO EL PRIMER EBR
         EBR ebr;
@@ -948,14 +946,6 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
         cout << "======================================" << endl;
         AgregarEBR(ebr,particion->path);
     }else{
-        //OBTENGO EL ULTIMO EBR
-        EBR ultimo = retornarUlitmoEBR(logicas);
-        //VERIFICO SI HAY ESPACIO PARA CREAR LA PARTICION LOGICA
-        int espacio = final - (ultimo.part_start + ultimo.part_s);
-        if(espacio < particion->size){
-            cout << "ERROR: No se puede crear la particion logica, no hay espacio suficiente en la particion extendida" << endl;
-            return;
-        }
         //CREO EL NUEVO EBR
         EBR ebr;
         ebr.part_status = '0';
@@ -970,6 +960,7 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
             }
         }else if(particiones[particion_id].part_fit == 'b' || particiones[particion_id].part_fit == 'B'){
             ebr.part_fit = 'B';
+            cout << "BEST FIT" << endl;
             if(BestFit_Logicas(logicas,particion->size, final) != -1){
                 ebr.part_start = BestFit_Logicas(logicas,particion->size, final);
             }else{
@@ -978,6 +969,7 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
             }
         }else if(particiones[particion_id].part_fit == 'w' || particiones[particion_id].part_fit == 'W'){
             ebr.part_fit = 'W';
+            cout << "WORST FIT" << endl;
             if(WorstFit_Logicas(logicas,particion->size, final) != -1){
                 ebr.part_start = WorstFit_Logicas(logicas,particion->size, final);
             }else{
@@ -986,9 +978,23 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
             }
         }
         ebr.part_s = particion->size;
-        ebr.part_next = -1;
+        for(int i = 0; i < logicas.size(); i++){
+            if(logicas[i].part_next == -1){
+                ebr.part_next = -1;
+                logicas[i].part_next = ebr.part_start;
+                ActualizarEBR(logicas[i],particion->path);
+                break;
+            }else if(logicas[i].part_next != -1){
+                if(logicas[i].part_start == ebr.part_start){
+                    ebr.part_next = logicas[i].part_next;
+                    logicas[i].part_next = ebr.part_start;
+                    break;
+                }
+            }
+        }
+
         strcpy(ebr.part_name,particion->name.c_str());
-        cout << "================= EBR =================" << endl;
+        cout << "================= EBR =================" << endl; 
         cout << "\t- Status: " << ebr.part_status << endl;
         cout << "\t- Fit: " << ebr.part_fit << endl;
         cout << "\t- Start: " << ebr.part_start << endl;
@@ -997,17 +1003,6 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
         cout << "\t- Name: " << ebr.part_name << endl;
         cout << "======================================" << endl;
         AgregarEBR(ebr,particion->path);
-        //ACTUALIZO EL ULTIMO EBR
-        ultimo.part_next = ebr.part_start;
-        cout << "================= EBR =================" << endl;
-        cout << "\t- Status: " << ultimo.part_status << endl;
-        cout << "\t- Fit: " << ultimo.part_fit << endl;
-        cout << "\t- Start: " << ultimo.part_start << endl;
-        cout << "\t- Size: " << ultimo.part_s << endl;
-        cout << "\t- Next: " << ultimo.part_next << endl;
-        cout << "\t- Name: " << ultimo.part_name << endl;
-        cout << "======================================" << endl;
-        ActualizarEBR(ultimo,particion->path);
 
     }
 }
@@ -1018,10 +1013,21 @@ vector<EBR> Fdisk::ListadoEBR(Particion extendida, string path){
     archivo = fopen(path.c_str(),"rb+");
     int temp = extendida.part_start;
     while(temp != -1){
+        cout << "temp: " << temp << endl;
         fseek(archivo,temp,SEEK_SET);
         EBR ebr;
         fread(&ebr,sizeof(EBR),1,archivo);
+        cout << "================= EBR =================" << endl;
+        cout << "\t- Status: " << ebr.part_status << endl;
+        cout << "\t- Fit: " << ebr.part_fit << endl;
+        cout << "\t- Start: " << ebr.part_start << endl;
+        cout << "\t- Size: " << ebr.part_s << endl;
+        cout << "\t- Next: " << ebr.part_next << endl;
+        cout << "\t- Name: " << ebr.part_name << endl;
+        cout << "======================================" << endl;
         if(!cadenaVacia(ebr.part_name)){
+            ebrs.push_back(ebr);
+        }else if(cadenaVacia(ebr.part_name) && ebr.part_s != 0){
             ebrs.push_back(ebr);
         }else{
             break;
@@ -1104,6 +1110,7 @@ void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk
         if(logicas[i].part_name == particion->name){
             error2 = false;
             particion_id2 = i;
+            break;
         }
     }
 
@@ -1113,14 +1120,14 @@ void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk
     }
 
     //ELIMINO LA PARTICION LOGICA
-    EBR ebr;
-    ebr.part_status = '0';
-    ebr.part_fit = '\0';
+    logicas[particion_id2].part_status = '0';
+    logicas[particion_id2].part_fit = '\0';
     for(int i = 0; i < 16; i++){
-        ebr.part_name[i] = '\0';
+        logicas[particion_id2].part_name[i] = '\0';
     }
 
-    ActualizarEBR(ebr,particion->path);
+
+    ActualizarEBR(logicas[particion_id2],particion->path);
 
     //LLENO DE CEROS LA PARTICION LOGICA
     FILE *archivo;
@@ -1130,7 +1137,7 @@ void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk
         return;
     }
     fseek(archivo,logicas[particion_id2].part_start+ sizeof(EBR),SEEK_SET);
-    for(int i = 0; i < logicas[particion_id2].part_s; i++){
+    for(int i = 0; i < (logicas[particion_id2].part_s-sizeof(EBR)); i++){
         char cero = '\0';
         fwrite(&cero,1,1,archivo);
     }
@@ -1154,6 +1161,10 @@ int Fdisk:: FirstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
                 if((final_pe-ebrs[i].part_start) >= tamanio){
                     return inicio;
                 }
+            }else if(ebrs[i].part_next == -1){
+                if((final_pe-(ebrs[i].part_start+ebrs[i].part_s)) >= tamanio){
+                    return inicio;
+                }
             }
         }
         inicio = ebrs[i].part_next;
@@ -1167,9 +1178,9 @@ int Fdisk:: BestFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
     for(int i = 0; i < ebrs.size(); i++){
         if(i != ebrs.size()-1){
             if(cadenaVacia(ebrs[i].part_name)){
-                if((ebrs[i].part_s-ebrs[i].part_start) >= tamanio){
-                    if((ebrs[i].part_s-ebrs[i].part_start) < mejor_ajuste){
-                        mejor_ajuste = ebrs[i].part_s-ebrs[i].part_start;
+                if(ebrs[i].part_s >= tamanio){
+                    if(ebrs[i].part_s < mejor_ajuste){
+                        mejor_ajuste = ebrs[i].part_s;
                         mejor_inicio = ebrs[i].part_start;
                     }
                 }
@@ -1182,6 +1193,11 @@ int Fdisk:: BestFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
                         mejor_inicio = ebrs[i].part_start;
                     }
                 }
+            }else if(ebrs[i].part_next == -1){
+                if((final_pe-(ebrs[i].part_start + ebrs[i].part_s)) < mejor_ajuste){
+                    mejor_ajuste = final_pe-(ebrs[i].part_start + ebrs[i].part_s);
+                    mejor_inicio = ebrs[i].part_start + ebrs[i].part_s;
+                }
             }
         }
     }
@@ -1192,11 +1208,19 @@ int Fdisk:: WorstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
     int peor_ajuste = 0;
     int peor_inicio = -1;
     for(int i = 0; i < ebrs.size(); i++){
+        cout << ebrs[i].part_s << endl;
+        cout << ebrs[i].part_start << endl;
+        cout << i << endl;
+        cout << ebrs.size() << endl;
         if(i != ebrs.size()-1){
+            cout << "entro0" << endl;
             if(cadenaVacia(ebrs[i].part_name)){
-                if((ebrs[i].part_s-ebrs[i].part_start) >= tamanio){
-                    if((ebrs[i].part_s-ebrs[i].part_start) > peor_ajuste){
-                        peor_ajuste = ebrs[i].part_s-ebrs[i].part_start;
+                cout << "entro1" << endl;
+                if(ebrs[i].part_s >= tamanio){
+                    cout << "entro2" << endl;
+                    if((ebrs[i].part_s) > peor_ajuste){
+                        cout << "entro3" << endl;
+                        peor_ajuste = ebrs[i].part_s;
                         peor_inicio = ebrs[i].part_start;
                     }
                 }
@@ -1207,10 +1231,18 @@ int Fdisk:: WorstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
                     if((final_pe-ebrs[i].part_start) > peor_ajuste){
                         peor_ajuste = final_pe-ebrs[i].part_start;
                         peor_inicio = ebrs[i].part_start;
+                        break;
                     }
+                }
+            }else if(ebrs[i].part_next == -1){
+                if((final_pe - (ebrs[i].part_start + ebrs[i].part_s)) > peor_ajuste){
+                    peor_ajuste = final_pe - (ebrs[i].part_start + ebrs[i].part_s);
+                    peor_inicio = ebrs[i].part_start + ebrs[i].part_s;
+                    break;
                 }
             }
         }
     }
+    cout << "peor_inicio: " << peor_inicio << endl;
     return peor_inicio;
 }

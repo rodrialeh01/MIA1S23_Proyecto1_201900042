@@ -33,12 +33,12 @@ void Mount::MontarParticion(Mount *montar){
     vector<Particion> particiones = {mbr.mbr_particion_1, mbr.mbr_particion_2, mbr.mbr_particion_3, mbr.mbr_particion_4};
     
     for(int i = 0; i < particiones.size(); i++){
-        if(particiones[i].part_status == '1'){
-            cout << "La particion que desea montar ya esta montada" << endl;
-            return;
-        }
         if(particiones[i].part_type == 'P'){
             if(montar->name == particiones[i].part_name){
+                if(particiones[i].part_status == '1'){
+                    cout << "La particion que desea montar ya esta montada" << endl;
+                    return;
+                }
                 particiones[i].part_status = '1';
                 string id = "42" + to_string(lista_particiones_montadas.CrearNoParticion(montar->path))+ nombre_disco(montar->path);
                 lista_particiones_montadas.Insertar(montar->path,particiones[i].part_name,id,particiones[i].part_type);
@@ -46,6 +46,10 @@ void Mount::MontarParticion(Mount *montar){
             }
         }else if(particiones[i].part_type == 'E'){
             if(montar->name == particiones[i].part_name){
+                if(particiones[i].part_status == '1'){
+                    cout << "La particion que desea montar ya esta montada" << endl;
+                    return;
+                }
                 particiones[i].part_status = '1';
                 string id = "42" + to_string(lista_particiones_montadas.CrearNoParticion(montar->path))+ nombre_disco(montar->path);
                 lista_particiones_montadas.Insertar(montar->path,particiones[i].part_name,id,particiones[i].part_type);

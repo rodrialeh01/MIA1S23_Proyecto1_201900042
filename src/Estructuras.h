@@ -2,7 +2,7 @@
 #define ESTRUCTURAS_H
 
 #include <ctime>
-#include "../RAM/ListaDoble.h"
+
 //Struct de la particion
 typedef struct {
     char part_status;
@@ -34,8 +34,5 @@ typedef struct {
     int part_next;
     char part_name[16];
 }EBR;
-
-//CREA LA LISTA DE PARTICIONES MONTADAS
-ListaDoble lista_particiones_montadas;
 
 #endif

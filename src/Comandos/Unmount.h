@@ -9,8 +9,11 @@
 #include <dirent.h>
 
 #include "../Estructuras.h"
+#include "../RAM/ListaDoble.h"
 
 using namespace std;
+
+extern ListaDoble lista_particiones_montadas;
 
 class Unmount {
     public:

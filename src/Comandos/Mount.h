@@ -9,6 +9,9 @@
 #include <dirent.h>
 
 #include "../Estructuras.h"
+#include "../RAM/ListaDoble.h"
+
+extern ListaDoble lista_particiones_montadas;
 
 using namespace std;
 
