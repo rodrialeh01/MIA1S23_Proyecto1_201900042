@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <cmath>
 #include <iomanip>
+#include "time.h"
 
 #include "../Estructuras.h"
 #include "../RAM/ListaDoble.h"
