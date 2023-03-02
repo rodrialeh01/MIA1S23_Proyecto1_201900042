@@ -37,7 +37,7 @@
 
 
 // First part of user prologue.
-#line 24 "parser.yy"
+#line 25 "parser.yy"
 
    
    #include <string>
@@ -51,6 +51,7 @@
    #include "../Comandos/Fdisk.h"
    #include "../Comandos/Mount.h"
    #include "../Comandos/Unmount.h"
+   #include "../Comandos/Rep.h"
 
    std::string dsk_size = "";
    std::string path = "";
@@ -60,9 +61,11 @@
    std::string type = "";
    std::string delete_ = "";
    std::string add = "";
+   std::string id = "";
+   std::string comruta = "";
 
 
-#line 66 "parser.tab.cc"
+#line 69 "parser.tab.cc"
 
 
 #include "parser.tab.hh"
@@ -140,7 +143,7 @@
 #define YYRECOVERING()  (!!yyerrstatus_)
 
 namespace yy {
-#line 144 "parser.tab.cc"
+#line 147 "parser.tab.cc"
 
   /// Build a parser object.
   Parser::Parser (Driver& driver_yyarg)
@@ -915,25 +918,25 @@ namespace yy {
           switch (yyn)
             {
   case 2: // Inicio: Lista
-#line 60 "parser.yy"
+#line 64 "parser.yy"
                                     {}
-#line 921 "parser.tab.cc"
+#line 924 "parser.tab.cc"
     break;
 
   case 3: // Lista: Lista COMANDO
-#line 65 "parser.yy"
+#line 69 "parser.yy"
                                     {}
-#line 927 "parser.tab.cc"
+#line 930 "parser.tab.cc"
     break;
 
   case 4: // Lista: COMANDO
-#line 66 "parser.yy"
+#line 70 "parser.yy"
                                     {}
-#line 933 "parser.tab.cc"
+#line 936 "parser.tab.cc"
     break;
 
   case 5: // COMANDO: "mkdisk" Lista_parametrosmkdisk
-#line 71 "parser.yy"
+#line 75 "parser.yy"
       {
          Mkdisk *nuevo_disco = new Mkdisk();
          if(dsk_size != ""){
@@ -950,22 +953,22 @@ namespace yy {
          unit = "";
          dsk_size = "";
       }
-#line 954 "parser.tab.cc"
+#line 957 "parser.tab.cc"
     break;
 
   case 6: // COMANDO: "rmdisk" ">path" "=" "RUTA"
-#line 88 "parser.yy"
+#line 92 "parser.yy"
       {
          Rmdisk *disco = new Rmdisk();
          disco->path = yystack_[0].value.as < std::string > ();
          disco->EliminarDisco(disco);
          path = "";
       }
-#line 965 "parser.tab.cc"
+#line 968 "parser.tab.cc"
     break;
 
   case 7: // COMANDO: "fdisk" Lista_fdisk
-#line 95 "parser.yy"
+#line 99 "parser.yy"
       {
          Fdisk *particion = new Fdisk();
          if(dsk_size != ""){
@@ -994,292 +997,292 @@ namespace yy {
          delete_ = "";
          add = "";
       }
-#line 998 "parser.tab.cc"
+#line 1001 "parser.tab.cc"
     break;
 
   case 8: // COMANDO: "mount" ">path" "=" "RUTA" ">name" "=" "CADENA"
-#line 124 "parser.yy"
+#line 128 "parser.yy"
       {
          Mount *montar = new Mount();
          montar->path = yystack_[3].value.as < std::string > ();
          montar->name = yystack_[0].value.as < std::string > ();
          montar->MontarParticion(montar);
       }
-#line 1009 "parser.tab.cc"
+#line 1012 "parser.tab.cc"
     break;
 
   case 9: // COMANDO: "mount" ">name" "=" "CADENA" ">path" "=" "RUTA"
-#line 131 "parser.yy"
+#line 135 "parser.yy"
       {
          Mount *montar = new Mount();
          montar->path = yystack_[0].value.as < std::string > ();
          montar->name = yystack_[3].value.as < std::string > ();
          montar->MontarParticion(montar);
       }
-#line 1020 "parser.tab.cc"
+#line 1023 "parser.tab.cc"
     break;
 
   case 10: // COMANDO: "unmount" ">id" "=" "CADENA"
-#line 138 "parser.yy"
+#line 142 "parser.yy"
       {
          Unmount *desmontar = new Unmount();
          desmontar->id = yystack_[0].value.as < std::string > ();
          desmontar->DesmontarParticion(desmontar);
       }
-#line 1030 "parser.tab.cc"
+#line 1033 "parser.tab.cc"
     break;
 
   case 11: // COMANDO: "mkfs" Lista_mkfs
-#line 144 "parser.yy"
+#line 148 "parser.yy"
       {
          std::cout << "COMANDO MKFS" << std::endl;
       }
-#line 1038 "parser.tab.cc"
+#line 1041 "parser.tab.cc"
     break;
 
   case 12: // COMANDO: "login" Lista_login
-#line 148 "parser.yy"
+#line 152 "parser.yy"
       {
          std::cout << "COMANDO LOGIN" << std::endl;
       }
-#line 1046 "parser.tab.cc"
+#line 1049 "parser.tab.cc"
     break;
 
   case 13: // COMANDO: "logout"
-#line 152 "parser.yy"
+#line 156 "parser.yy"
       {
          std::cout << "COMANDO LOGOUT" << std::endl;
       }
-#line 1054 "parser.tab.cc"
+#line 1057 "parser.tab.cc"
     break;
 
   case 14: // COMANDO: "mkgrp" ">name" "=" "CADENA"
-#line 156 "parser.yy"
+#line 160 "parser.yy"
       {
          std::cout << "COMANDO MKGRP" << std::endl;
          std::cout << "NAME: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1063 "parser.tab.cc"
+#line 1066 "parser.tab.cc"
     break;
 
   case 15: // COMANDO: "rmgrp" ">name" "=" "CADENA"
-#line 161 "parser.yy"
+#line 165 "parser.yy"
       {
          std::cout << "COMANDO RMGRP" << std::endl;
          std::cout << "NAME: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1072 "parser.tab.cc"
+#line 1075 "parser.tab.cc"
     break;
 
   case 16: // COMANDO: "rmusr" ">user" "=" "CADENA"
-#line 166 "parser.yy"
+#line 170 "parser.yy"
       {
          std::cout << "COMANDO RMUSR" << std::endl;
          std::cout << "USER: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1081 "parser.tab.cc"
+#line 1084 "parser.tab.cc"
     break;
 
   case 17: // COMANDO: "mkusr" Lista_mkusr
-#line 171 "parser.yy"
+#line 175 "parser.yy"
       {
          std::cout << "COMANDO MKUSR" << std::endl;
       }
-#line 1089 "parser.tab.cc"
+#line 1092 "parser.tab.cc"
     break;
 
   case 18: // COMANDO: "mkfile" Lista_mkfile
-#line 175 "parser.yy"
+#line 179 "parser.yy"
       {
          std::cout << "COMANDO MKFILE" << std::endl;
       }
-#line 1097 "parser.tab.cc"
+#line 1100 "parser.tab.cc"
     break;
 
   case 19: // COMANDO: "cat" Lista_cat
-#line 179 "parser.yy"
+#line 183 "parser.yy"
       {
          std::cout << "COMANDO CAT" << std::endl;
       }
-#line 1105 "parser.tab.cc"
+#line 1108 "parser.tab.cc"
     break;
 
   case 20: // COMANDO: "remove" ">path" "=" "RUTA"
-#line 183 "parser.yy"
+#line 187 "parser.yy"
       {
          std::cout << "COMANDO REMOVE" << std::endl;
          std::cout << "PATH: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1114 "parser.tab.cc"
+#line 1117 "parser.tab.cc"
     break;
 
   case 21: // COMANDO: "edit" ">path" "=" "RUTA" ">cont" "=" "RUTA"
-#line 188 "parser.yy"
+#line 192 "parser.yy"
       {
          std::cout << "COMANDO EDIT" << std::endl;
          std::cout << "PATH: "<< yystack_[3].value.as < std::string > () << std::endl;
          std::cout << "CONT: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1124 "parser.tab.cc"
+#line 1127 "parser.tab.cc"
     break;
 
   case 22: // COMANDO: "edit" ">cont" "=" "RUTA" ">path" "=" "RUTA"
-#line 194 "parser.yy"
+#line 198 "parser.yy"
       {
          std::cout << "COMANDO EDIT" << std::endl;
          std::cout << "PATH: "<< yystack_[0].value.as < std::string > () << std::endl;
          std::cout << "CONT: "<< yystack_[3].value.as < std::string > () << std::endl;
       }
-#line 1134 "parser.tab.cc"
+#line 1137 "parser.tab.cc"
     break;
 
   case 23: // COMANDO: "rename" ">path" "=" "RUTA" ">name" "=" "CADENA"
-#line 200 "parser.yy"
+#line 204 "parser.yy"
       {
          std::cout << "COMANDO RENAME" << std::endl;
          std::cout << "PATH: "<< yystack_[3].value.as < std::string > () << std::endl;
          std::cout << "NAME: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1144 "parser.tab.cc"
+#line 1147 "parser.tab.cc"
     break;
 
   case 24: // COMANDO: "rename" ">name" "=" "CADENA" ">path" "=" "RUTA"
-#line 206 "parser.yy"
+#line 210 "parser.yy"
       {
          std::cout << "COMANDO RENAME" << std::endl;
          std::cout << "PATH: "<< yystack_[0].value.as < std::string > () << std::endl;
          std::cout << "NAME: "<< yystack_[3].value.as < std::string > () << std::endl;
       }
-#line 1154 "parser.tab.cc"
+#line 1157 "parser.tab.cc"
     break;
 
   case 25: // COMANDO: "mkdir" ">path" "=" "RUTA"
-#line 212 "parser.yy"
+#line 216 "parser.yy"
       {
          std::cout << "COMANDO MKDIR" << std::endl;
          std::cout << "PATH: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1163 "parser.tab.cc"
+#line 1166 "parser.tab.cc"
     break;
 
   case 26: // COMANDO: "mkdir" ">path" "=" "RUTA" ">r"
-#line 217 "parser.yy"
+#line 221 "parser.yy"
       {
          std::cout << "COMANDO MKDIR" << std::endl;
          std::cout << "PATH: "<< yystack_[1].value.as < std::string > () << std::endl;
          std::cout << "R" << std::endl;
       }
-#line 1173 "parser.tab.cc"
+#line 1176 "parser.tab.cc"
     break;
 
   case 27: // COMANDO: "mkdir" ">r" ">path" "=" "RUTA"
-#line 223 "parser.yy"
+#line 227 "parser.yy"
       {
          std::cout << "COMANDO MKDIR" << std::endl;
          std::cout << "PATH: "<< yystack_[0].value.as < std::string > () << std::endl;
          std::cout << "R" << std::endl;
       }
-#line 1183 "parser.tab.cc"
+#line 1186 "parser.tab.cc"
     break;
 
   case 28: // COMANDO: "copy" ">path" "=" "RUTA" ">destino" "=" "RUTA"
-#line 229 "parser.yy"
+#line 233 "parser.yy"
       {
          std::cout << "COMANDO COPY" << std::endl;
          std::cout << "PATH: "<< yystack_[3].value.as < std::string > () << std::endl;
          std::cout << "DESTINO: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1193 "parser.tab.cc"
+#line 1196 "parser.tab.cc"
     break;
 
   case 29: // COMANDO: "copy" ">destino" "=" "RUTA" ">path" "=" "RUTA"
-#line 235 "parser.yy"
+#line 239 "parser.yy"
       {
          std::cout << "COMANDO COPY" << std::endl;
          std::cout << "PATH: "<< yystack_[0].value.as < std::string > () << std::endl;
          std::cout << "DESTINO: "<< yystack_[3].value.as < std::string > () << std::endl;
       }
-#line 1203 "parser.tab.cc"
+#line 1206 "parser.tab.cc"
     break;
 
   case 30: // COMANDO: "move" ">path" "=" "RUTA" ">destino" "=" "RUTA"
-#line 241 "parser.yy"
+#line 245 "parser.yy"
       {
          std::cout << "COMANDO MOVE" << std::endl;
          std::cout << "PATH: "<< yystack_[3].value.as < std::string > () << std::endl;
          std::cout << "DESTINO: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1213 "parser.tab.cc"
+#line 1216 "parser.tab.cc"
     break;
 
   case 31: // COMANDO: "move" ">destino" "=" "RUTA" ">path" "=" "RUTA"
-#line 247 "parser.yy"
+#line 251 "parser.yy"
       {
          std::cout << "COMANDO MOVE" << std::endl;
          std::cout << "PATH: "<< yystack_[0].value.as < std::string > () << std::endl;
          std::cout << "DESTINO: "<< yystack_[3].value.as < std::string > () << std::endl;
       }
-#line 1223 "parser.tab.cc"
+#line 1226 "parser.tab.cc"
     break;
 
   case 32: // COMANDO: "find" ">path" "=" "RUTA" ">name" "=" "CADENA"
-#line 253 "parser.yy"
+#line 257 "parser.yy"
       {
          std::cout << "COMANDO FIND" << std::endl;
          std::cout << "PATH: "<< yystack_[3].value.as < std::string > () << std::endl;
          std::cout << "NAME: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1233 "parser.tab.cc"
+#line 1236 "parser.tab.cc"
     break;
 
   case 33: // COMANDO: "find" ">name" "=" "CADENA" ">path" "=" "RUTA"
-#line 259 "parser.yy"
+#line 263 "parser.yy"
       {
          std::cout << "COMANDO FIND" << std::endl;
          std::cout << "PATH: "<< yystack_[0].value.as < std::string > () << std::endl;
          std::cout << "NAME: "<< yystack_[3].value.as < std::string > () << std::endl;
       }
-#line 1243 "parser.tab.cc"
+#line 1246 "parser.tab.cc"
     break;
 
   case 34: // COMANDO: "chown" Lista_chown
-#line 265 "parser.yy"
+#line 269 "parser.yy"
       {
          std::cout << "COMANDO CHOWN" << std::endl;
       }
-#line 1251 "parser.tab.cc"
+#line 1254 "parser.tab.cc"
     break;
 
   case 35: // COMANDO: "chgrp" ">user" "=" "CADENA" ">grp" "=" "CADENA"
-#line 269 "parser.yy"
+#line 273 "parser.yy"
       {
          std::cout << "COMANDO CHRGP" << std::endl;
          std::cout << "USER: "<< yystack_[3].value.as < std::string > () << std::endl;
          std::cout << "GRP: "<< yystack_[0].value.as < std::string > () << std::endl;
       }
-#line 1261 "parser.tab.cc"
+#line 1264 "parser.tab.cc"
     break;
 
   case 36: // COMANDO: "chgrp" ">grp" "=" "CADENA" ">user" "=" "CADENA"
-#line 275 "parser.yy"
+#line 279 "parser.yy"
       {
          std::cout << "COMANDO CHRGP" << std::endl;
          std::cout << "USER: "<< yystack_[0].value.as < std::string > () << std::endl;
          std::cout << "GRP: "<< yystack_[3].value.as < std::string > () << std::endl;
       }
-#line 1271 "parser.tab.cc"
+#line 1274 "parser.tab.cc"
     break;
 
   case 37: // COMANDO: "chmod" Lista_chmod
-#line 281 "parser.yy"
+#line 285 "parser.yy"
       {
          std::cout << "COMANDO CHMOD" << std::endl;
       }
-#line 1279 "parser.tab.cc"
+#line 1282 "parser.tab.cc"
     break;
 
   case 38: // COMANDO: "execute" ">path" "=" "RUTA"
-#line 285 "parser.yy"
+#line 289 "parser.yy"
       {
          std::string filename(yystack_[0].value.as < std::string > ());
          std::string linea;
@@ -1295,577 +1298,582 @@ namespace yy {
          }
          input_file.close();
       }
-#line 1299 "parser.tab.cc"
+#line 1302 "parser.tab.cc"
     break;
 
   case 39: // COMANDO: "rep" Lista_rep
-#line 301 "parser.yy"
+#line 305 "parser.yy"
       {
-         std::cout << "COMANDO REP" << std::endl;
+         Rep *reporte = new Rep();
+         reporte-> id = id;
+         reporte-> path = path;
+         reporte-> name = name;
+         reporte-> ruta = comruta;
+         reporte->controlReportes(reporte);
       }
-#line 1307 "parser.tab.cc"
+#line 1315 "parser.tab.cc"
     break;
 
   case 40: // COMANDO: "pause"
-#line 305 "parser.yy"
+#line 314 "parser.yy"
       {
         std::cout << "Presione una tecla para continuar..." << std::endl;
         std::cin.ignore();
       }
-#line 1316 "parser.tab.cc"
+#line 1324 "parser.tab.cc"
     break;
 
   case 41: // Lista_parametrosmkdisk: Lista_parametrosmkdisk parametromk
-#line 312 "parser.yy"
+#line 321 "parser.yy"
                                            {}
-#line 1322 "parser.tab.cc"
+#line 1330 "parser.tab.cc"
     break;
 
   case 42: // Lista_parametrosmkdisk: parametromk
-#line 313 "parser.yy"
+#line 322 "parser.yy"
                                       {}
-#line 1328 "parser.tab.cc"
-    break;
-
-  case 43: // parametromk: ">size" "=" "NUM"
-#line 318 "parser.yy"
-    {
-        dsk_size = yystack_[0].value.as < std::string > ();
-    }
 #line 1336 "parser.tab.cc"
     break;
 
-  case 44: // parametromk: ">fit" "=" "BF"
-#line 322 "parser.yy"
+  case 43: // parametromk: ">size" "=" "NUM"
+#line 327 "parser.yy"
     {
-        fit = yystack_[0].value.as < std::string > ();
+        dsk_size = yystack_[0].value.as < std::string > ();
     }
 #line 1344 "parser.tab.cc"
     break;
 
-  case 45: // parametromk: ">fit" "=" "FF"
-#line 326 "parser.yy"
+  case 44: // parametromk: ">fit" "=" "BF"
+#line 331 "parser.yy"
     {
         fit = yystack_[0].value.as < std::string > ();
     }
 #line 1352 "parser.tab.cc"
     break;
 
-  case 46: // parametromk: ">fit" "=" "WF"
-#line 330 "parser.yy"
+  case 45: // parametromk: ">fit" "=" "FF"
+#line 335 "parser.yy"
     {
         fit = yystack_[0].value.as < std::string > ();
     }
 #line 1360 "parser.tab.cc"
     break;
 
-  case 47: // parametromk: ">UNIT" "=" "K"
-#line 334 "parser.yy"
+  case 46: // parametromk: ">fit" "=" "WF"
+#line 339 "parser.yy"
     {
-        unit = yystack_[0].value.as < std::string > ();
+        fit = yystack_[0].value.as < std::string > ();
     }
 #line 1368 "parser.tab.cc"
     break;
 
-  case 48: // parametromk: ">UNIT" "=" "M"
-#line 338 "parser.yy"
+  case 47: // parametromk: ">UNIT" "=" "K"
+#line 343 "parser.yy"
     {
         unit = yystack_[0].value.as < std::string > ();
     }
 #line 1376 "parser.tab.cc"
     break;
 
-  case 49: // parametromk: ">path" "=" "RUTA"
-#line 342 "parser.yy"
+  case 48: // parametromk: ">UNIT" "=" "M"
+#line 347 "parser.yy"
     {
-        path = yystack_[0].value.as < std::string > ();
+        unit = yystack_[0].value.as < std::string > ();
     }
 #line 1384 "parser.tab.cc"
     break;
 
+  case 49: // parametromk: ">path" "=" "RUTA"
+#line 351 "parser.yy"
+    {
+        path = yystack_[0].value.as < std::string > ();
+    }
+#line 1392 "parser.tab.cc"
+    break;
+
   case 50: // Lista_fdisk: Lista_fdisk parametrofdisk
-#line 348 "parser.yy"
+#line 357 "parser.yy"
                                     {}
-#line 1390 "parser.tab.cc"
+#line 1398 "parser.tab.cc"
     break;
 
   case 51: // Lista_fdisk: parametrofdisk
-#line 349 "parser.yy"
+#line 358 "parser.yy"
                                     {}
-#line 1396 "parser.tab.cc"
-    break;
-
-  case 52: // parametrofdisk: ">size" "=" "NUM"
-#line 354 "parser.yy"
-      {
-         dsk_size = yystack_[0].value.as < std::string > ();
-      }
 #line 1404 "parser.tab.cc"
     break;
 
-  case 53: // parametrofdisk: ">path" "=" "RUTA"
-#line 358 "parser.yy"
+  case 52: // parametrofdisk: ">size" "=" "NUM"
+#line 363 "parser.yy"
       {
-         path = yystack_[0].value.as < std::string > ();
+         dsk_size = yystack_[0].value.as < std::string > ();
       }
 #line 1412 "parser.tab.cc"
     break;
 
-  case 54: // parametrofdisk: ">name" "=" "CADENA"
-#line 362 "parser.yy"
+  case 53: // parametrofdisk: ">path" "=" "RUTA"
+#line 367 "parser.yy"
       {
-         name = yystack_[0].value.as < std::string > ();
+         path = yystack_[0].value.as < std::string > ();
       }
 #line 1420 "parser.tab.cc"
     break;
 
-  case 55: // parametrofdisk: ">UNIT" "=" "B"
-#line 366 "parser.yy"
+  case 54: // parametrofdisk: ">name" "=" "CADENA"
+#line 371 "parser.yy"
       {
-         unit = yystack_[0].value.as < std::string > ();
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1428 "parser.tab.cc"
     break;
 
-  case 56: // parametrofdisk: ">UNIT" "=" "K"
-#line 370 "parser.yy"
+  case 55: // parametrofdisk: ">UNIT" "=" "B"
+#line 375 "parser.yy"
       {
          unit = yystack_[0].value.as < std::string > ();
       }
 #line 1436 "parser.tab.cc"
     break;
 
-  case 57: // parametrofdisk: ">UNIT" "=" "M"
-#line 374 "parser.yy"
+  case 56: // parametrofdisk: ">UNIT" "=" "K"
+#line 379 "parser.yy"
       {
          unit = yystack_[0].value.as < std::string > ();
       }
 #line 1444 "parser.tab.cc"
     break;
 
-  case 58: // parametrofdisk: ">type" "=" "P"
-#line 378 "parser.yy"
+  case 57: // parametrofdisk: ">UNIT" "=" "M"
+#line 383 "parser.yy"
       {
-         type = yystack_[0].value.as < std::string > ();
+         unit = yystack_[0].value.as < std::string > ();
       }
 #line 1452 "parser.tab.cc"
     break;
 
-  case 59: // parametrofdisk: ">type" "=" "E"
-#line 382 "parser.yy"
+  case 58: // parametrofdisk: ">type" "=" "P"
+#line 387 "parser.yy"
       {
          type = yystack_[0].value.as < std::string > ();
       }
 #line 1460 "parser.tab.cc"
     break;
 
-  case 60: // parametrofdisk: ">type" "=" "L"
-#line 386 "parser.yy"
+  case 59: // parametrofdisk: ">type" "=" "E"
+#line 391 "parser.yy"
       {
          type = yystack_[0].value.as < std::string > ();
       }
 #line 1468 "parser.tab.cc"
     break;
 
-  case 61: // parametrofdisk: ">fit" "=" "BF"
-#line 390 "parser.yy"
+  case 60: // parametrofdisk: ">type" "=" "L"
+#line 395 "parser.yy"
       {
-         fit = yystack_[0].value.as < std::string > ();
+         type = yystack_[0].value.as < std::string > ();
       }
 #line 1476 "parser.tab.cc"
     break;
 
-  case 62: // parametrofdisk: ">fit" "=" "FF"
-#line 394 "parser.yy"
+  case 61: // parametrofdisk: ">fit" "=" "BF"
+#line 399 "parser.yy"
       {
          fit = yystack_[0].value.as < std::string > ();
       }
 #line 1484 "parser.tab.cc"
     break;
 
-  case 63: // parametrofdisk: ">fit" "=" "WF"
-#line 398 "parser.yy"
+  case 62: // parametrofdisk: ">fit" "=" "FF"
+#line 403 "parser.yy"
       {
          fit = yystack_[0].value.as < std::string > ();
       }
 #line 1492 "parser.tab.cc"
     break;
 
-  case 64: // parametrofdisk: ">delete" "=" "full"
-#line 402 "parser.yy"
+  case 63: // parametrofdisk: ">fit" "=" "WF"
+#line 407 "parser.yy"
       {
-         delete_ = yystack_[0].value.as < std::string > ();
+         fit = yystack_[0].value.as < std::string > ();
       }
 #line 1500 "parser.tab.cc"
     break;
 
-  case 65: // parametrofdisk: ">add" "=" "NUM"
-#line 406 "parser.yy"
+  case 64: // parametrofdisk: ">delete" "=" "full"
+#line 411 "parser.yy"
       {
-         add = yystack_[0].value.as < std::string > ();
+         delete_ = yystack_[0].value.as < std::string > ();
       }
 #line 1508 "parser.tab.cc"
     break;
 
+  case 65: // parametrofdisk: ">add" "=" "NUM"
+#line 415 "parser.yy"
+      {
+         add = yystack_[0].value.as < std::string > ();
+      }
+#line 1516 "parser.tab.cc"
+    break;
+
   case 66: // Lista_mkfs: Lista_mkfs param_mkfs
-#line 412 "parser.yy"
+#line 421 "parser.yy"
                                                 {}
-#line 1514 "parser.tab.cc"
+#line 1522 "parser.tab.cc"
     break;
 
   case 67: // Lista_mkfs: param_mkfs
-#line 413 "parser.yy"
+#line 422 "parser.yy"
                                                 {}
-#line 1520 "parser.tab.cc"
-    break;
-
-  case 68: // param_mkfs: ">id" "=" "CADENA"
-#line 418 "parser.yy"
-      {
-         std::cout << "ID: " << yystack_[0].value.as < std::string > () << std::endl;
-      }
 #line 1528 "parser.tab.cc"
     break;
 
-  case 69: // param_mkfs: ">type" "=" "full"
-#line 422 "parser.yy"
+  case 68: // param_mkfs: ">id" "=" "CADENA"
+#line 427 "parser.yy"
       {
-         std::cout << "TYPE: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "ID: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1536 "parser.tab.cc"
     break;
 
-  case 70: // param_mkfs: ">fs" "=" "2fs"
-#line 426 "parser.yy"
+  case 69: // param_mkfs: ">type" "=" "full"
+#line 431 "parser.yy"
       {
-         std::cout << "FS: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "TYPE: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1544 "parser.tab.cc"
     break;
 
-  case 71: // param_mkfs: ">fs" "=" "3fs"
-#line 430 "parser.yy"
+  case 70: // param_mkfs: ">fs" "=" "2fs"
+#line 435 "parser.yy"
       {
          std::cout << "FS: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1552 "parser.tab.cc"
     break;
 
+  case 71: // param_mkfs: ">fs" "=" "3fs"
+#line 439 "parser.yy"
+      {
+         std::cout << "FS: " << yystack_[0].value.as < std::string > () << std::endl;
+      }
+#line 1560 "parser.tab.cc"
+    break;
+
   case 72: // Lista_login: Lista_login param_login
-#line 436 "parser.yy"
+#line 445 "parser.yy"
                                              {}
-#line 1558 "parser.tab.cc"
+#line 1566 "parser.tab.cc"
     break;
 
   case 73: // Lista_login: param_login
-#line 437 "parser.yy"
+#line 446 "parser.yy"
                                              {}
-#line 1564 "parser.tab.cc"
-    break;
-
-  case 74: // param_login: ">user" "=" "CADENA"
-#line 442 "parser.yy"
-      {
-         std::cout << "USER: " << yystack_[0].value.as < std::string > () << std::endl;
-      }
 #line 1572 "parser.tab.cc"
     break;
 
-  case 75: // param_login: ">pass" "=" "CADENA"
-#line 446 "parser.yy"
+  case 74: // param_login: ">user" "=" "CADENA"
+#line 451 "parser.yy"
       {
-         std::cout << "PASSWORD: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "USER: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1580 "parser.tab.cc"
     break;
 
-  case 76: // param_login: ">pass" "=" "NUM"
-#line 450 "parser.yy"
+  case 75: // param_login: ">pass" "=" "CADENA"
+#line 455 "parser.yy"
       {
          std::cout << "PASSWORD: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1588 "parser.tab.cc"
     break;
 
-  case 77: // param_login: ">id" "=" "CADENA"
-#line 454 "parser.yy"
+  case 76: // param_login: ">pass" "=" "NUM"
+#line 459 "parser.yy"
       {
-         std::cout << "ID: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "PASSWORD: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1596 "parser.tab.cc"
     break;
 
+  case 77: // param_login: ">id" "=" "CADENA"
+#line 463 "parser.yy"
+      {
+         std::cout << "ID: " << yystack_[0].value.as < std::string > () << std::endl;
+      }
+#line 1604 "parser.tab.cc"
+    break;
+
   case 78: // Lista_mkusr: Lista_mkusr param_mkusr
-#line 460 "parser.yy"
+#line 469 "parser.yy"
                                              {}
-#line 1602 "parser.tab.cc"
+#line 1610 "parser.tab.cc"
     break;
 
   case 79: // Lista_mkusr: param_mkusr
-#line 461 "parser.yy"
+#line 470 "parser.yy"
                                              {}
-#line 1608 "parser.tab.cc"
-    break;
-
-  case 80: // param_mkusr: ">user" "=" "CADENA"
-#line 466 "parser.yy"
-      {
-         std::cout << "USER: " << yystack_[0].value.as < std::string > () << std::endl;
-      }
 #line 1616 "parser.tab.cc"
     break;
 
-  case 81: // param_mkusr: ">pass" "=" "CADENA"
-#line 470 "parser.yy"
+  case 80: // param_mkusr: ">user" "=" "CADENA"
+#line 475 "parser.yy"
       {
-         std::cout << "PASS: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "USER: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1624 "parser.tab.cc"
     break;
 
-  case 82: // param_mkusr: ">pass" "=" "NUM"
-#line 474 "parser.yy"
+  case 81: // param_mkusr: ">pass" "=" "CADENA"
+#line 479 "parser.yy"
       {
          std::cout << "PASS: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1632 "parser.tab.cc"
     break;
 
-  case 83: // param_mkusr: ">grp" "=" "CADENA"
-#line 478 "parser.yy"
+  case 82: // param_mkusr: ">pass" "=" "NUM"
+#line 483 "parser.yy"
       {
-         std::cout << "GROUP: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "PASS: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1640 "parser.tab.cc"
     break;
 
+  case 83: // param_mkusr: ">grp" "=" "CADENA"
+#line 487 "parser.yy"
+      {
+         std::cout << "GROUP: " << yystack_[0].value.as < std::string > () << std::endl;
+      }
+#line 1648 "parser.tab.cc"
+    break;
+
   case 84: // Lista_mkfile: Lista_mkfile param_mkfile
-#line 484 "parser.yy"
+#line 493 "parser.yy"
                                                {}
-#line 1646 "parser.tab.cc"
+#line 1654 "parser.tab.cc"
     break;
 
   case 85: // Lista_mkfile: param_mkfile
-#line 485 "parser.yy"
+#line 494 "parser.yy"
                                                {}
-#line 1652 "parser.tab.cc"
-    break;
-
-  case 86: // param_mkfile: ">path" "=" "RUTA"
-#line 490 "parser.yy"
-      {
-         std::cout << "PATH: " << yystack_[0].value.as < std::string > () << std::endl;
-      }
 #line 1660 "parser.tab.cc"
     break;
 
-  case 87: // param_mkfile: ">r"
-#line 494 "parser.yy"
+  case 86: // param_mkfile: ">path" "=" "RUTA"
+#line 499 "parser.yy"
       {
-         std::cout << "R " << std::endl;
+         std::cout << "PATH: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1668 "parser.tab.cc"
     break;
 
-  case 88: // param_mkfile: ">size" "=" "NUM"
-#line 498 "parser.yy"
+  case 87: // param_mkfile: ">r"
+#line 503 "parser.yy"
       {
-         std::cout << "SIZE: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "R " << std::endl;
       }
 #line 1676 "parser.tab.cc"
     break;
 
-  case 89: // param_mkfile: ">cont" "=" "RUTA"
-#line 502 "parser.yy"
+  case 88: // param_mkfile: ">size" "=" "NUM"
+#line 507 "parser.yy"
       {
-         std::cout << "CONT: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "SIZE: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1684 "parser.tab.cc"
     break;
 
+  case 89: // param_mkfile: ">cont" "=" "RUTA"
+#line 511 "parser.yy"
+      {
+         std::cout << "CONT: " << yystack_[0].value.as < std::string > () << std::endl;
+      }
+#line 1692 "parser.tab.cc"
+    break;
+
   case 90: // Lista_cat: Lista_cat param_cat
-#line 508 "parser.yy"
+#line 517 "parser.yy"
                                        {}
-#line 1690 "parser.tab.cc"
+#line 1698 "parser.tab.cc"
     break;
 
   case 91: // Lista_cat: param_cat
-#line 509 "parser.yy"
+#line 518 "parser.yy"
                                        {}
-#line 1696 "parser.tab.cc"
+#line 1704 "parser.tab.cc"
     break;
 
   case 92: // param_cat: "FILEN" "=" "RUTA"
-#line 514 "parser.yy"
+#line 523 "parser.yy"
       {
          std::cout << "RUTA: " << yystack_[0].value.as < std::string > () << std::endl;
          std::cout << "FILE: " << yystack_[2].value.as < std::string > () << std::endl;
       }
-#line 1705 "parser.tab.cc"
-    break;
-
-  case 95: // param_chown: ">path" "=" "RUTA"
-#line 527 "parser.yy"
-      {
-         std::cout << "RUTA: " << yystack_[0].value.as < std::string > () << std::endl;
-      }
 #line 1713 "parser.tab.cc"
     break;
 
-  case 96: // param_chown: ">user" "=" "CADENA"
-#line 531 "parser.yy"
+  case 95: // param_chown: ">path" "=" "RUTA"
+#line 536 "parser.yy"
       {
-         std::cout << "USER: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "RUTA: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1721 "parser.tab.cc"
     break;
 
-  case 97: // param_chown: ">r"
-#line 535 "parser.yy"
+  case 96: // param_chown: ">user" "=" "CADENA"
+#line 540 "parser.yy"
       {
-         std::cout << "R" << std::endl;
+         std::cout << "USER: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1729 "parser.tab.cc"
     break;
 
-  case 100: // param_chmod: ">path" "=" "RUTA"
-#line 547 "parser.yy"
+  case 97: // param_chown: ">r"
+#line 544 "parser.yy"
       {
-         std::cout << "RUTA: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "R" << std::endl;
       }
 #line 1737 "parser.tab.cc"
     break;
 
-  case 101: // param_chmod: ">ugo" "=" "NUM"
-#line 551 "parser.yy"
+  case 100: // param_chmod: ">path" "=" "RUTA"
+#line 556 "parser.yy"
       {
-         std::cout << "UGO: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "RUTA: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1745 "parser.tab.cc"
     break;
 
-  case 102: // param_chmod: ">r"
-#line 555 "parser.yy"
+  case 101: // param_chmod: ">ugo" "=" "NUM"
+#line 560 "parser.yy"
       {
-         std::cout << "R" << std::endl;
+         std::cout << "UGO: " << yystack_[0].value.as < std::string > () << std::endl;
       }
 #line 1753 "parser.tab.cc"
     break;
 
-  case 105: // param_rep: ">name" "=" "mbr"
-#line 567 "parser.yy"
+  case 102: // param_chmod: ">r"
+#line 564 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         std::cout << "R" << std::endl;
       }
 #line 1761 "parser.tab.cc"
     break;
 
-  case 106: // param_rep: ">name" "=" "disk"
-#line 571 "parser.yy"
+  case 105: // param_rep: ">name" "=" "mbr"
+#line 576 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1769 "parser.tab.cc"
     break;
 
-  case 107: // param_rep: ">name" "=" "inode"
-#line 575 "parser.yy"
+  case 106: // param_rep: ">name" "=" "disk"
+#line 580 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1777 "parser.tab.cc"
     break;
 
-  case 108: // param_rep: ">name" "=" "journaling"
-#line 579 "parser.yy"
+  case 107: // param_rep: ">name" "=" "inode"
+#line 584 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1785 "parser.tab.cc"
     break;
 
-  case 109: // param_rep: ">name" "=" "block"
-#line 583 "parser.yy"
+  case 108: // param_rep: ">name" "=" "journaling"
+#line 588 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1793 "parser.tab.cc"
     break;
 
-  case 110: // param_rep: ">name" "=" "bm_inode"
-#line 587 "parser.yy"
+  case 109: // param_rep: ">name" "=" "block"
+#line 592 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1801 "parser.tab.cc"
     break;
 
-  case 111: // param_rep: ">name" "=" "bm_block"
-#line 591 "parser.yy"
+  case 110: // param_rep: ">name" "=" "bm_inode"
+#line 596 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1809 "parser.tab.cc"
     break;
 
-  case 112: // param_rep: ">name" "=" "tree"
-#line 595 "parser.yy"
+  case 111: // param_rep: ">name" "=" "bm_block"
+#line 600 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1817 "parser.tab.cc"
     break;
 
-  case 113: // param_rep: ">name" "=" "sb"
-#line 599 "parser.yy"
+  case 112: // param_rep: ">name" "=" "tree"
+#line 604 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1825 "parser.tab.cc"
     break;
 
-  case 114: // param_rep: ">name" "=" "file"
-#line 603 "parser.yy"
+  case 113: // param_rep: ">name" "=" "sb"
+#line 608 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1833 "parser.tab.cc"
     break;
 
-  case 115: // param_rep: ">name" "=" "ls"
-#line 607 "parser.yy"
+  case 114: // param_rep: ">name" "=" "file"
+#line 612 "parser.yy"
       {
-         std::cout << "NAME: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1841 "parser.tab.cc"
     break;
 
-  case 116: // param_rep: ">path" "=" "RUTA"
-#line 611 "parser.yy"
+  case 115: // param_rep: ">name" "=" "ls"
+#line 616 "parser.yy"
       {
-         std::cout << "PATH: " << yystack_[0].value.as < std::string > () << std::endl;
+         name = yystack_[0].value.as < std::string > ();
       }
 #line 1849 "parser.tab.cc"
     break;
 
-  case 117: // param_rep: ">id" "=" "CADENA"
-#line 615 "parser.yy"
+  case 116: // param_rep: ">path" "=" "RUTA"
+#line 620 "parser.yy"
       {
-         std::cout << "ID: " << yystack_[0].value.as < std::string > () << std::endl;
+         path = yystack_[0].value.as < std::string > ();
       }
 #line 1857 "parser.tab.cc"
     break;
 
-  case 118: // param_rep: ">ruta" "=" "RUTA"
-#line 619 "parser.yy"
+  case 117: // param_rep: ">id" "=" "CADENA"
+#line 624 "parser.yy"
       {
-         std::cout << "RUTA: " << yystack_[0].value.as < std::string > () << std::endl;
+         id = yystack_[0].value.as < std::string > ();
       }
 #line 1865 "parser.tab.cc"
     break;
 
+  case 118: // param_rep: ">ruta" "=" "RUTA"
+#line 628 "parser.yy"
+      {
+         comruta = yystack_[0].value.as < std::string > ();
+      }
+#line 1873 "parser.tab.cc"
+    break;
 
-#line 1869 "parser.tab.cc"
+
+#line 1877 "parser.tab.cc"
 
             default:
               break;
@@ -2481,18 +2489,18 @@ namespace yy {
   const short
   Parser::yyrline_[] =
   {
-       0,    60,    60,    65,    66,    70,    87,    94,   123,   130,
-     137,   143,   147,   151,   155,   160,   165,   170,   174,   178,
-     182,   187,   193,   199,   205,   211,   216,   222,   228,   234,
-     240,   246,   252,   258,   264,   268,   274,   280,   284,   300,
-     304,   312,   313,   317,   321,   325,   329,   333,   337,   341,
-     348,   349,   353,   357,   361,   365,   369,   373,   377,   381,
-     385,   389,   393,   397,   401,   405,   412,   413,   417,   421,
-     425,   429,   436,   437,   441,   445,   449,   453,   460,   461,
-     465,   469,   473,   477,   484,   485,   489,   493,   497,   501,
-     508,   509,   513,   521,   522,   526,   530,   534,   541,   542,
-     546,   550,   554,   561,   562,   566,   570,   574,   578,   582,
-     586,   590,   594,   598,   602,   606,   610,   614,   618
+       0,    64,    64,    69,    70,    74,    91,    98,   127,   134,
+     141,   147,   151,   155,   159,   164,   169,   174,   178,   182,
+     186,   191,   197,   203,   209,   215,   220,   226,   232,   238,
+     244,   250,   256,   262,   268,   272,   278,   284,   288,   304,
+     313,   321,   322,   326,   330,   334,   338,   342,   346,   350,
+     357,   358,   362,   366,   370,   374,   378,   382,   386,   390,
+     394,   398,   402,   406,   410,   414,   421,   422,   426,   430,
+     434,   438,   445,   446,   450,   454,   458,   462,   469,   470,
+     474,   478,   482,   486,   493,   494,   498,   502,   506,   510,
+     517,   518,   522,   530,   531,   535,   539,   543,   550,   551,
+     555,   559,   563,   570,   571,   575,   579,   583,   587,   591,
+     595,   599,   603,   607,   611,   615,   619,   623,   627
   };
 
   void
@@ -2524,9 +2532,9 @@ namespace yy {
 
 
 } // yy
-#line 2528 "parser.tab.cc"
+#line 2536 "parser.tab.cc"
 
-#line 624 "parser.yy"
+#line 633 "parser.yy"
 
 
 void yy::Parser::error( const std::string& error){

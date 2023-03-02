@@ -54,8 +54,9 @@
    class Execute;
    class Mount;
    class Unmount;
+   class Rep;
 
-#line 59 "parser.tab.hh"
+#line 60 "parser.tab.hh"
 
 
 # include <cstdlib> // std::abort
@@ -190,7 +191,7 @@
 #endif
 
 namespace yy {
-#line 194 "parser.tab.hh"
+#line 195 "parser.tab.hh"
 
 
 
@@ -2942,7 +2943,7 @@ switch (yykind)
 
 
 } // yy
-#line 2946 "parser.tab.hh"
+#line 2947 "parser.tab.hh"
 
 
 

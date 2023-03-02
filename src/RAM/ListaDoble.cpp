@@ -115,3 +115,14 @@ string ListaDoble::getName(string id){
     }
     return "";
 }
+
+bool ListaDoble::ExisteParticion(string id){
+    Nodo* aux = primero;
+    while(aux != NULL){
+        if(aux->id == id){
+            return true;
+        }
+        aux = aux->siguiente;
+    }
+    return false;
+}

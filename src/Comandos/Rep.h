@@ -7,8 +7,11 @@
 #include <iostream>
 #include <unistd.h>
 #include <dirent.h>
+#include <cmath>
+#include <iomanip>
 
 #include "../Estructuras.h"
+#include "../RAM/ListaDoble.h"
 
 using namespace std;
 
@@ -22,6 +25,10 @@ class Rep {
         void controlReportes(Rep *reporte);
         void ReporteMBR(Rep *reporte);
         void ReporteDisk(Rep *reporte);
+        string toLowerCase(string palabra);
+        vector<EBR> ListadoEBR(Particion extendida, string path);
+        bool cadenaVacia(char cadena[]);
+        vector<string> split(string texto, char parametro);
 };
 
 #endif

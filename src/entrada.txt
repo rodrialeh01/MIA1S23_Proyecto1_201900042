@@ -14,19 +14,19 @@ pause
 #======================FDISK====================================
 #Crea una partición primaria llamada Particion1 de 300 kb
 #con el peor ajuste en el disco Disco1.dsk
-fdisk >size=7 >path=/tmp/rodrialeh/Disco2.dsk >name=ParticionN
+fdisk >size=50 >path=/tmp/rodrialeh/Disco2.dsk >name=Particion1
 #Crea una partición extendida dentro de Disco2 de 300 kb
 #Tiene el peor ajuste
 fdisk >type=E >path=/tmp/rodrialeh/Disco2.dsk >unit=K >name=Particion2 >size=30
 #Crea una partición lógica con el mejor ajuste, llamada Partición 3,
 #de 1 Mb en el Disco3
-fdisk >size=1 >type=L >unit=K >fit=bf >path=/tmp/rodrialeh/Disco2.dsk >name=Particion3
+fdisk >size=1 >type=L >unit=K >fit=bf >path=/tmp/rodrialeh/Disco2.dsk >name=ParticionL1
 #Intenta crear una partición extendida dentro de Disco2 de 200 kb
 #Debería mostrar error ya que ya existe una partición extendida
 #dentro de Disco2
 fdisk >type=E >path=/tmp/Disco2.dsk >name=Part3 >unit=K >size=200
 #Elimina de forma rápida una partición llamada Partición 1
-fdisk >delete=full >name=Particion3 >path=/tmp/rodrialeh/Disco1.dsk
+fdisk >delete=full >name=ParticionL2 >path=/tmp/rodrialeh/Disco2.dsk
 #Elimina de forma completa una partición llamada Partición 1
 fdisk >name=Particion4 >delete=full >path=/tmp/rodrialeh/Disco2.dsk
 #Quitan 500 Kb de Partición 4 en Disco4.dsk
@@ -43,7 +43,7 @@ pause
 #Monta las particiones de Disco1.dsk, Disco2.dsk y Disco3.dsk,
 #Canet Ejemplo -> 201404106
 mount >path=/tmp/Disco1.dsk >name=Part1 #id=061Disco1
-mount >path=/tmp/Disco2.dsk >name=Part1 #id=061Disco2
+mount >path=/tmp/rodrialeh/Disco2.dsk >name=Particion1 #id=421Disco2
 mount >name=Part2 >path=/tmp/Disco3.dsk #id=061Disco3
 mount >path=/tmp/Disco1.dsk >name=Part2 #id=062Disco1
 mount >path=/tmp/Disco2.dsk >name=Part2 #id=062Disco2
@@ -277,7 +277,7 @@ pause
 #MBR y EBR Disco1.dsk
 rep >id=061Disco1 >path=/home/user/reports/reporte1.jpg >name=mbr
 
-rep >id=061Disco1 >path=/home/user/reports/report2.pdf >name=disk
+rep >id=421Disco2 >path=/tmp/rodrialeh/reports/report2.pdf >name=disk
 
 rep >id=061Disco1 >path=/home/user/reports/report3.jpg >name=inode
 
