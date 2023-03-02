@@ -80,13 +80,13 @@ void Rep::ReporteMBR(Rep *reporte){
     reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_tamano) + "</td>\n";
     reporte_mbr += "</tr>\n";
     reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">mbr_fecha_creacion</td>\n";
-    reporte_mbr += "<td border=\"1\">" + to_string(ctime(&mbr.mbr_fecha_creacion)) + "</td>\n";
+    reporte_mbr += "<td border=\"1\">" + getFecha(mbr.mbr_fecha_creacion) + "</td>\n";
     reporte_mbr += "</tr>\n";
     reporte_mbr += "<tr><td border=\"1\">mbr_dsk_signature</td>\n";
     reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_dsk_signature) + "</td>\n";
     reporte_mbr += "</tr>\n";
     reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">dsk_fit</td>\n";
-    reporte_mbr += "<td border=\"1\">" + to_string(mbr.disk_fit) + "</td>\n";
+    reporte_mbr += "<td border=\"1\">" + string(1,mbr.disk_fit) + "</td>\n";
     reporte_mbr += "</tr>\n";
     //REPORTE DE LA PARTICION1
     if(mbr.mbr_particion_1.part_s> 0 && (!cadenaVacia(mbr.mbr_particion_1.part_name))){
@@ -711,4 +711,12 @@ vector<string> Rep::split(string texto, char parametro) {
         resultado.push_back(text2);
     }
     return resultado;
+}
+
+string Rep::getFecha(time_t fecha){
+    time_t date = fecha;
+    char time_string[100];
+    strftime(time_string, sizeof(time_string), "%d/%m/%Y %H:%M:%S", localtime(&date));
+    string final_date(time_string);
+    return final_date;
 }

@@ -30,6 +30,7 @@ class Rep {
         vector<EBR> ListadoEBR(Particion extendida, string path);
         bool cadenaVacia(char cadena[]);
         vector<string> split(string texto, char parametro);
+        string getFecha(time_t fecha);
 };
 
 #endif

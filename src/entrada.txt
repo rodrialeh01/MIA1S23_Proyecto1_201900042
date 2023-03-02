@@ -274,8 +274,8 @@ execute >path=/home/Desktop/calificacion.eea
 pause
 
 #============================REP======================================
-#MBR y EBR Disco1.dsk
-rep >id=061Disco1 >path=/home/user/reports/reporte1.jpg >name=mbr
+#MBR y EBR Disco2.dsk
+rep >id=421Disco2 >path=/tmp/rodrialeh/reports/report1.jpg >name=mbr
 
 rep >id=421Disco2 >path=/tmp/rodrialeh/reports/report2.pdf >name=disk
 
