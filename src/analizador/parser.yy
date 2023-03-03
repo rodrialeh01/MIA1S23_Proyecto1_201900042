@@ -20,6 +20,7 @@
    class Mount;
    class Unmount;
    class Rep;
+   class Mkfs;
 }
 
 %{
@@ -36,6 +37,7 @@
    #include "../Comandos/Mount.h"
    #include "../Comandos/Unmount.h"
    #include "../Comandos/Rep.h"
+   #include "../Comandos/Mkfs.h"
 
    std::string dsk_size = "";
    std::string path = "";
@@ -47,12 +49,13 @@
    std::string add = "";
    std::string id = "";
    std::string comruta = "";
+   std::string fs = "";
 
 %}
 
 
 /******* TERMINALES ********/
-%token <std::string> MKDISK"mkdisk" RMDISK"rmdisk" FDISK"fdisk" MOUNT"mount" UNMOUNT"unmount" MKFS"mkfs" LOGIN"login" LOGOUT"logout" MKGRP"mkgrp" RMGRP"rmgrp" MKUSR"mkusr" RMUSR"rmusr" MKFILE"mkfile" CAT"cat" REMOVE"remove" EDIT"edit" RENAME"rename" MKDIR"mkdir" COPY"copy" MOVE"move" FIND"find" CHOWN"chown" CHGRP"chgrp" CHMOD"chmod" PAUSE"pause" EXECUTE"execute" REP"rep" FULL"full" BESTFIT"BestFit" FIRSTFIT"FirstFit" WORSTFIT"WorstFit" DOSFS"2fs" TRESFS"3fs" MBR"mbr" DISK"disk" INODE"inode" JOURNALING"journaling" BLOCK"block" BMINODE"bm_inode" BMBLOCK"bm_block" TREE"tree" SB"sb" FILE"file" LS"ls" IGUAL"=" R">r" SIZE">size" PATH">path" FIT">fit" UNIT">UNIT" NAME">name" TYPE">type" DELETE">delete" ADD">add" ID">id" FS">fs" USER">user" PASS">pass" GRP">grp" CONT">cont" DESTINO">destino" UGO">ugo" COMRUTA">ruta" FILEN"FILEN" BF"BF" FF"FF" WF"WF" K"K" M"M" B"B" P"P" E"E" L"L"  RUTA"RUTA" CADENA"CADENA"
+%token <std::string> MKDISK"mkdisk" RMDISK"rmdisk" FDISK"fdisk" MOUNT"mount" UNMOUNT"unmount" MKFS"mkfs" LOGIN"login" LOGOUT"logout" MKGRP"mkgrp" RMGRP"rmgrp" MKUSR"mkusr" RMUSR"rmusr" MKFILE"mkfile" CAT"cat" REMOVE"remove" EDIT"edit" RENAME"rename" MKDIR"mkdir" COPY"copy" MOVE"move" FIND"find" CHOWN"chown" CHGRP"chgrp" CHMOD"chmod" PAUSE"pause" EXECUTE"execute" REP"rep" RECOVERY"recovery" LOSS"loss" FULL"full" BESTFIT"BestFit" FIRSTFIT"FirstFit" WORSTFIT"WorstFit" DOSFS"2fs" TRESFS"3fs" MBR"mbr" DISK"disk" INODE"inode" JOURNALING"journaling" BLOCK"block" BMINODE"bm_inode" BMBLOCK"bm_block" TREE"tree" SB"sb" FILE"file" LS"ls" IGUAL"=" R">r" SIZE">size" PATH">path" FIT">fit" UNIT">UNIT" NAME">name" TYPE">type" DELETE">delete" ADD">add" ID">id" FS">fs" USER">user" PASS">pass" GRP">grp" CONT">cont" DESTINO">destino" UGO">ugo" COMRUTA">ruta" FILEN"FILEN" BF"BF" FF"FF" WF"WF" K"K" M"M" B"B" P"P" E"E" L"L"  RUTA"RUTA" CADENA"CADENA" 
 %token <std::string> NUM "NUM"                     
 %token FIN 0 "eof"                    
 
@@ -146,7 +149,11 @@
       }
       | MKFS Lista_mkfs
       {
-         std::cout << "COMANDO MKFS" << std::endl;
+         Mkfs *formatear = new Mkfs();
+         formatear->id = id;
+         formatear->type = type;
+         formatear->fs = fs;
+         formatear->SistemaDeArchivos(formatear);
       }
       | LOGIN Lista_login
       {
@@ -285,6 +292,16 @@
       {
          std::cout << "COMANDO CHMOD" << std::endl;
       }
+      | RECOVERY ID IGUAL CADENA
+      {
+         std::cout << "COMANDO RECOVERY" << std::endl;
+         std::cout << "ID: "<< $3 << std::endl;
+      }
+      | LOSS ID IGUAL CADENA
+      {
+         std::cout << "COMANDO LOSS" << std::endl;
+         std::cout << "ID: "<< $3 << std::endl;
+      }
       | EXECUTE PATH IGUAL RUTA
       {
          std::string filename($4);
@@ -309,6 +326,10 @@
          reporte-> name = name;
          reporte-> ruta = comruta;
          reporte->controlReportes(reporte);
+         id="";
+         path="";
+         name="";
+         comruta="";
       }
       | PAUSE
       {
@@ -425,19 +446,19 @@
    param_mkfs
       : ID IGUAL CADENA
       {
-         std::cout << "ID: " << $3 << std::endl;
+         id = $3;
       }
       | TYPE IGUAL FULL
       {
-         std::cout << "TYPE: " << $3 << std::endl;
+         type = $3;
       }
       | FS IGUAL DOSFS
       {
-         std::cout << "FS: " << $3 << std::endl;
+         fs = $3;
       }
       | FS IGUAL TRESFS
       {
-         std::cout << "FS: " << $3 << std::endl;
+         fs = $3;
       }
    ;
 

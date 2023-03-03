@@ -35,7 +35,7 @@ void Mount::MontarParticion(Mount *montar){
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_type == 'P'){
             if(montar->name == particiones[i].part_name){
-                if(!lista_particiones_montadas.ParticionMontada(particiones[i].part_name,montar->path)){
+                if(lista_particiones_montadas.ParticionMontada(particiones[i].part_name,montar->path)){
                     cout << "La particion que desea montar ya esta montada" << endl;
                     return;
                 }
@@ -45,7 +45,7 @@ void Mount::MontarParticion(Mount *montar){
             }
         }else if(particiones[i].part_type == 'E'){
             if(montar->name == particiones[i].part_name){
-                if(!lista_particiones_montadas.ParticionMontada(particiones[i].part_name,montar->path)){
+                if(lista_particiones_montadas.ParticionMontada(particiones[i].part_name,montar->path)){
                     cout << "La particion que desea montar ya esta montada" << endl;
                     return;
                 }
@@ -56,7 +56,7 @@ void Mount::MontarParticion(Mount *montar){
                 vector<EBR> ebrs = ListadoEBR(particiones[i], montar->path);
                 for(int j = 0; j < ebrs.size(); j++){
                     if(montar->name == ebrs[j].part_name){
-                        if(!lista_particiones_montadas.ParticionMontada(ebrs[j].part_name,montar->path)){
+                        if(lista_particiones_montadas.ParticionMontada(ebrs[j].part_name,montar->path)){
                             cout << "La particion que desea montar ya esta montada" << endl;
                             return;
                         }

@@ -55,8 +55,9 @@
    class Mount;
    class Unmount;
    class Rep;
+   class Mkfs;
 
-#line 60 "parser.tab.hh"
+#line 61 "parser.tab.hh"
 
 
 # include <cstdlib> // std::abort
@@ -191,7 +192,7 @@
 #endif
 
 namespace yy {
-#line 195 "parser.tab.hh"
+#line 196 "parser.tab.hh"
 
 
 
@@ -414,6 +415,8 @@ namespace yy {
       // "pause"
       // "execute"
       // "rep"
+      // "recovery"
+      // "loss"
       // "full"
       // "BestFit"
       // "FirstFit"
@@ -534,55 +537,57 @@ namespace yy {
     PAUSE = 282,                   // "pause"
     EXECUTE = 283,                 // "execute"
     REP = 284,                     // "rep"
-    FULL = 285,                    // "full"
-    BESTFIT = 286,                 // "BestFit"
-    FIRSTFIT = 287,                // "FirstFit"
-    WORSTFIT = 288,                // "WorstFit"
-    DOSFS = 289,                   // "2fs"
-    TRESFS = 290,                  // "3fs"
-    MBR = 291,                     // "mbr"
-    DISK = 292,                    // "disk"
-    INODE = 293,                   // "inode"
-    JOURNALING = 294,              // "journaling"
-    BLOCK = 295,                   // "block"
-    BMINODE = 296,                 // "bm_inode"
-    BMBLOCK = 297,                 // "bm_block"
-    TREE = 298,                    // "tree"
-    SB = 299,                      // "sb"
-    FILE = 300,                    // "file"
-    LS = 301,                      // "ls"
-    IGUAL = 302,                   // "="
-    R = 303,                       // ">r"
-    SIZE = 304,                    // ">size"
-    PATH = 305,                    // ">path"
-    FIT = 306,                     // ">fit"
-    UNIT = 307,                    // ">UNIT"
-    NAME = 308,                    // ">name"
-    TYPE = 309,                    // ">type"
-    DELETE = 310,                  // ">delete"
-    ADD = 311,                     // ">add"
-    ID = 312,                      // ">id"
-    FS = 313,                      // ">fs"
-    USER = 314,                    // ">user"
-    PASS = 315,                    // ">pass"
-    GRP = 316,                     // ">grp"
-    CONT = 317,                    // ">cont"
-    DESTINO = 318,                 // ">destino"
-    UGO = 319,                     // ">ugo"
-    COMRUTA = 320,                 // ">ruta"
-    FILEN = 321,                   // "FILEN"
-    BF = 322,                      // "BF"
-    FF = 323,                      // "FF"
-    WF = 324,                      // "WF"
-    K = 325,                       // "K"
-    M = 326,                       // "M"
-    B = 327,                       // "B"
-    P = 328,                       // "P"
-    E = 329,                       // "E"
-    L = 330,                       // "L"
-    RUTA = 331,                    // "RUTA"
-    CADENA = 332,                  // "CADENA"
-    NUM = 333                      // "NUM"
+    RECOVERY = 285,                // "recovery"
+    LOSS = 286,                    // "loss"
+    FULL = 287,                    // "full"
+    BESTFIT = 288,                 // "BestFit"
+    FIRSTFIT = 289,                // "FirstFit"
+    WORSTFIT = 290,                // "WorstFit"
+    DOSFS = 291,                   // "2fs"
+    TRESFS = 292,                  // "3fs"
+    MBR = 293,                     // "mbr"
+    DISK = 294,                    // "disk"
+    INODE = 295,                   // "inode"
+    JOURNALING = 296,              // "journaling"
+    BLOCK = 297,                   // "block"
+    BMINODE = 298,                 // "bm_inode"
+    BMBLOCK = 299,                 // "bm_block"
+    TREE = 300,                    // "tree"
+    SB = 301,                      // "sb"
+    FILE = 302,                    // "file"
+    LS = 303,                      // "ls"
+    IGUAL = 304,                   // "="
+    R = 305,                       // ">r"
+    SIZE = 306,                    // ">size"
+    PATH = 307,                    // ">path"
+    FIT = 308,                     // ">fit"
+    UNIT = 309,                    // ">UNIT"
+    NAME = 310,                    // ">name"
+    TYPE = 311,                    // ">type"
+    DELETE = 312,                  // ">delete"
+    ADD = 313,                     // ">add"
+    ID = 314,                      // ">id"
+    FS = 315,                      // ">fs"
+    USER = 316,                    // ">user"
+    PASS = 317,                    // ">pass"
+    GRP = 318,                     // ">grp"
+    CONT = 319,                    // ">cont"
+    DESTINO = 320,                 // ">destino"
+    UGO = 321,                     // ">ugo"
+    COMRUTA = 322,                 // ">ruta"
+    FILEN = 323,                   // "FILEN"
+    BF = 324,                      // "BF"
+    FF = 325,                      // "FF"
+    WF = 326,                      // "WF"
+    K = 327,                       // "K"
+    M = 328,                       // "M"
+    B = 329,                       // "B"
+    P = 330,                       // "P"
+    E = 331,                       // "E"
+    L = 332,                       // "L"
+    RUTA = 333,                    // "RUTA"
+    CADENA = 334,                  // "CADENA"
+    NUM = 335                      // "NUM"
       };
       /// Backward compatibility alias (Bison 3.6).
       typedef token_kind_type yytokentype;
@@ -599,7 +604,7 @@ namespace yy {
     {
       enum symbol_kind_type
       {
-        YYNTOKENS = 79, ///< Number of tokens.
+        YYNTOKENS = 81, ///< Number of tokens.
         S_YYEMPTY = -2,
         S_YYEOF = 0,                             // "eof"
         S_YYerror = 1,                           // error
@@ -631,79 +636,81 @@ namespace yy {
         S_PAUSE = 27,                            // "pause"
         S_EXECUTE = 28,                          // "execute"
         S_REP = 29,                              // "rep"
-        S_FULL = 30,                             // "full"
-        S_BESTFIT = 31,                          // "BestFit"
-        S_FIRSTFIT = 32,                         // "FirstFit"
-        S_WORSTFIT = 33,                         // "WorstFit"
-        S_DOSFS = 34,                            // "2fs"
-        S_TRESFS = 35,                           // "3fs"
-        S_MBR = 36,                              // "mbr"
-        S_DISK = 37,                             // "disk"
-        S_INODE = 38,                            // "inode"
-        S_JOURNALING = 39,                       // "journaling"
-        S_BLOCK = 40,                            // "block"
-        S_BMINODE = 41,                          // "bm_inode"
-        S_BMBLOCK = 42,                          // "bm_block"
-        S_TREE = 43,                             // "tree"
-        S_SB = 44,                               // "sb"
-        S_FILE = 45,                             // "file"
-        S_LS = 46,                               // "ls"
-        S_IGUAL = 47,                            // "="
-        S_R = 48,                                // ">r"
-        S_SIZE = 49,                             // ">size"
-        S_PATH = 50,                             // ">path"
-        S_FIT = 51,                              // ">fit"
-        S_UNIT = 52,                             // ">UNIT"
-        S_NAME = 53,                             // ">name"
-        S_TYPE = 54,                             // ">type"
-        S_DELETE = 55,                           // ">delete"
-        S_ADD = 56,                              // ">add"
-        S_ID = 57,                               // ">id"
-        S_FS = 58,                               // ">fs"
-        S_USER = 59,                             // ">user"
-        S_PASS = 60,                             // ">pass"
-        S_GRP = 61,                              // ">grp"
-        S_CONT = 62,                             // ">cont"
-        S_DESTINO = 63,                          // ">destino"
-        S_UGO = 64,                              // ">ugo"
-        S_COMRUTA = 65,                          // ">ruta"
-        S_FILEN = 66,                            // "FILEN"
-        S_BF = 67,                               // "BF"
-        S_FF = 68,                               // "FF"
-        S_WF = 69,                               // "WF"
-        S_K = 70,                                // "K"
-        S_M = 71,                                // "M"
-        S_B = 72,                                // "B"
-        S_P = 73,                                // "P"
-        S_E = 74,                                // "E"
-        S_L = 75,                                // "L"
-        S_RUTA = 76,                             // "RUTA"
-        S_CADENA = 77,                           // "CADENA"
-        S_NUM = 78,                              // "NUM"
-        S_YYACCEPT = 79,                         // $accept
-        S_Inicio = 80,                           // Inicio
-        S_Lista = 81,                            // Lista
-        S_COMANDO = 82,                          // COMANDO
-        S_Lista_parametrosmkdisk = 83,           // Lista_parametrosmkdisk
-        S_parametromk = 84,                      // parametromk
-        S_Lista_fdisk = 85,                      // Lista_fdisk
-        S_parametrofdisk = 86,                   // parametrofdisk
-        S_Lista_mkfs = 87,                       // Lista_mkfs
-        S_param_mkfs = 88,                       // param_mkfs
-        S_Lista_login = 89,                      // Lista_login
-        S_param_login = 90,                      // param_login
-        S_Lista_mkusr = 91,                      // Lista_mkusr
-        S_param_mkusr = 92,                      // param_mkusr
-        S_Lista_mkfile = 93,                     // Lista_mkfile
-        S_param_mkfile = 94,                     // param_mkfile
-        S_Lista_cat = 95,                        // Lista_cat
-        S_param_cat = 96,                        // param_cat
-        S_Lista_chown = 97,                      // Lista_chown
-        S_param_chown = 98,                      // param_chown
-        S_Lista_chmod = 99,                      // Lista_chmod
-        S_param_chmod = 100,                     // param_chmod
-        S_Lista_rep = 101,                       // Lista_rep
-        S_param_rep = 102                        // param_rep
+        S_RECOVERY = 30,                         // "recovery"
+        S_LOSS = 31,                             // "loss"
+        S_FULL = 32,                             // "full"
+        S_BESTFIT = 33,                          // "BestFit"
+        S_FIRSTFIT = 34,                         // "FirstFit"
+        S_WORSTFIT = 35,                         // "WorstFit"
+        S_DOSFS = 36,                            // "2fs"
+        S_TRESFS = 37,                           // "3fs"
+        S_MBR = 38,                              // "mbr"
+        S_DISK = 39,                             // "disk"
+        S_INODE = 40,                            // "inode"
+        S_JOURNALING = 41,                       // "journaling"
+        S_BLOCK = 42,                            // "block"
+        S_BMINODE = 43,                          // "bm_inode"
+        S_BMBLOCK = 44,                          // "bm_block"
+        S_TREE = 45,                             // "tree"
+        S_SB = 46,                               // "sb"
+        S_FILE = 47,                             // "file"
+        S_LS = 48,                               // "ls"
+        S_IGUAL = 49,                            // "="
+        S_R = 50,                                // ">r"
+        S_SIZE = 51,                             // ">size"
+        S_PATH = 52,                             // ">path"
+        S_FIT = 53,                              // ">fit"
+        S_UNIT = 54,                             // ">UNIT"
+        S_NAME = 55,                             // ">name"
+        S_TYPE = 56,                             // ">type"
+        S_DELETE = 57,                           // ">delete"
+        S_ADD = 58,                              // ">add"
+        S_ID = 59,                               // ">id"
+        S_FS = 60,                               // ">fs"
+        S_USER = 61,                             // ">user"
+        S_PASS = 62,                             // ">pass"
+        S_GRP = 63,                              // ">grp"
+        S_CONT = 64,                             // ">cont"
+        S_DESTINO = 65,                          // ">destino"
+        S_UGO = 66,                              // ">ugo"
+        S_COMRUTA = 67,                          // ">ruta"
+        S_FILEN = 68,                            // "FILEN"
+        S_BF = 69,                               // "BF"
+        S_FF = 70,                               // "FF"
+        S_WF = 71,                               // "WF"
+        S_K = 72,                                // "K"
+        S_M = 73,                                // "M"
+        S_B = 74,                                // "B"
+        S_P = 75,                                // "P"
+        S_E = 76,                                // "E"
+        S_L = 77,                                // "L"
+        S_RUTA = 78,                             // "RUTA"
+        S_CADENA = 79,                           // "CADENA"
+        S_NUM = 80,                              // "NUM"
+        S_YYACCEPT = 81,                         // $accept
+        S_Inicio = 82,                           // Inicio
+        S_Lista = 83,                            // Lista
+        S_COMANDO = 84,                          // COMANDO
+        S_Lista_parametrosmkdisk = 85,           // Lista_parametrosmkdisk
+        S_parametromk = 86,                      // parametromk
+        S_Lista_fdisk = 87,                      // Lista_fdisk
+        S_parametrofdisk = 88,                   // parametrofdisk
+        S_Lista_mkfs = 89,                       // Lista_mkfs
+        S_param_mkfs = 90,                       // param_mkfs
+        S_Lista_login = 91,                      // Lista_login
+        S_param_login = 92,                      // param_login
+        S_Lista_mkusr = 93,                      // Lista_mkusr
+        S_param_mkusr = 94,                      // param_mkusr
+        S_Lista_mkfile = 95,                     // Lista_mkfile
+        S_param_mkfile = 96,                     // param_mkfile
+        S_Lista_cat = 97,                        // Lista_cat
+        S_param_cat = 98,                        // param_cat
+        S_Lista_chown = 99,                      // Lista_chown
+        S_param_chown = 100,                     // param_chown
+        S_Lista_chmod = 101,                     // Lista_chmod
+        S_param_chmod = 102,                     // param_chmod
+        S_Lista_rep = 103,                       // Lista_rep
+        S_param_rep = 104                        // param_rep
       };
     };
 
@@ -765,6 +772,8 @@ namespace yy {
       case symbol_kind::S_PAUSE: // "pause"
       case symbol_kind::S_EXECUTE: // "execute"
       case symbol_kind::S_REP: // "rep"
+      case symbol_kind::S_RECOVERY: // "recovery"
+      case symbol_kind::S_LOSS: // "loss"
       case symbol_kind::S_FULL: // "full"
       case symbol_kind::S_BESTFIT: // "BestFit"
       case symbol_kind::S_FIRSTFIT: // "FirstFit"
@@ -901,6 +910,8 @@ switch (yykind)
       case symbol_kind::S_PAUSE: // "pause"
       case symbol_kind::S_EXECUTE: // "execute"
       case symbol_kind::S_REP: // "rep"
+      case symbol_kind::S_RECOVERY: // "recovery"
+      case symbol_kind::S_LOSS: // "loss"
       case symbol_kind::S_FULL: // "full"
       case symbol_kind::S_BESTFIT: // "BestFit"
       case symbol_kind::S_FIRSTFIT: // "FirstFit"
@@ -1549,6 +1560,36 @@ switch (yykind)
       make_REP (const std::string& v)
       {
         return symbol_type (token::REP, v);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RECOVERY (std::string v)
+      {
+        return symbol_type (token::RECOVERY, std::move (v));
+      }
+#else
+      static
+      symbol_type
+      make_RECOVERY (const std::string& v)
+      {
+        return symbol_type (token::RECOVERY, v);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LOSS (std::string v)
+      {
+        return symbol_type (token::LOSS, std::move (v));
+      }
+#else
+      static
+      symbol_type
+      make_LOSS (const std::string& v)
+      {
+        return symbol_type (token::LOSS, v);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -2614,9 +2655,9 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 317,     ///< Last index in yytable_.
+      yylast_ = 326,     ///< Last index in yytable_.
       yynnts_ = 24,  ///< Number of nonterminal symbols.
-      yyfinal_ = 110 ///< Termination state number.
+      yyfinal_ = 114 ///< Termination state number.
     };
 
 
@@ -2668,10 +2709,10 @@ switch (yykind)
       45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77,    78
+      75,    76,    77,    78,    79,    80
     };
     // Last valid token kind.
-    const int code_max = 333;
+    const int code_max = 335;
 
     if (t <= 0)
       return symbol_kind::S_YYEOF;
@@ -2716,6 +2757,8 @@ switch (yykind)
       case symbol_kind::S_PAUSE: // "pause"
       case symbol_kind::S_EXECUTE: // "execute"
       case symbol_kind::S_REP: // "rep"
+      case symbol_kind::S_RECOVERY: // "recovery"
+      case symbol_kind::S_LOSS: // "loss"
       case symbol_kind::S_FULL: // "full"
       case symbol_kind::S_BESTFIT: // "BestFit"
       case symbol_kind::S_FIRSTFIT: // "FirstFit"
@@ -2826,6 +2869,8 @@ switch (yykind)
       case symbol_kind::S_PAUSE: // "pause"
       case symbol_kind::S_EXECUTE: // "execute"
       case symbol_kind::S_REP: // "rep"
+      case symbol_kind::S_RECOVERY: // "recovery"
+      case symbol_kind::S_LOSS: // "loss"
       case symbol_kind::S_FULL: // "full"
       case symbol_kind::S_BESTFIT: // "BestFit"
       case symbol_kind::S_FIRSTFIT: // "FirstFit"
@@ -2943,7 +2988,7 @@ switch (yykind)
 
 
 } // yy
-#line 2947 "parser.tab.hh"
+#line 2992 "parser.tab.hh"
 
 
 

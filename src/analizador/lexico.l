@@ -47,6 +47,8 @@ FILEN                   ">file"({DIGIT}+)
 "pause"                 {return yy::Parser::make_PAUSE(yytext);}
 "execute"               {return yy::Parser::make_EXECUTE(yytext);}
 "rep"                   {return yy::Parser::make_REP(yytext);}
+"recovery"              {return yy::Parser::make_RECOVERY(yytext);}
+"loss"                  {return yy::Parser::make_LOSS(yytext);}
 
 "full"                  {return yy::Parser::make_FULL(yytext);}
 "2fs"                   {return yy::Parser::make_DOSFS(yytext);}
