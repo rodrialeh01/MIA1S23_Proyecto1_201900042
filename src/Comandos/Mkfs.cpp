@@ -164,6 +164,109 @@ void Mkfs::FormatearExt2(string id){
 
     fwrite(&bitmap_bloques, sizeof(bitmap_bloques), 1, archivo);
 
+
+    //=============CREACION DEL /USERS.TXT============
+
+    //ESCRITURA DEL INNODO DE LA CARPETA RAIZ
+    Inodo inodo_raiz;
+    inodo_raiz.i_uid = 1;
+    inodo_raiz.i_gid = 1;
+    inodo_raiz.i_s = 0;
+    inodo_raiz.i_atime = time(0);
+    inodo_raiz.i_ctime = time(0);
+    inodo_raiz.i_mtime = time(0);
+    inodo_raiz.i_block[0] = 0;
+    inodo_raiz.i_type = '0';
+    inodo_raiz.i_perm = 001001664;
+
+    fseek(archivo, inicio_inodos, SEEK_SET);
+    fwrite(&inodo_raiz, sizeof(Inodo), 1, archivo);
+
+    //ESCRITURA AL BITMAP DE INNODOS
+    fseek(archivo, inicio_bitmap_inodos, SEEK_SET);
+    char bitmap_inodos2[tamanio_bitmap_inodos];
+    bitmap_inodos2[0] = '1';
+    for(int i = 1; i < tamanio_bitmap_inodos; i++){
+        bitmap_inodos2[i] = '0';
+    }
+    fwrite(&bitmap_inodos2, sizeof(bitmap_inodos2), 1, archivo);
+
+    //ACTUALIZACION DEL SUPERBLOQUE
+    superbloque.s_free_inodes_count = superbloque.s_free_inodes_count - 1;
+    fseek(archivo, pos_inicio, SEEK_SET);
+    fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
+
+    //ESCRITURA DEL BLOQUE DE LA CARPETA RAIZ
+    BloqueCarpeta carpeta_raiz;
+    strcpy(carpeta_raiz.b_content[0].b_name, "users.txt");
+    carpeta_raiz.b_content[0].b_inodo = 1;
+
+    fseek(archivo, inicio_bloques, SEEK_SET);
+    fwrite(&carpeta_raiz, sizeof(BloqueCarpeta), 1, archivo);
+
+    //ESCRITURA AL BITMAP DE BLOQUES
+    fseek(archivo, inicio_bitmap_bloques, SEEK_SET);
+    char bitmap_bloques2[tamanio_bitmap_bloques];
+    bitmap_bloques2[0] = '1';
+    for(int i = 1; i < tamanio_bitmap_bloques; i++){
+        bitmap_bloques2[i] = '0';
+    }
+    fwrite(&bitmap_bloques2, sizeof(bitmap_bloques2), 1, archivo);
+
+    //ACTUALIZACION DEL SUPERBLOQUE
+    superbloque.s_free_blocks_count = superbloque.s_free_blocks_count - 1;
+    fseek(archivo, pos_inicio, SEEK_SET);
+
+    //ESCRITURA DEL INODO DEL ARCHIVO USERS.TXT
+    Inodo inodo_users;
+    inodo_users.i_uid = 1;
+    inodo_users.i_gid = 1;
+    inodo_users.i_s = 22;
+    inodo_users.i_atime = time(0);
+    inodo_users.i_ctime = time(0);
+    inodo_users.i_mtime = time(0);
+    inodo_users.i_block[0] = 0;
+    inodo_users.i_type = '1';
+    inodo_users.i_perm = 001001664;
+
+    fseek(archivo, inicio_inodos + sizeof(Inodo), SEEK_SET);
+    fwrite(&inodo_users, sizeof(Inodo), 1, archivo);
+
+    //ESCRITURA AL BITMAP DE INODOS
+    fseek(archivo, inicio_bitmap_inodos, SEEK_SET);
+    char bitmap_inodos3[tamanio_bitmap_inodos];
+    bitmap_inodos3[1] = '1';
+    for(int i = 2; i < tamanio_bitmap_inodos; i++){
+        bitmap_inodos3[i] = '0';
+    }
+    fwrite(&bitmap_inodos3, sizeof(bitmap_inodos3), 1, archivo);
+
+    //ACTUALIZACION DEL SUPERBLOQUE
+    superbloque.s_free_inodes_count = superbloque.s_free_inodes_count - 1;
+    fseek(archivo, pos_inicio, SEEK_SET);
+    fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
+
+    //ESCRITURA DEL BLOQUE DEL ARCHIVO USERS.TXT
+
+    BloqueArchivo bloque_userstxt;
+    strcpy(bloque_userstxt.b_content,"1,G,root\n1,U,root,root,123\n");
+
+    fseek(archivo, inicio_bloques + sizeof(BloqueArchivo), SEEK_SET);
+    fwrite(&bloque_userstxt, sizeof(BloqueArchivo), 1, archivo);
+
+    //ESCRITURA AL BITMAP DE BLOQUES
+    fseek(archivo, inicio_bitmap_bloques, SEEK_SET);
+    char bitmap_bloques3[tamanio_bitmap_bloques];
+    bitmap_bloques3[1] = '1';
+    for(int i = 2; i < tamanio_bitmap_bloques; i++){
+        bitmap_bloques3[i] = '0';
+    }
+    fwrite(&bitmap_bloques3, sizeof(bitmap_bloques3), 1, archivo);
+
+    //ACTUALIZACION DEL SUPERBLOQUE
+    superbloque.s_free_blocks_count = superbloque.s_free_blocks_count - 1;
+    fseek(archivo, pos_inicio, SEEK_SET);
+    fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
     fclose(archivo);
 
     cout << "SE FORMATEO LA PARTICION Y SE CREO EL SISTEMA DE ARCHIVOS EXT2" << endl;

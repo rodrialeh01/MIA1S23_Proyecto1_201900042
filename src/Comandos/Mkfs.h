@@ -2,10 +2,11 @@
 #define MKFS_H
 
 #include "vector"
-#include "string"
+#include <string.h>
 #include "sstream"
 #include <iostream>
 #include <unistd.h>
+#include <stdio.h>
 #include <dirent.h>
 #include <cmath>
 

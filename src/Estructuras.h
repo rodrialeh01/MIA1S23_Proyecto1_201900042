@@ -68,9 +68,13 @@ typedef struct {
 }Inodo;
 
 typedef struct {
+    Content b_content[4];
+}BloqueCarpeta;
+
+typedef struct {
     char b_name[12];
     int b_inodo;
-}BloqueCarpeta;
+}Content;
 
 typedef struct {
     char b_content[64];
