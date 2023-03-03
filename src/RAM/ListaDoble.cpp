@@ -126,3 +126,14 @@ bool ListaDoble::ExisteParticion(string id){
     }
     return false;
 }
+
+bool ListaDoble::ParticionMontada(string name, string path){
+    Nodo* aux = primero;
+    while(aux != NULL){
+        if(aux->path == path && aux->name == name){
+            return true;
+        }
+        aux = aux->siguiente;
+    }
+    return false;
+}

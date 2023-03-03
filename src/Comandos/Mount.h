@@ -23,6 +23,8 @@ class Mount {
         void MontarParticion(Mount *montar);
         string nombre_disco(string path);
         vector<string> split(string texto, char  parametro);
+        vector<EBR> ListadoEBR(Particion extendida, string path);
+        bool cadenaVacia(char cadena[]);
 };
 
 #endif

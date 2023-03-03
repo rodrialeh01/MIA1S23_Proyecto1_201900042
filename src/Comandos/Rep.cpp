@@ -71,7 +71,7 @@ void Rep::ReporteMBR(Rep *reporte){
     string reporte_mbr = "digraph G {\n";
     reporte_mbr += "node [shape=plaintext]\n";
     reporte_mbr += "tablambr[label=<\n";
-    reporte_mbr += "<table fontname=\"Shantell Sans\" border=\"0\" cellspacing=\"0\">\n";
+    reporte_mbr += "<table fontname=\"Century Gothic\" border=\"0\" cellspacing=\"0\">\n";
     //REPORTE DE MBR
     reporte_mbr += "<tr><td bgcolor=\"\#8523d6\" ><FONT COLOR=\"white\">REPORTE DE MBR</FONT></td>\n";
     reporte_mbr += "<td bgcolor=\"\#8523d6\" ><FONT COLOR=\"\#8523d6\">a</FONT></td>\n";
@@ -80,13 +80,13 @@ void Rep::ReporteMBR(Rep *reporte){
     reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_tamano) + "</td>\n";
     reporte_mbr += "</tr>\n";
     reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">mbr_fecha_creacion</td>\n";
-    reporte_mbr += "<td border=\"1\">" + getFecha(mbr.mbr_fecha_creacion) + "</td>\n";
+    reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + getFecha(mbr.mbr_fecha_creacion) + "</td>\n";
     reporte_mbr += "</tr>\n";
     reporte_mbr += "<tr><td border=\"1\">mbr_dsk_signature</td>\n";
     reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_dsk_signature) + "</td>\n";
     reporte_mbr += "</tr>\n";
     reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">dsk_fit</td>\n";
-    reporte_mbr += "<td border=\"1\">" + string(1,mbr.disk_fit) + "</td>\n";
+    reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + string(1,mbr.disk_fit) + "</td>\n";
     reporte_mbr += "</tr>\n";
     //REPORTE DE LA PARTICION1
     if(mbr.mbr_particion_1.part_s> 0 && (!cadenaVacia(mbr.mbr_particion_1.part_name))){
@@ -94,23 +94,27 @@ void Rep::ReporteMBR(Rep *reporte){
         reporte_mbr += "<td bgcolor=\"\#8523d6\" ><FONT COLOR=\"\#8523d6\">a</FONT></td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_status</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_1.part_status) + "</td>\n";
+        if(lista_particiones_montadas.ParticionMontada(mbr.mbr_particion_1.part_name, particion_reporte.path)){
+            reporte_mbr += "<td border=\"1\">1</td>\n";
+        }else{
+            reporte_mbr += "<td border=\"1\">0</td>\n";
+        }
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_type</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_1.part_type) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + string(1,mbr.mbr_particion_1.part_type) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_fit</td>\n";
         reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_1.part_fit) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_start</td>\n";
-        reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_particion_1.part_start) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + to_string(mbr.mbr_particion_1.part_start) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_size</td>\n";
         reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_particion_1.part_s) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_name</td>\n";
         string name_1(mbr.mbr_particion_1.part_name);
-        reporte_mbr += "<td border=\"1\">" + name_1 + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + name_1 + "</td>\n";
         reporte_mbr += "</tr>\n";
     }
     //SI LA PARTICION 1 ES EXTENDIDA
@@ -121,23 +125,27 @@ void Rep::ReporteMBR(Rep *reporte){
                 reporte_mbr += "<td bgcolor=\"\#ff9f23\" ><FONT COLOR=\"\#ff9f23\">a</FONT></td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_status</td>\n";
-                reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_status) + "</td>\n";
+                if(lista_particiones_montadas.ParticionMontada(ebrs[i].part_name, particion_reporte.path)){
+                    reporte_mbr += "<td border=\"1\">1</td>\n";
+                }else{
+                    reporte_mbr += "<td border=\"1\">0</td>\n";
+                }
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_fit</td>\n";
-                reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_fit) + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + string(1,ebrs[i].part_fit) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_start</td>\n";
                 reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_start) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_size</td>\n";
-                reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_s) + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + to_string(ebrs[i].part_s) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_next</td>\n";
                 reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_next) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_name</td>\n";
                 string name_1(ebrs[i].part_name);
-                reporte_mbr += "<td border=\"1\">" + name_1 + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + name_1 + "</td>\n";
                 reporte_mbr += "</tr>\n";
             }
         }
@@ -149,23 +157,27 @@ void Rep::ReporteMBR(Rep *reporte){
         reporte_mbr += "<td bgcolor=\"\#8523d6\" ><FONT COLOR=\"\#8523d6\">a</FONT></td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_status</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_2.part_status) + "</td>\n";
+        if(lista_particiones_montadas.ParticionMontada(mbr.mbr_particion_2.part_name, particion_reporte.path)){
+            reporte_mbr += "<td border=\"1\">1</td>\n";
+        }else{
+            reporte_mbr += "<td border=\"1\">0</td>\n";
+        }
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_type</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_2.part_type) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + string(1,mbr.mbr_particion_2.part_type) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_fit</td>\n";
         reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_2.part_fit) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_start</td>\n";
-        reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_particion_2.part_start) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + to_string(mbr.mbr_particion_2.part_start) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_size</td>\n";
         reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_particion_2.part_s) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_name</td>\n";
         string name_2(mbr.mbr_particion_2.part_name);
-        reporte_mbr += "<td border=\"1\">" + name_2 + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + name_2 + "</td>\n";
         reporte_mbr += "</tr>\n";
     }
     //SI LA PARTICION 2 ES EXTENDIDA
@@ -176,23 +188,27 @@ void Rep::ReporteMBR(Rep *reporte){
                 reporte_mbr += "<td bgcolor=\"\#ff9f23\" ><FONT COLOR=\"\#ff9f23\">a</FONT></td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_status</td>\n";
-                reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_status) + "</td>\n";
+                if(lista_particiones_montadas.ParticionMontada(ebrs[i].part_name, particion_reporte.path)){
+                    reporte_mbr += "<td border=\"1\">1</td>\n";
+                }else{
+                    reporte_mbr += "<td border=\"1\">0</td>\n";
+                }
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_fit</td>\n";
-                reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_fit) + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + string(1,ebrs[i].part_fit) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_start</td>\n";
                 reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_start) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_size</td>\n";
-                reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_s) + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + to_string(ebrs[i].part_s) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_next</td>\n";
                 reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_next) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_name</td>\n";
                 string name_1(ebrs[i].part_name);
-                reporte_mbr += "<td border=\"1\">" + name_1 + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + name_1 + "</td>\n";
                 reporte_mbr += "</tr>\n";
             }
         }
@@ -204,23 +220,27 @@ void Rep::ReporteMBR(Rep *reporte){
         reporte_mbr += "<td bgcolor=\"\#8523d6\" ><FONT COLOR=\"\#8523d6\">a</FONT></td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_status</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_3.part_status) + "</td>\n";
+        if(lista_particiones_montadas.ParticionMontada(mbr.mbr_particion_3.part_name, particion_reporte.path)){
+            reporte_mbr += "<td border=\"1\">1</td>\n";
+        }else{
+            reporte_mbr += "<td border=\"1\">0</td>\n";
+        }
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_type</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_3.part_type) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + string(1,mbr.mbr_particion_3.part_type) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_fit</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_3.part_fit) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" >" + string(1,mbr.mbr_particion_3.part_fit) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_start</td>\n";
-        reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_particion_3.part_start) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + to_string(mbr.mbr_particion_3.part_start) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_size</td>\n";
         reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_particion_3.part_s) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_name</td>\n";
         string name_3(mbr.mbr_particion_3.part_name);
-        reporte_mbr += "<td border=\"1\">" + name_3 + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + name_3 + "</td>\n";
         reporte_mbr += "</tr>\n";
     }
     //SI LA PARTICION 3 ES EXTENDIDA
@@ -231,23 +251,27 @@ void Rep::ReporteMBR(Rep *reporte){
                 reporte_mbr += "<td bgcolor=\"\#ff9f23\" ><FONT COLOR=\"\#ff9f23\">a</FONT></td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_status</td>\n";
-                reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_status) + "</td>\n";
+                if(lista_particiones_montadas.ParticionMontada(ebrs[i].part_name, particion_reporte.path)){
+                    reporte_mbr += "<td border=\"1\">1</td>\n";
+                }else{
+                    reporte_mbr += "<td border=\"1\">0</td>\n";
+                }
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_fit</td>\n";
-                reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_fit) + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + string(1,ebrs[i].part_fit) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_start</td>\n";
                 reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_start) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_size</td>\n";
-                reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_s) + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + to_string(ebrs[i].part_s) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_next</td>\n";
                 reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_next) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_name</td>\n";
                 string name_1(ebrs[i].part_name);
-                reporte_mbr += "<td border=\"1\">" + name_1 + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + name_1 + "</td>\n";
                 reporte_mbr += "</tr>\n";
             }
         }
@@ -259,23 +283,27 @@ void Rep::ReporteMBR(Rep *reporte){
         reporte_mbr += "<td bgcolor=\"\#8523d6\" ><FONT COLOR=\"\#8523d6\">a</FONT></td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_status</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_4.part_status) + "</td>\n";
+        if(lista_particiones_montadas.ParticionMontada(mbr.mbr_particion_4.part_name, particion_reporte.path)){
+            reporte_mbr += "<td border=\"1\">1</td>\n";
+        }else{
+            reporte_mbr += "<td border=\"1\">0</td>\n";
+        }
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_type</td>\n";
-        reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_4.part_type) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + string(1,mbr.mbr_particion_4.part_type) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_fit</td>\n";
         reporte_mbr += "<td border=\"1\">" + string(1,mbr.mbr_particion_4.part_fit) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_start</td>\n";
-        reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_particion_4.part_start) + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + to_string(mbr.mbr_particion_4.part_start) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\">part_size</td>\n";
         reporte_mbr += "<td border=\"1\">" + to_string(mbr.mbr_particion_4.part_s) + "</td>\n";
         reporte_mbr += "</tr>\n";
         reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#ddcdea\">part_name</td>\n";
         string name_4(mbr.mbr_particion_4.part_name);
-        reporte_mbr += "<td border=\"1\">" + name_4 + "</td>\n";
+        reporte_mbr += "<td border=\"1\" bgcolor=\"\#ddcdea\">" + name_4 + "</td>\n";
         reporte_mbr += "</tr>\n";
     }
     //SI LA PARTICION 4 ES EXTENDIDA
@@ -286,23 +314,27 @@ void Rep::ReporteMBR(Rep *reporte){
                 reporte_mbr += "<td bgcolor=\"\#ff9f23\" ><FONT COLOR=\"\#ff9f23\">a</FONT></td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_status</td>\n";
-                reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_status) + "</td>\n";
+                if(lista_particiones_montadas.ParticionMontada(ebrs[i].part_name,particion_reporte.path)){
+                    reporte_mbr += "<td border=\"1\">1</td>\n";
+                }else{
+                    reporte_mbr += "<td border=\"1\">0</td>\n";
+                }
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_fit</td>\n";
-                reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_fit) + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + string(1,ebrs[i].part_fit) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_start</td>\n";
                 reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_start) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_size</td>\n";
-                reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_s) + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + to_string(ebrs[i].part_s) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\">part_next</td>\n";
                 reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_next) + "</td>\n";
                 reporte_mbr += "</tr>\n";
                 reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_name</td>\n";
                 string name_1(ebrs[i].part_name);
-                reporte_mbr += "<td border=\"1\">" + name_1 + "</td>\n";
+                reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + name_1 + "</td>\n";
                 reporte_mbr += "</tr>\n";
             }
         }
@@ -312,7 +344,7 @@ void Rep::ReporteMBR(Rep *reporte){
     //REPORTE EBR
     if(ebrs.size()>0){
         reporte_mbr += "tablaEBR[label=<\n";
-        reporte_mbr += "<table fontname=\"Shantell Sans\" border=\"0\" cellspacing=\"0\">\n";
+        reporte_mbr += "<table fontname=\"Century Gothic\" border=\"0\" cellspacing=\"0\">\n";
         reporte_mbr += "<tr><td bgcolor=\"\#8523d6\" ><FONT COLOR=\"white\">REPORTE DE EBR</FONT></td>\n";
         reporte_mbr += "<td bgcolor=\"\#8523d6\" ><FONT COLOR=\"\#8523d6\">a</FONT></td>\n";
         reporte_mbr += "</tr>\n";
@@ -324,20 +356,20 @@ void Rep::ReporteMBR(Rep *reporte){
             reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_status) + "</td>\n";
             reporte_mbr += "</tr>\n";
             reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_fit</td>\n";
-            reporte_mbr += "<td border=\"1\">" + string(1,ebrs[i].part_fit) + "</td>\n";
+            reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + string(1,ebrs[i].part_fit) + "</td>\n";
             reporte_mbr += "</tr>\n";
             reporte_mbr += "<tr><td border=\"1\">part_start</td>\n";
             reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_start) + "</td>\n";
             reporte_mbr += "</tr>\n";
             reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_size</td>\n";
-            reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_s) + "</td>\n";
+            reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + to_string(ebrs[i].part_s) + "</td>\n";
             reporte_mbr += "</tr>\n";
             reporte_mbr += "<tr><td border=\"1\">part_next</td>\n";
             reporte_mbr += "<td border=\"1\">" + to_string(ebrs[i].part_next) + "</td>\n";
             reporte_mbr += "</tr>\n";
             reporte_mbr += "<tr><td border=\"1\" bgcolor=\"\#fad6a8\">part_name</td>\n";
             string name_1(ebrs[i].part_name);
-            reporte_mbr += "<td border=\"1\">" + name_1 + "</td>\n";
+            reporte_mbr += "<td border=\"1\" bgcolor=\"\#fad6a8\">" + name_1 + "</td>\n";
             reporte_mbr += "</tr>\n";
         }
         reporte_mbr += "</table>>];\n";

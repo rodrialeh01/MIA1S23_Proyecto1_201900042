@@ -37,6 +37,7 @@ class ListaDoble {
         string getPath(string id);
         string getName(string id);
         bool ExisteParticion(string id);
+        bool ParticionMontada(string path, string name);
 };
 
 #endif
