@@ -14,6 +14,8 @@ void ListaDoble::Insertar(string path, string name, string id, char type){
     nuevo->name = name;
     nuevo->id = id;
     nuevo->type = type;
+    time_t fecha_hoy;
+    nuevo->fecha_mount = time(&fecha_hoy);
     nuevo->siguiente = NULL;
     nuevo->anterior = NULL;
     if(primero == NULL){

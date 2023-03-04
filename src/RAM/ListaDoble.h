@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <dirent.h>
+#include "time.h"
 
 using namespace std;
 
@@ -15,6 +16,7 @@ struct Nodo{
     string name = "";
     string id = "";
     char type = '\0';
+    time_t fecha_mount;
     Nodo* siguiente;
     Nodo* anterior;
 };

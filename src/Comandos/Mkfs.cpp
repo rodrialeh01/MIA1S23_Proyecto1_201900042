@@ -130,7 +130,7 @@ void Mkfs::FormatearExt2(string id){
     superbloque.s_blocks_count = tamanio_bitmap_bloques;
     superbloque.s_free_blocks_count = tamanio_bitmap_bloques;
     superbloque.s_free_inodes_count = tamanio_bitmap_inodos;
-    superbloque.s_mtime = time(0);
+    superbloque.s_mtime = particion.fecha_mount;
     superbloque.s_umtime = time(0);
     superbloque.s_mnt_count = 0;
     superbloque.s_magic = 0xEF53;
@@ -165,16 +165,20 @@ void Mkfs::FormatearExt2(string id){
     fwrite(&bitmap_bloques, sizeof(bitmap_bloques), 1, archivo);
 
 
-    //=============CREACION DEL /USERS.TXT============
+    //========================================CREACION DEL /USERS.TXT====================================
 
     //ESCRITURA DEL INNODO DE LA CARPETA RAIZ
     Inodo inodo_raiz;
     inodo_raiz.i_uid = 1;
     inodo_raiz.i_gid = 1;
     inodo_raiz.i_s = 0;
-    inodo_raiz.i_atime = time(0);
-    inodo_raiz.i_ctime = time(0);
-    inodo_raiz.i_mtime = time(0);
+    time_t ahora;
+    inodo_raiz.i_atime = time(&ahora);
+    inodo_raiz.i_ctime = time(&ahora);
+    inodo_raiz.i_mtime = time(&ahora);
+    for(int i = 0; i < 15; i++){
+        inodo_raiz.i_block[i] = -1;
+    }
     inodo_raiz.i_block[0] = 0;
     inodo_raiz.i_type = '0';
     inodo_raiz.i_perm = 001001664;
@@ -198,8 +202,18 @@ void Mkfs::FormatearExt2(string id){
 
     //ESCRITURA DEL BLOQUE DE LA CARPETA RAIZ
     BloqueCarpeta carpeta_raiz;
-    strcpy(carpeta_raiz.b_content[0].b_name, "users.txt");
-    carpeta_raiz.b_content[0].b_inodo = 1;
+    //SIGNIFICA EL .
+    strcpy(carpeta_raiz.b_content[0].b_name, "/");
+    carpeta_raiz.b_content[0].b_inodo = 0;
+    //SIGNIFICA EL ..
+    strcpy(carpeta_raiz.b_content[1].b_name, "/");
+    carpeta_raiz.b_content[0].b_inodo = 0;
+    //APUNTA AL INODO DEL USERS.TXT
+    strcpy(carpeta_raiz.b_content[2].b_name, "users.txt");
+    carpeta_raiz.b_content[2].b_inodo = 1;
+    //MANTIENE EL OTRO APUNTADOR EN -1
+    carpeta_raiz.b_content[3].b_inodo = -1;
+
 
     fseek(archivo, inicio_bloques, SEEK_SET);
     fwrite(&carpeta_raiz, sizeof(BloqueCarpeta), 1, archivo);
@@ -221,11 +235,14 @@ void Mkfs::FormatearExt2(string id){
     Inodo inodo_users;
     inodo_users.i_uid = 1;
     inodo_users.i_gid = 1;
-    inodo_users.i_s = 22;
-    inodo_users.i_atime = time(0);
-    inodo_users.i_ctime = time(0);
-    inodo_users.i_mtime = time(0);
-    inodo_users.i_block[0] = 0;
+    inodo_users.i_s = 27;
+    inodo_users.i_atime = time(&ahora);
+    inodo_users.i_ctime = time(&ahora);
+    inodo_users.i_mtime = time(&ahora);
+    for(int i = 0; i < 15; i++){
+        inodo_users.i_block[i] = -1;
+    }
+    inodo_users.i_block[0] = 1;
     inodo_users.i_type = '1';
     inodo_users.i_perm = 001001664;
 
@@ -246,7 +263,7 @@ void Mkfs::FormatearExt2(string id){
     fseek(archivo, pos_inicio, SEEK_SET);
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
 
-    //ESCRITURA DEL BLOQUE DEL ARCHIVO USERS.TXT
+    //ESCRITURA DEL BLOQUE DE CONTENIDO DEL ARCHIVO USERS.TXT
 
     BloqueArchivo bloque_userstxt;
     strcpy(bloque_userstxt.b_content,"1,G,root\n1,U,root,root,123\n");
