@@ -3,6 +3,9 @@
 
 #include <ctime>
 
+bool logueado= false;
+string userlogueado = "";
+
 //Struct de la particion
 typedef struct {
     char part_status;
