@@ -28,13 +28,13 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
     bool ruta_complex = false;
     //VALIDACION DEL SIZE
     if (disco_nuevo->size <= 0){
-        cout << "No se ha ingresado un tamaño válido para el disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado un tamaño válido para el disco \e[m\n" << endl;
         return;
     }
 
     //VALIDACION DEL PATH
     if (disco_nuevo->path == ""){
-        cout << "No se ha ingresado la ruta para crear el disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado la ruta para crear el disco \e[m\n" << endl;
         return;
     }
 
@@ -45,7 +45,7 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
 
     //VALIDACION DEL FIT
     if(toLowerCase(disco_nuevo->fit) != "bf" && toLowerCase(disco_nuevo->fit) != "ff" && toLowerCase(disco_nuevo->fit) != "wf"){
-        cout << "No se ha ingresado un fit válido para el disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado un fit válido para el disco \e[m\n" << endl;
         return;
     }
 
@@ -56,7 +56,7 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
 
     //VALIDACION DE LA UNIDAD
     if(toLowerCase(disco_nuevo->unit) != "m" && toLowerCase(disco_nuevo->unit) != "k"){
-        cout << "No se ha ingresado una unidad válida para el disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado una unidad válida para el disco \e[m\n" << endl;
         return;
     }
 
@@ -80,8 +80,7 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
     //VERIFICA SI EXISTE EL ARCHIVO
     FILE *archivo;
     if((archivo = fopen(disco_nuevo->path.c_str(),"rb"))){
-        cout << "El disco con el nombre " << carpetas[carpetas.size()-1] << " ya existe" << endl;
-        fclose(archivo);
+        cout << "\e[1;31m[ERROR]:\e[1;37m El disco con el nombre " << carpetas[carpetas.size()-1] << " ya existe\e[m\n" << endl;
         return;
     }
     string ruta = "";
@@ -101,7 +100,7 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
     }
     string comando_linux = "mkdir -p " + ruta;
     system(comando_linux.c_str());
-    cout << "Creando el disco en " << ruta<< " ..." << endl;
+    cout << "\n Creando el disco en " << ruta<< " ..." << endl;
     sleep(1);
     
     //CREACION DEL ARCHIVO
@@ -155,44 +154,5 @@ void Mkdisk::CrearDisco(Mkdisk *disco_nuevo){
     }
     fclose(disco);
 
-    //MUESTRO TEMPORALMENTE EL MBR
-    cout << "================MBR==================" << endl;
-    cout << "Tamaño: " << mbr.mbr_tamano << endl;
-    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
-    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
-    cout << "\t- Particion 1: "  << endl;
-    string name = "";
-    cout << "\t\t-Name: " << name.assign(mbr.mbr_particion_1.part_name,16) << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
-    cout << "\t- Particion 2: "  << endl;
-    name = "";
-    cout << "\t\t-Name: " << name.assign(mbr.mbr_particion_2.part_name,16) << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
-    cout << "\t- Particion 3: "  << endl;
-    name = "";
-    cout << "\t\t-Name: " << name.assign(mbr.mbr_particion_3.part_name,16) << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
-    cout << "\t- Particion 4: "  << endl;
-    name = "";
-    cout << "\t\t-Name: " << name.assign(mbr.mbr_particion_4.part_name,16) << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
-    cout << "=====================================" << endl;
-
-    cout << "El disco con el nombre " << carpetas[carpetas.size()-1] << " ha sido creado exitosamente" << endl;
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m El disco con el nombre " << carpetas[carpetas.size()-1] << " ha sido creado exitosamente \e[m\n" << endl;
 }

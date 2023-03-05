@@ -1341,7 +1341,7 @@ YY_RULE_SETUP
 case 77:
 YY_RULE_SETUP
 #line 103 "lexico.l"
-{std::cout << yytext << std::endl;}
+{std::cout <<"\e[1m "<< yytext << "\e[m"<<std::endl;}
 	YY_BREAK
 case 78:
 YY_RULE_SETUP

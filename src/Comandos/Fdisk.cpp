@@ -3,6 +3,7 @@
 Fdisk::Fdisk() {
 }
 
+//FUNCION PARA APLICAR EL SPLIT A UNA CADENA DE TEXTO
 vector<string> Fdisk::split(string texto, char parametro) {
     stringstream text_to_split(texto);
     string text2;
@@ -13,6 +14,7 @@ vector<string> Fdisk::split(string texto, char parametro) {
     return resultado;
 }
 
+//FUNCION PARA CONVERTIR UNA CADENA DE TEXTO A MINUSCULAS
 string Fdisk::toLowerCase(string palabra){
     int i = 0;
     string retorno = "";
@@ -23,6 +25,7 @@ string Fdisk::toLowerCase(string palabra){
     return retorno;
 }
 
+//FUNCION PARA CONVERTIR UNA CADENA DE TEXTO A MAYUSCULAS
 string Fdisk::toUpperCase(string palabra){
     int i = 0;
     string retorno = "";
@@ -33,6 +36,7 @@ string Fdisk::toUpperCase(string palabra){
     return retorno;
 }
 
+//FUNCION PARA VALIDAR SI UNA CADENA[16] DE TEXTO ESTA VACIA
 bool Fdisk::cadenaVacia(char cadena[]){
     for(int i = 0; i < 16; i++) {
         if(cadena[i] != '\0') {
@@ -42,25 +46,25 @@ bool Fdisk::cadenaVacia(char cadena[]){
    return true;
 }
 
+//METODO PARA VER LAS ACCIONES A REALIZAR EN EL SISTEMA DE PARTICIONES
 void Fdisk::SistemaDeParticiones(Fdisk *particion){
     //VALIDAR ATRIBUTOS GENERALES OBLIGATORIOS
     //PATH
     if(particion->path == ""){
-        cout << "ERROR: No se ha ingresado la ruta para crear la particion" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado la ruta para crear la particion\e[m\n" << endl;
         return;
     }
 
     FILE *archivo;
     if(!(archivo = fopen(particion->path.c_str(),"rb"))){
-        cout << "El disco no se encuentro en el sistema" << endl;
-        fclose(archivo);
+        cout << "\e[1;31m[ERROR]:\e[1;37m El disco no se encuentro en el sistema\e[m\n" << endl;
         return;
     }
     fclose(archivo);
 
     //NAME
     if(particion->name == ""){
-        cout << "ERROR: No se ha ingresado el nombre para la particion" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado el nombre para la particion\e[m\n" << endl;
         return;
     }
 
@@ -71,7 +75,7 @@ void Fdisk::SistemaDeParticiones(Fdisk *particion){
     }
 
     if(toUpperCase(particion->unit) != "K" && toUpperCase(particion->unit) != "M" && toUpperCase(particion->unit) != "B"){
-        cout << "ERROR: No se ha ingresado una unidad válida para la particion" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado una unidad válida para la particion\e[m\n" << endl;
         return;
     }
 
@@ -83,7 +87,7 @@ void Fdisk::SistemaDeParticiones(Fdisk *particion){
     }
 
     if(toUpperCase(particion->type) != "P" && toUpperCase(particion->type) != "E" && toUpperCase(particion->type) != "L"){
-        cout << "ERROR: No se ha ingresado un tipo válido para la particion" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado un tipo válido para la particion\e[m\n" << endl;
         return;
     }
 
@@ -95,7 +99,7 @@ void Fdisk::SistemaDeParticiones(Fdisk *particion){
     }
 
     if(toUpperCase(particion->fit) != "FF" && toUpperCase(particion->fit) != "BF" && toUpperCase(particion->fit) != "WF"){
-        cout << "ERROR: No se ha ingresado un ajuste válido para la particion" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado un ajuste válido para la particion\e[m\n" << endl;
         return;
     }
 
@@ -123,10 +127,11 @@ void Fdisk::SistemaDeParticiones(Fdisk *particion){
 
 }
 
+//METODO PARA CREAR UNA PARTICION
 void Fdisk::AgregarParticion(Fdisk *particion){
    //VALIDACION DEL SIZE
     if(particion->size <= 0){
-       cout << "ERROR: No se ha ingresado un tamaño válido para la particion" << endl;
+       cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado un tamaño válido para la particion\e[m\n" << endl;
        return;
     }
 
@@ -149,41 +154,6 @@ void Fdisk::AgregarParticion(Fdisk *particion){
     fread(&mbr,sizeof(MBR),1,archivo);
     fclose(archivo);
 
-    //MUESTRO TEMPORALMENTE EL MBR
-    cout << "================MBR==================" << endl;
-    cout << "Tamaño: " << mbr.mbr_tamano << endl;
-    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
-    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
-    cout << "\t- Particion 1: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_1.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
-    cout << "\t- Particion 2: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_2.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
-    cout << "\t- Particion 3: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_3.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
-    cout << "\t- Particion 4: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_4.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
-    cout << "=====================================" << endl;
-
     particiones.push_back(mbr.mbr_particion_1);
     particiones.push_back(mbr.mbr_particion_2);
     particiones.push_back(mbr.mbr_particion_3);
@@ -199,20 +169,20 @@ void Fdisk::AgregarParticion(Fdisk *particion){
 
     if(particion->type == "P"){
         if(cantidad_primarias == 4){
-            cout << "ERROR: Ya existen 4 particiones primarias" << endl;
+            cout << "\e[1;31m[ERROR]:\e[1;37m Ya existen 4 particiones primarias\e[m\n" << endl;
             return;
         }
     }else if(particion->type == "E"){
         if(cantidad_primarias == 4){
-            cout << "ERROR: Ya existen 4 particiones primarias" << endl;
+            cout << "\e[1;31m[ERROR]:\e[1;37m Ya existen 4 particiones primarias\e[m\n" << endl;
             return;
         }else if(cantidad_extendidas == 1){
-            cout << "ERROR: Ya existe una particion extendida" << endl;
+            cout << "\e[1;31m[ERROR]:\e[1;37m Ya existe una particion extendida\e[m\n" << endl;
             return;
         }
     }else if(particion->type == "L"){
         if(cantidad_extendidas == 0){
-            cout << "ERROR: No existe una particion extendida para poder agregar su partición Lógica" << endl;
+            cout << "\e[1;31m[ERROR]:\e[1;37m No existe una particion extendida para poder agregar su partición Lógica\e[m\n" << endl;
             return;
         }
     }
@@ -220,7 +190,7 @@ void Fdisk::AgregarParticion(Fdisk *particion){
     //VALIDACION DE QUE NO EXISTA UNA PARTICION CON EL MISMO NOMBRE
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_name == particion->name){
-            cout << "ERROR: Ya existe una particion con el mismo nombre" << endl;
+            cout << "\e[1;31m[ERROR]:\e[1;37m Ya existe una particion con el mismo nombre\e[m\n" << endl;
             return;
         }else if(particiones[i].part_type == 'E'){
             //SI EXISTE UNA PARTICION EXTENDIDA SE DEBE DE BUSCAR EN SU EBR
@@ -229,7 +199,7 @@ void Fdisk::AgregarParticion(Fdisk *particion){
             if(ebrs.size() > 0){
                 for(int j = 0; j < ebrs.size(); j++){
                     if(ebrs[j].part_name == particion->name){
-                        cout << "ERROR: Ya existe una particion con el mismo nombre" << endl;
+                        cout << "\e[1;31m[ERROR]:\e[1;37m Ya existe una particion con el mismo nombre\e[m\n" << endl;
                         return;
                     }
                 }
@@ -237,10 +207,9 @@ void Fdisk::AgregarParticion(Fdisk *particion){
         }
     }
 
-    cout << "=====================================" << endl;
     //VALIDACION QUE LA PARTICION A CREAR NO SEA DE MAYOR TAMAÑO QUE EL DISCO
     if(particion->size > mbr.mbr_tamano){
-        cout << "ERROR: El tamaño de la particion es mayor al tamaño del disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m El tamaño de la particion es mayor al tamaño del disco\e[m\n" << endl;
         return;
     }
 
@@ -262,7 +231,7 @@ void Fdisk::AgregarParticion(Fdisk *particion){
 
 }
 
-//METODO PARA PODER APLICAR EL PRIMER AJUSTE
+//METODO PARA PODER APLICAR EL PRIMER AJUSTE DE PRIMARIAS Y EXTENDIDAS
 void Fdisk::FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
     //VERIFICA CUANDO COMIENZA A NO TENER 4 PARTICIONES EL DISCO QUE FUERON CREADAS ANTES
     for(int i = 0; i < particiones.size(); i++){
@@ -286,7 +255,7 @@ void Fdisk::FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
                     ActualizarDisco(particiones, mbr, particion->path);
                     return;
                 }else{
-                    cout << "ERROR: No hay espacio suficiente para crear la particion" << endl;
+                    cout << "\e[1;31m[ERROR]:\e[1;37m No hay espacio suficiente para crear la particion\e[m\n" << endl;
                     return;
                 }
             }
@@ -327,10 +296,11 @@ void Fdisk::FirstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
     }
 
     if(error){
-        cout << "ERROR: No se pudo crear la partición" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se pudo crear la partición\e[m\n" << endl;
     }
 }
 
+//METODO PARA PODER APLICAR EL MEJOR AJUSTE DE PRIMARIAS Y EXTENDIDAS
 void Fdisk::BestFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_start == -1){
@@ -353,7 +323,7 @@ void Fdisk::BestFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
                     ActualizarDisco(particiones, mbr, particion->path);
                     return;
                 }else{
-                    cout << "ERROR: No hay espacio suficiente para crear la particion" << endl;
+                    cout << "\e[1;31m[ERROR]:\e[1;37m No hay espacio suficiente para crear la particion\e[m\n" << endl;
                     return;
                 }
             }
@@ -374,7 +344,7 @@ void Fdisk::BestFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
     }
 
     if(espacio_pequeño == 1*1024*1024*1024){
-        cout << "ERROR: No se pudo crear la partición ya que no hay espacio" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se pudo crear la partición ya que no hay espacio" << endl;
         return;
     }else{
         particiones[no_particion].part_s = particion->size;
@@ -386,6 +356,7 @@ void Fdisk::BestFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
 
 }
 
+//METODO PARA PODER APLICAR EL PEOR AJUSTE DE PRIMARIAS Y EXTENDIDAS
 void Fdisk::WorstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_start == -1){
@@ -408,7 +379,7 @@ void Fdisk::WorstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
                     ActualizarDisco(particiones, mbr, particion->path);
                     return;
                 }else{
-                    cout << "ERROR: No hay espacio suficiente para crear la particion" << endl;
+                    cout << "\e[1;31m[ERROR]:\e[1;37m No hay espacio suficiente para crear la particion\e[m\n" << endl;
                     return;
                 }
             }
@@ -429,7 +400,7 @@ void Fdisk::WorstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
     }
 
     if(espacio_grande == 0){
-        cout << "ERROR: No se pudo crear la partición ya que no hay espacio" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se pudo crear la partición ya que no hay espacio" << endl;
         return;
     }else{
         particiones[no_particion].part_s = particion->size;
@@ -441,6 +412,7 @@ void Fdisk::WorstFit(vector<Particion> particiones, MBR mbr,Fdisk *particion){
 
 }
 
+//METODO PARA REGISTRAR LOS CAMBIOS HECHOS EN LAS PARTICIONES EN EL DISCO
 void Fdisk::ActualizarDisco(vector<Particion> particiones,MBR mbr, string path){
     mbr.mbr_particion_1 = particiones[0];
     mbr.mbr_particion_2 = particiones[1];
@@ -451,47 +423,26 @@ void Fdisk::ActualizarDisco(vector<Particion> particiones,MBR mbr, string path){
     fseek(archivo,0,SEEK_SET);
     fwrite(&mbr,sizeof(MBR),1,archivo);
     fclose(archivo);
-
-    //MUESTRO TEMPORALMENTE EL MBR
-    cout << "================MBR==================" << endl;
-    cout << "Tamaño: " << mbr.mbr_tamano << endl;
-    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
-    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
-    cout << "\t- Particion 1: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_1.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
-    cout << "\t- Particion 2: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_2.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
-    cout << "\t- Particion 3: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_3.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
-    cout << "\t- Particion 4: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_4.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
-    cout << "=====================================" << endl;
-
-    cout << "La Particion fue creada exitosamente" << endl;
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m La Particion fue creada exitosamente\e[m\n" << endl;
     return;
 }
 
+//METODO PARA ELIMINAR UNA PARTICION
 void Fdisk::EliminarParticion(Fdisk *particion){
+    string respuesta = "";
+    do{
+        cout << "¿Quiere eliminar la particion? [S/N]" << endl;
+        cin >> respuesta;
+        if(respuesta == "N" || respuesta == "n"){
+            cout << "\e[1;33m[WARNING]:\e[1;37m No se elimino la particion\e[m\n" << endl;
+            return;
+        }else if(respuesta == "S" || respuesta == "s"){
+            break;
+        }else{
+            cout << "\e[1;31m[ERROR]:\e[1;37m Opcion no valida\e[m\n" << endl;
+        }
+    }while(respuesta != "S" && respuesta != "s" && respuesta != "N" && respuesta != "n");
+
     vector<Particion> particiones;
     //OBTIENE LA INFORMACION DEL MBR
     FILE *archivo;
@@ -500,41 +451,6 @@ void Fdisk::EliminarParticion(Fdisk *particion){
     fseek(archivo,0,SEEK_SET);
     fread(&mbr,sizeof(MBR),1,archivo);
     fclose(archivo);
-
-    //MUESTRO TEMPORALMENTE EL MBR
-    cout << "================MBR==================" << endl;
-    cout << "Tamaño: " << mbr.mbr_tamano << endl;
-    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
-    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
-    cout << "\t- Particion 1: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_1.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
-    cout << "\t- Particion 2: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_2.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
-    cout << "\t- Particion 3: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_3.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
-    cout << "\t- Particion 4: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_4.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
-    cout << "=====================================" << endl;
 
     particiones.push_back(mbr.mbr_particion_1);
     particiones.push_back(mbr.mbr_particion_2);
@@ -592,7 +508,7 @@ void Fdisk::EliminarParticion(Fdisk *particion){
                 }
             }
             if(!existe){
-                cout << "ERROR: El nombre ingresado no coincide con las particiones que se encuentran dentro del disco" << endl;
+                cout << "\e[1;31m[ERROR]:\e[1;37m El nombre ingresado no coincide con las particiones que se encuentran dentro del disco\e[m\n" << endl;
                 return;
             }else{
                 //ACTUALIZA EL MBR EN EL ARCHIVO Y ELIMINA LA PARTICION Y LA LLENA DE CEROS
@@ -611,50 +527,16 @@ void Fdisk::EliminarParticion(Fdisk *particion){
                 }
                 fclose(archivo);
 
-                //MUESTRO TEMPORALMENTE EL MBR
-                cout << "================MBR==================" << endl;
-                cout << "Tamaño: " << mbr.mbr_tamano << endl;
-                cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
-                cout << "Firma: " << mbr.mbr_dsk_signature << endl;
-                cout << "\t- Particion 1: "  << endl;
-                cout << "\t\t-Name: " << mbr.mbr_particion_1.part_name << endl;
-                cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
-                cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
-                cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
-                cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
-                cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
-                cout << "\t- Particion 2: "  << endl;
-                cout << "\t\t-Name: " << mbr.mbr_particion_2.part_name << endl;
-                cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
-                cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
-                cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
-                cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
-                cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
-                cout << "\t- Particion 3: "  << endl;
-                cout << "\t\t-Name: " << mbr.mbr_particion_3.part_name << endl;
-                cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
-                cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
-                cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
-                cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
-                cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
-                cout << "\t- Particion 4: "  << endl;
-                cout << "\t\t-Name: " << mbr.mbr_particion_4.part_name << endl;
-                cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
-                cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
-                cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
-                cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
-                cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
-                cout << "=====================================" << endl;
-
-                cout << "La Particion fue eliminada correctamente" << endl;
+                cout << "\e[1;32m [SUCCESS]: \e[1;37m La Particion fue eliminada correctamente \e[m\n" << endl;
             }
         }
     }else{
-        cout << "ERROR: La particion no existe" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m La particion no existe\e[m\n" << endl;
         return;
     }
 }
 
+//METODO PARA CAMBIAR EL TAMAÑO DE LAS PARTICIONES
 void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
     vector<Particion> particiones;
     //OBTIENE LA INFORMACION DEL MBR
@@ -664,41 +546,6 @@ void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
     fseek(archivo,0,SEEK_SET);
     fread(&mbr,sizeof(MBR),1,archivo);
     fclose(archivo);
-
-    //MUESTRO TEMPORALMENTE EL MBR
-    cout << "================MBR==================" << endl;
-    cout << "Tamaño: " << mbr.mbr_tamano << endl;
-    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
-    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
-    cout << "\t- Particion 1: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_1.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
-    cout << "\t- Particion 2: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_2.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
-    cout << "\t- Particion 3: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_3.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
-    cout << "\t- Particion 4: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_4.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
-    cout << "=====================================" << endl;
 
     particiones.push_back(mbr.mbr_particion_1);
     particiones.push_back(mbr.mbr_particion_2);
@@ -714,22 +561,15 @@ void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
             break;
         }else if(particiones[i].part_type == 'E'){
             //OBTIENE LA INFORMACION DEL EBR
-            FILE *archivo;
-            archivo = fopen(particion->path.c_str(),"rb+");
-            EBR ebr;
-            int temp = particiones[i].part_start;
-            while(temp != -1){
-                fseek(archivo,temp,SEEK_SET);
-                fread(&ebr,sizeof(EBR),1,archivo);
-                if(ebr.part_name == particion->name){
+            vector<EBR> ebrs = ListadoEBR(particiones[i],particion->path);
+            for(int j = 0; j < ebrs.size(); j++){
+                if(ebrs[j].part_name == particion->name){
                     encontrado = true;
                     logica = true;
                     break;
                 }
-                temp = ebr.part_next;
             }
-            
-            fclose(archivo);
+
         }
     }
 
@@ -741,7 +581,7 @@ void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
     }
 
     if(!encontrado){
-        cout << "ERROR: No se encontro la particion con el nombre: " << particion->name << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se encontro la particion con el nombre: " << particion->name << "\e[m\n" << endl;
         return;
     }
 
@@ -755,33 +595,37 @@ void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
                     if(i != 3){
                         if(particiones[i+1].part_start != -1){
                             int nuevo_tamanio = particiones[i].part_s + extra;
-                            if(nuevo_tamanio > 0 && nuevo_tamanio < particiones[i+1].part_start){
+                            if(nuevo_tamanio > 0 && (nuevo_tamanio+particiones[i].part_start) < particiones[i+1].part_start && particiones[i+1].part_start != -1){
+                                particiones[i].part_s = nuevo_tamanio;
+                                error = false;
+                                break;
+                            }else if(nuevo_tamanio > 0 && particiones[i+1].part_start == -1 && (particiones[i].part_start + nuevo_tamanio) < mbr.mbr_tamano){
                                 particiones[i].part_s = nuevo_tamanio;
                                 error = false;
                                 break;
                             }else{
-                                cout << "No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso" << endl;
+                                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso \e[m\n" << endl;
                                 return;
                             }
                         }else{
                             int nuevo_tamanio = particiones[i].part_s + extra;
-                            if(nuevo_tamanio > 0 && nuevo_tamanio < mbr.mbr_tamano){
+                            if(nuevo_tamanio > 0 && (particiones[i].part_start + nuevo_tamanio) < mbr.mbr_tamano){
                                 particiones[i].part_s = nuevo_tamanio;
                                 error = false;
                                 break;
                             }else{
-                                cout << "No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso" << endl;
+                                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso \e[m\n" << endl;
                                 return;
                             }
                         }
                     }else{
                         int nuevo_tamanio = particiones[i].part_s + extra;
-                        if(nuevo_tamanio > 0 && nuevo_tamanio < mbr.mbr_tamano){
+                        if(nuevo_tamanio > 0 && (particiones[i].part_start + nuevo_tamanio) < mbr.mbr_tamano){
                             particiones[i].part_s = nuevo_tamanio;
                             error = false;
                             break;
                         }else{
-                            cout << "No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso" << endl;
+                            cout << "\e[1;31m[ERROR]:\e[1;37m No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso \e[m\n" << endl;
                             return;
                         }
                     }
@@ -790,7 +634,7 @@ void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
         }
 
         if(error){
-            cout << "No se encontro la particion con el nombre: " << particion->name << endl;
+            cout << "\e[1;31m[ERROR]:\e[1;37m No se encontro la particion con el nombre: " << particion->name << "\e[m\n" << endl;
             return;
         }
     }else{
@@ -799,50 +643,37 @@ void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
         for(int i = 0; i < particiones.size(); i++){
             if(particiones[i].part_type == 'E'){
                 //OBTIENE LA INFORMACION DEL EBR
-                FILE *archivo;
-                archivo = fopen(particion->path.c_str(),"rb+");
-                EBR ebr;
-                int temp = particiones[i].part_start;
-                while(temp != -1){
-                    fseek(archivo,temp,SEEK_SET);
-                    fread(&ebr,sizeof(EBR),1,archivo);
-                    if(ebr.part_name == particion->name){
-                        if(ebr.part_next != -1){
-                            int nuevo_tamanio = ebr.part_s + extra;
-                            if(nuevo_tamanio > 0 && nuevo_tamanio < ebr.part_next){
-                                ebr.part_s = nuevo_tamanio;
-                                fseek(archivo,temp,SEEK_SET);
-                                fwrite(&ebr,sizeof(EBR),1,archivo);
+                vector<EBR> ebrs = ListadoEBR(particiones[i],particion->path);
+                for(int j = 0; j < ebrs.size(); j++){
+                    if(ebrs[j].part_name == particion->name){
+                        if(j != ebrs.size()){
+                            int nuevo_tamanio = ebrs[j].part_s + extra;
+                            if(nuevo_tamanio > 0 && (nuevo_tamanio+ebrs[j].part_start) < ebrs[j].part_next){
+                                ebrs[j].part_s = nuevo_tamanio;
                                 error = false;
                                 break;
                             }else{
-                                cout << "No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso" << endl;
+                                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso \e[m\n" << endl;
                                 return;
                             }
                         }else{
-                            int nuevo_tamanio = ebr.part_s + extra;
-                            if(nuevo_tamanio > 0 && nuevo_tamanio < particiones[i].part_s){
-                                ebr.part_s = nuevo_tamanio;
-                                fseek(archivo,temp,SEEK_SET);
-                                fwrite(&ebr,sizeof(EBR),1,archivo);
+                            int nuevo_tamanio = ebrs[j].part_s + extra;
+                            if(nuevo_tamanio > 0 && (ebrs[j].part_start + nuevo_tamanio) < particiones[i].part_s){
+                                ebrs[j].part_s = nuevo_tamanio;
                                 error = false;
                                 break;
                             }else{
-                                cout << "No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso" << endl;
+                                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede realizar la operacion ADD, el tamaño de la particion no es la adecuada para realizar este proceso \e[m\n" << endl;
                                 return;
                             }
                         }
-                        
                     }
-                    temp = ebr.part_next;
                 }
-                
-                fclose(archivo);
             }
         }
 
         if(error){
-            cout << "No se encontro la particion con el nombre: " << particion->name << endl;
+            cout << "\e[1;31m[ERROR]:\e[1;37m No se encontro la particion con el nombre: " << particion->name << " \e[m\n" << endl;
             return;
         }
     }
@@ -858,46 +689,11 @@ void Fdisk::Cambiar_Tamanio_Particion(Fdisk *particion){
     fwrite(&mbr,sizeof(MBR),1,archivo1);
     fclose(archivo);
 
-    //MUESTRO TEMPORALMENTE EL MBR
-    cout << "================MBR==================" << endl;
-    cout << "Tamaño: " << mbr.mbr_tamano << endl;
-    cout << "Fecha: " << mbr.mbr_fecha_creacion << endl;
-    cout << "Firma: " << mbr.mbr_dsk_signature << endl;
-    cout << "\t- Particion 1: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_1.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_1.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_1.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_1.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_1.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_1.part_fit << endl;
-    cout << "\t- Particion 2: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_2.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_2.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_2.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_2.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_2.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_2.part_fit << endl;
-    cout << "\t- Particion 3: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_3.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_3.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_3.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_3.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_3.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_3.part_fit << endl;
-    cout << "\t- Particion 4: "  << endl;
-    cout << "\t\t-Name: " << mbr.mbr_particion_4.part_name << endl;
-    cout << "\t\t-Status: " << mbr.mbr_particion_4.part_status << endl;
-    cout << "\t\t-Type: " << mbr.mbr_particion_4.part_type << endl;
-    cout << "\t\t-Start: " << mbr.mbr_particion_4.part_start << endl;
-    cout << "\t\t-Size: " << mbr.mbr_particion_4.part_s << endl;
-    cout << "\t\t-Fit: " << mbr.mbr_particion_4.part_fit << endl;
-    cout << "=====================================" << endl;
-
-    cout << "La Particion fue modificada exitosamente" << endl;
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m La Particion fue modificada exitosamente \e[m\n" << endl;
     
 }
 
-
+//METODO PARA AGREGAR UNA PARTICION LOGICA
 void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk *particion){
     //BUSCO SI EXISTE LA PARTICION EXTENDIDA
     bool error = true;
@@ -910,7 +706,7 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
     }
 
     if(error){
-        cout << "ERROR: No se encontro la particion extendida en el disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se encontro la particion extendida en el disco \e[m\n" << endl;
         return;
     }
 
@@ -924,7 +720,7 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
     //VERIFICACIONES PARA CREAR LA PARTICION LOGICA
     //TAMANIO
     if(particion->size > tamanio){
-        cout << "ERROR: No se puede crear la particion logica, el tamaño de la particion a crear es mayor al tamaño de la particion extendida" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se puede crear la particion logica, el tamaño de la particion a crear es mayor al tamaño de la particion extendida \e[m\n" << endl;
         return;
     }
 
@@ -939,15 +735,6 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
         ebr.part_s = particion->size;
         ebr.part_next = -1;
         strcpy(ebr.part_name,particion->name.c_str());
-        cout << "SIUUUUUUUUUU" << endl;
-        cout << "================= EBR =================" << endl;
-        cout << "\t- Status: " << ebr.part_status << endl;
-        cout << "\t- Fit: " << ebr.part_fit << endl;
-        cout << "\t- Start: " << ebr.part_start << endl;
-        cout << "\t- Size: " << ebr.part_s << endl;
-        cout << "\t- Next: " << ebr.part_next << endl;
-        cout << "\t- Name: " << ebr.part_name << endl;
-        cout << "======================================" << endl;
         AgregarEBR(ebr,particion->path);
     }else{
         //CREO EL NUEVO EBR
@@ -959,25 +746,23 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
             if(FirstFit_Logicas(logicas,particion->size,final) != -1){
                 ebr.part_start = FirstFit_Logicas(logicas,particion->size, final);
             }else{
-                cout << "ERROR: No se puede crear la particion logica, no hay espacio suficiente " << endl;
+                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede crear la particion logica, no hay espacio suficiente \e[m\n" << endl;
                 return;
             }
         }else if(particiones[particion_id].part_fit == 'b' || particiones[particion_id].part_fit == 'B'){
             ebr.part_fit = 'B';
-            cout << "BEST FIT" << endl;
             if(BestFit_Logicas(logicas,particion->size, final) != -1){
                 ebr.part_start = BestFit_Logicas(logicas,particion->size, final);
             }else{
-                cout << "ERROR: No se puede crear la particion logica, no hay espacio suficiente " << endl;
+                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede crear la particion logica, no hay espacio suficiente \e[m\n" << endl;
                 return;
             }
         }else if(particiones[particion_id].part_fit == 'w' || particiones[particion_id].part_fit == 'W'){
             ebr.part_fit = 'W';
-            cout << "WORST FIT" << endl;
             if(WorstFit_Logicas(logicas,particion->size, final) != -1){
                 ebr.part_start = WorstFit_Logicas(logicas,particion->size, final);
             }else{
-                cout << "ERROR: No se puede crear la particion logica, no hay espacio suficiente " << endl;
+                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede crear la particion logica, no hay espacio suficiente \e[m\n" << endl;
                 return;
             }
         }
@@ -998,37 +783,21 @@ void Fdisk::AgregarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk 
         }
 
         strcpy(ebr.part_name,particion->name.c_str());
-        cout << "================= EBR =================" << endl; 
-        cout << "\t- Status: " << ebr.part_status << endl;
-        cout << "\t- Fit: " << ebr.part_fit << endl;
-        cout << "\t- Start: " << ebr.part_start << endl;
-        cout << "\t- Size: " << ebr.part_s << endl;
-        cout << "\t- Next: " << ebr.part_next << endl;
-        cout << "\t- Name: " << ebr.part_name << endl;
-        cout << "======================================" << endl;
         AgregarEBR(ebr,particion->path);
 
     }
 }
 
+//FUNCION PARA ENLISTAR LOS EBRS DE UNA PARTICION EXTENDIDA
 vector<EBR> Fdisk::ListadoEBR(Particion extendida, string path){
     vector<EBR> ebrs;
     FILE *archivo;
     archivo = fopen(path.c_str(),"rb+");
     int temp = extendida.part_start;
     while(temp != -1){
-        cout << "temp: " << temp << endl;
         fseek(archivo,temp,SEEK_SET);
         EBR ebr;
         fread(&ebr,sizeof(EBR),1,archivo);
-        cout << "================= EBR =================" << endl;
-        cout << "\t- Status: " << ebr.part_status << endl;
-        cout << "\t- Fit: " << ebr.part_fit << endl;
-        cout << "\t- Start: " << ebr.part_start << endl;
-        cout << "\t- Size: " << ebr.part_s << endl;
-        cout << "\t- Next: " << ebr.part_next << endl;
-        cout << "\t- Name: " << ebr.part_name << endl;
-        cout << "======================================" << endl;
         if(!cadenaVacia(ebr.part_name)){
             ebrs.push_back(ebr);
         }else if(cadenaVacia(ebr.part_name) && ebr.part_s != 0){
@@ -1042,6 +811,7 @@ vector<EBR> Fdisk::ListadoEBR(Particion extendida, string path){
     return ebrs;
 }
 
+//FUNCION PARA RETORNAR EL ULTIMO EBR DE LA LISTA
 EBR Fdisk::retornarUlitmoEBR(vector<EBR> ebrs){
     EBR ebr;
     for(int i = 0; i < ebrs.size(); i++){
@@ -1052,11 +822,12 @@ EBR Fdisk::retornarUlitmoEBR(vector<EBR> ebrs){
     return ebr;
 }
 
+//METODO PARA ACTUALIZAR LOS CAMBIOS HECHOS EN EL EBR
 void Fdisk::ActualizarEBR(EBR ebr, string path){
     FILE *archivo;
     archivo = fopen(path.c_str(),"rb+");
     if(archivo == NULL){
-        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se pudo abrir el archivo \e[m\n" << endl;
         return;
     }
     fseek(archivo,ebr.part_start,SEEK_SET);
@@ -1064,18 +835,21 @@ void Fdisk::ActualizarEBR(EBR ebr, string path){
     fclose(archivo);
 }
 
+//METODO PARA AGREGAR UN NUEVO EBR
 void Fdisk::AgregarEBR(EBR ebr, string path){
     FILE *archivo;
     archivo = fopen(path.c_str(),"rb+");
     if(archivo == NULL){
-        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se pudo abrir el archivo \e[m\n" << endl;
         return;
     }
     fseek(archivo,ebr.part_start,SEEK_SET);
     fwrite(&ebr,sizeof(EBR),1,archivo);
     fclose(archivo);
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m Se creo la particion logica correctamente \e[m\n" << endl;
 }
 
+//METODO PARA ELIMINAR UNA PARTICION LOGICA
 void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk *particion){
     //BUSCO SI EXISTE LA PARTICION EXTENDIDA
     bool error = true;
@@ -1088,7 +862,7 @@ void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk
     }
 
     if(error){
-        cout << "ERROR: No se encontro la particion extendida en el disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se encontro la particion extendida en el disco\e[m\n" << endl;
         return;
     }
 
@@ -1103,7 +877,7 @@ void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk
     vector<EBR> logicas = ListadoEBR(particiones[particion_id],particion->path);
 
     if(logicas.size() == 0){
-        cout << "ERROR: No se encontro ninguna particion logica en la particion extendida" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se encontro ninguna particion logica en la particion extendida \e[m\n" << endl;
         return;
     }
 
@@ -1119,7 +893,7 @@ void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk
     }
 
     if(error2){
-        cout << "ERROR: No se encontro la particion logica que se quiere eliminar" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se encontro la particion logica que se quiere eliminar \e[m\n" << endl;
         return;
     }
 
@@ -1137,7 +911,7 @@ void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk
     FILE *archivo;
     archivo = fopen(particion->path.c_str(),"rb+");
     if(archivo == NULL){
-        cout << "ERROR: No se pudo abrir el archivo" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se pudo abrir el archivo \e[m\n" << endl;
         return;
     }
     fseek(archivo,logicas[particion_id2].part_start+ sizeof(EBR),SEEK_SET);
@@ -1147,10 +921,11 @@ void Fdisk::EliminarParticionLogica(vector<Particion> particiones, MBR mbr,Fdisk
     }
     fclose(archivo);
 
-    cout << "PARTICION LOGICA ELIMINADA" << endl;
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m La particion Lógica ha sido eliminada correctamente \e[m\n" << endl;
 
 }
 
+//FUNCION PARA RETORNAR LA POSICION DE LA PARTICION EN UN FIT DE PRIMER AJUSTE
 int Fdisk:: FirstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
     int inicio = -1;
     for(int i = 0; i < ebrs.size(); i++){
@@ -1167,6 +942,7 @@ int Fdisk:: FirstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
                 }
             }else if(ebrs[i].part_next == -1){
                 if((final_pe-(ebrs[i].part_start+ebrs[i].part_s)) >= tamanio){
+                    inicio = ebrs[i].part_start+ebrs[i].part_s;
                     return inicio;
                 }
             }
@@ -1176,6 +952,7 @@ int Fdisk:: FirstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
     return inicio;
 }
 
+//FUNCION PARA RETORNAR LA POSICION DE LA PARTICION EN UN FIT DE MEJOR AJUSTE
 int Fdisk:: BestFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
     int mejor_ajuste = 999999999;
     int mejor_inicio = -1;
@@ -1208,6 +985,7 @@ int Fdisk:: BestFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
     return mejor_inicio;
 }
 
+//FUNCION PARA RETORNAR LA POSICION DE LA PARTICION EN UN FIT DE PEOR AJUSTE
 int Fdisk:: WorstFit_Logicas(vector<EBR> ebrs, int tamanio, int final_pe){
     int peor_ajuste = 0;
     int peor_inicio = -1;

@@ -19,7 +19,7 @@ void Login::IniciarSesion(Login *login){
 
     //OBTIENE LA PARTICION
     if(lista_particiones_montadas.ExisteParticion(id) == false){
-        cout << "ERROR: No existe la particion con el id: " << id << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No existe la particion con el id: " << id << "\e[m\n" << endl;
         return;
     }
     Nodo particion = lista_particiones_montadas.obtenerNodoParticion(id);
@@ -40,7 +40,7 @@ void Login::IniciarSesion(Login *login){
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_type == 'e' || particiones[i].part_type == 'E'){
             if(particiones[i].part_name == particion.name){
-                cout << "ERROR: No se puede formatear una particion extendida" << endl;
+                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede formatear una particion extendida \e[m\n" << endl;
                 return;
             }else{
                 ebrs = ListadoEBRS(particiones[i], particion.path);
@@ -110,20 +110,20 @@ void Login::IniciarSesion(Login *login){
                     if(logueado == false){
                         logueado = true;
                         userlogueado = datos[3];
-                        cout << "Se ha iniciado sesion con el usuario: " << datos[3] << endl;
+                        cout << "\e[1;32m [SUCCESS]: \e[1;37m Se ha iniciado sesion con el usuario: " << datos[3] << "\e[m\n" << endl;
                         return;
                     }else{
-                        cout << "ERROR: Ya hay una sesion iniciada " << endl;
+                        cout << "\e[1;31m[ERROR]:\e[1;37m Ya hay una sesion iniciada \e[m\n" << endl;
                         return;
                     }
                 }else{
-                    cout << "ERROR: Autenticación fallida" << endl;
+                    cout << "\e[1;31m[ERROR]:\e[1;37m Autenticación fallida \e[m\n" << endl;
                     return;
                 }
             }
         }
     }
-    cout << "ERROR: No se encontro el usuario" << endl;
+    cout << "\e[1;31m[ERROR]:\e[1;37m No se encontro el usuario \e[m\n" << endl;
 
 }
 

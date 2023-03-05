@@ -30,13 +30,14 @@ void ListaDoble::Insertar(string path, string name, string id, char type){
 }
 
 void ListaDoble::Mostrar(){
-    cout << "========== LAS PARTICIONES QUE SE ENCUENTRAN MONTADAS SON ==========" << endl;
+    cout << endl;
+    cout << "\e[1;34m PARTICIONES MONTADAS EN EL SISTEMA: " << endl;
     Nodo* aux = primero;
     while(aux != NULL){
-        cout << "Id: " << aux->id << endl;
-        cout << "---------------------------------------------------------------" << endl;
+        cout << "\e[1;37m Id: e[1;36m" << aux->id << endl;
         aux = aux->siguiente;
     }
+    cout <<"\e[m\n"<< endl;
 }
 
 void ListaDoble::Eliminar(string id){

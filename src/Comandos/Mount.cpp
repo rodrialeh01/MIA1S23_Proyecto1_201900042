@@ -5,12 +5,12 @@ Mount::Mount() {
 
 void Mount::MontarParticion(Mount *montar){
     if(montar->path == ""){
-        cout << "ERROR: No se ha ingresado la ruta del disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado la ruta del disco \e[m\n" << endl;
         return;
     }
 
     if(montar->name == ""){
-        cout << "ERROR: No se ha ingresado el nombre de la particion" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado el nombre de la particion \e[m\n" << endl;
         return;
     }
 
@@ -18,7 +18,7 @@ void Mount::MontarParticion(Mount *montar){
     FILE *archivo;
     archivo = fopen(montar->path.c_str(), "rb+");
     if(archivo == NULL){
-        cout << "ERROR: No se ha encontrado el disco" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado el disco \e[m\n" << endl;
         return;
     }
 
@@ -27,16 +27,16 @@ void Mount::MontarParticion(Mount *montar){
     fseek(archivo, 0, SEEK_SET);
     fread(&mbr, sizeof(MBR), 1, archivo);
     if(mbr.mbr_tamano == 0){
-        cout << "ERROR: El disco no tiene particiones" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m El disco no tiene particiones \e[m\n" << endl;
         return;
     }
     vector<Particion> particiones = {mbr.mbr_particion_1, mbr.mbr_particion_2, mbr.mbr_particion_3, mbr.mbr_particion_4};
-    
+    bool extendid = false;
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_type == 'P'){
             if(montar->name == particiones[i].part_name){
                 if(lista_particiones_montadas.ParticionMontada(particiones[i].part_name,montar->path)){
-                    cout << "La particion que desea montar ya esta montada" << endl;
+                    cout << "\e[1;31m[ERROR]:\e[1;37m La particion que desea montar ya esta montada \e[m\n" << endl;
                     return;
                 }
                 string id = "42" + to_string(lista_particiones_montadas.CrearNoParticion(montar->path))+ nombre_disco(montar->path);
@@ -46,18 +46,19 @@ void Mount::MontarParticion(Mount *montar){
         }else if(particiones[i].part_type == 'E'){
             if(montar->name == particiones[i].part_name){
                 if(lista_particiones_montadas.ParticionMontada(particiones[i].part_name,montar->path)){
-                    cout << "La particion que desea montar ya esta montada" << endl;
+                    cout << " \e[1;31m[ERROR]:\e[1;37m La particion que desea montar ya esta montada \e[m\n" << endl;
                     return;
                 }
                 string id = "42" + to_string(lista_particiones_montadas.CrearNoParticion(montar->path))+ nombre_disco(montar->path);
                 lista_particiones_montadas.Insertar(montar->path,particiones[i].part_name,id,particiones[i].part_type);
+                extendid = true;
                 break;
             }else{
                 vector<EBR> ebrs = ListadoEBR(particiones[i], montar->path);
                 for(int j = 0; j < ebrs.size(); j++){
                     if(montar->name == ebrs[j].part_name){
                         if(lista_particiones_montadas.ParticionMontada(ebrs[j].part_name,montar->path)){
-                            cout << "La particion que desea montar ya esta montada" << endl;
+                            cout << "\e[1;31m[ERROR]:\e[1;37m La particion que desea montar ya esta montada \e[m\n" << endl;
                             return;
                         }
                         string id = "42" + to_string(lista_particiones_montadas.CrearNoParticion(montar->path))+ nombre_disco(montar->path);
@@ -69,7 +70,10 @@ void Mount::MontarParticion(Mount *montar){
         }
     }
     fclose(archivo);
-    cout << "La particion se ha montado correctamente" << endl;
+    if(extendid){
+        cout << "\e[1;33m[WARNING]:\e[1;37m Se montó una partición de tipo Extendida \e[m\n" << endl;
+    }
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m La particion se ha montado correctamente \e[m\n" << endl;
 
     lista_particiones_montadas.Mostrar();
 }
@@ -101,7 +105,6 @@ vector<EBR> Mount::ListadoEBR(Particion extendida, string path){
     archivo = fopen(path.c_str(),"rb+");
     int temp = extendida.part_start;
     while(temp != -1){
-        cout << "temp: " << temp << endl;
         fseek(archivo,temp,SEEK_SET);
         EBR ebr;
         fread(&ebr,sizeof(EBR),1,archivo);

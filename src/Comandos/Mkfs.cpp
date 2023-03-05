@@ -15,7 +15,7 @@ bool Mkfs::cadenaVacia(char cadena[]){
 void Mkfs::SistemaDeArchivos(Mkfs *mkfs){
     //VALIDACIONES DE PARAMETROS
     if(mkfs->id == ""){
-        cout << "ERROR: No se ha ingresado el id de la particion" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha ingresado el id de la particion \e[m\n" << endl;
         return;
     }
     if(mkfs->type == ""){
@@ -27,7 +27,7 @@ void Mkfs::SistemaDeArchivos(Mkfs *mkfs){
 
     //VALIDACION SI EXISTE EL ID
     if(!lista_particiones_montadas.ExisteID(mkfs->id)){
-        cout << "ERROR: No se ha encontrado la particion" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion \e[m\n" << endl;
         return;
     }
 
@@ -37,11 +37,11 @@ void Mkfs::SistemaDeArchivos(Mkfs *mkfs){
         }else if(mkfs->fs == "3fs"){
             FormatearExt3(mkfs->id);
         }else{
-            cout << "ERROR: El sistema de archivos a formatear no existe" << endl;
+            cout << "\e[1;31m[ERROR]:\e[1;37m El sistema de archivos a formatear no existe \e[m\n" << endl;
             return;
         }
     }else{
-        cout << "ERROR: El tipo de formateo no existe" << endl;
+        cout << "\e[1;31m[ERROR]:\e[1;37m El tipo de formateo no existe \e[m\n" << endl;
         return;
     }
 
@@ -67,7 +67,7 @@ void Mkfs::FormatearExt2(string id){
     for(int i = 0; i < particiones.size(); i++){
         if(particiones[i].part_type == 'e' || particiones[i].part_type == 'E'){
             if(particiones[i].part_name == particion.name){
-                cout << "ERROR: No se puede formatear una particion extendida" << endl;
+                cout << "\e[1;31m[ERROR]:\e[1;37m No se puede formatear una particion extendida \e[m\n" << endl;
                 return;
             }else{
                 ebrs = ListadoEBRS(particiones[i], particion.path);
@@ -290,7 +290,7 @@ void Mkfs::FormatearExt2(string id){
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
     fclose(archivo);
 
-    cout << "SE FORMATEO LA PARTICION Y SE CREO EL SISTEMA DE ARCHIVOS EXT2" << endl;
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m Se acaba de formatear la partición y se creó el sistema de archivos EXT2 \e[m\n" << endl;
 
 }
 

@@ -100,7 +100,7 @@ FILEN                   ">file"({DIGIT}+)
 "="		                {return yy::Parser::make_IGUAL(yytext);}
 {CADENA}                {return yy::Parser::make_CADENA(yytext);}
 {ESPACIOS}              {}
-{COMENTARIO}            {std::cout << yytext << std::endl;}
+{COMENTARIO}            {std::cout <<"\e[1m "<< yytext << "\e[m"<<std::endl;}
 
 
 [[:blank:]]     {}
