@@ -1,1 +1,1 @@
-c++ main.cpp ./RAM/*.cpp ./Comandos/*.cpp ./analizador/*.cc 
+c++ main.cpp Estructuras.cpp ./RAM/*.cpp ./Comandos/*.cpp ./analizador/*.cc 

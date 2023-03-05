@@ -30,6 +30,16 @@ void Rep::controlReportes(Rep *reporte){
         ReporteMBR(reporte);
     }else if (toLowerCase(reporte->name) == "disk"){
         ReporteDisk(reporte);
+    }else if (toLowerCase(reporte->name) == "inodo"){
+        ReporteInodo(reporte);
+    }else if (toLowerCase(reporte->name) == "bloque"){
+        ReporteBloque(reporte);
+    }else if (toLowerCase(reporte->name) == "bm_inode"){
+        ReporteBMInodo(reporte);
+    }else if (toLowerCase(reporte->name) == "bm_block"){
+        ReporteBMBloque(reporte);
+    }else if (toLowerCase(reporte->name) == "sb"){
+        ReporteSuperBloque(reporte);
     }else{
         cout << "ERROR: El reporte no existe" << endl;
     }
@@ -557,14 +567,14 @@ void Rep::ReporteDisk(Rep *reporte){
     }
     if(mbr.mbr_particion_1.part_s ==0){
         reporte_dsk += "\t\t<TD rowspan=\"2\" bgcolor=\"\#a2a2a2\">Libre<BR/>\n";
-        reporte_dsk += "\t\t<FONT POINT-SIZE=\"10\">100\% del disco<FONT/></TD>\n";
+        reporte_dsk += "\t\t<FONT POINT-SIZE=\"10\">100\% del disco</FONT></TD>\n";
     }else if(mbr.mbr_particion_2.part_s ==0){
         reporte_dsk += "\t\t<TD rowspan=\"2\" bgcolor=\"\#a2a2a2\">Libre<BR/>\n";
         double porcentaje = (double(mbr.mbr_tamano-(mbr.mbr_particion_1.part_start + mbr.mbr_particion_1.part_s))/double(mbr.mbr_tamano-sizeof(MBR)))*100;
         stringstream porcentaje_s;
         porcentaje_s << std::fixed << std::setprecision(2) << porcentaje;
         string porcentaje_fs = porcentaje_s.str();
-        reporte_dsk += "\t\t<FONT POINT-SIZE=\"10\">"+porcentaje_fs+"\% del disco<FONT/></TD>\n";
+        reporte_dsk += "\t\t<FONT POINT-SIZE=\"10\">"+porcentaje_fs+"\% del disco</FONT></TD>\n";
     }else if(mbr.mbr_particion_3.part_s ==0){
         reporte_dsk += "\t\t<TD rowspan=\"2\" bgcolor=\"\#a2a2a2\">Libre<BR/>\n";
         double porcentaje = (double(mbr.mbr_tamano-(mbr.mbr_particion_2.part_start + mbr.mbr_particion_2.part_s))/double(mbr.mbr_tamano-sizeof(MBR)))*100;
@@ -701,6 +711,60 @@ void Rep::ReporteDisk(Rep *reporte){
     system(comando_open.c_str());
 
     cout << "Reporte generado con exito" << endl;
+}
+
+void Rep::ReporteInodo(Rep *reporte){
+
+}
+
+void Rep::ReporteBloque(Rep *reporte){
+    
+}
+
+void Rep::ReporteBMInodo(Rep *reporte){
+    
+}
+
+void Rep::ReporteBMBloque(Rep *reporte){
+    
+}
+
+void Rep::ReporteSuperBloque(Rep *reporte){
+    if(!lista_particiones_montadas.ExisteParticion(reporte->id)){
+        cout << "ERROR: No se ha encontrado la particion con el id: " << reporte->id << endl;
+        return;
+    }
+
+    Nodo particion_reporte = lista_particiones_montadas.obtenerNodoParticion(reporte->id);
+
+    FILE *archivo2;
+    archivo2 = fopen(particion_reporte.path.c_str(), "rb+");
+    if(archivo2 == NULL){
+        cout << "ERROR: No se ha encontrado el disco" << endl;
+        return;
+    }
+
+    MBR mbr;
+    fseek(archivo2, 0, SEEK_SET);
+    fread(&mbr, sizeof(MBR), 1, archivo2);
+    fclose(archivo2);
+
+    vector<Particion> particiones = {mbr.mbr_particion_1, mbr.mbr_particion_2, mbr.mbr_particion_3, mbr.mbr_particion_4};
+    for(int i = 0; i < particiones.size(); i++){
+        cout << "Particion " << i+1 << endl;
+    }
+    
+    vector<EBR> ebrs;
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_type == 'e'|| particiones[i].part_type == 'E'){
+            ebrs = ListadoEBR(particiones[i], particion_reporte.path);
+            if(ebrs.size() > 0){
+
+            }
+        }
+    }
+
+    
 }
 
 vector<EBR> Rep::ListadoEBR(Particion extendida, string path){

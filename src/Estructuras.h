@@ -2,9 +2,9 @@
 #define ESTRUCTURAS_H
 
 #include <ctime>
+#include <string>
 
-bool logueado= false;
-string userlogueado = "";
+using namespace std;
 
 //Struct de la particion
 typedef struct {
@@ -71,13 +71,13 @@ typedef struct {
 }Inodo;
 
 typedef struct {
-    Content b_content[4];
-}BloqueCarpeta;
-
-typedef struct {
     char b_name[12];
     int b_inodo;
 }Content;
+
+typedef struct {
+    Content b_content[4];
+}BloqueCarpeta;
 
 typedef struct {
     char b_content[64];
@@ -86,5 +86,10 @@ typedef struct {
 typedef struct {
     char b_content[64];
 }BloqueApuntador;
+
+class Estructuras{
+    public:
+        Estructuras();
+};
 
 #endif

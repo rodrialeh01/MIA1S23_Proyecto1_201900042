@@ -26,6 +26,11 @@ class Rep {
         void controlReportes(Rep *reporte);
         void ReporteMBR(Rep *reporte);
         void ReporteDisk(Rep *reporte);
+        void ReporteInodo(Rep *reporte);
+        void ReporteBloque(Rep *reporte);
+        void ReporteBMInodo(Rep *reporte);
+        void ReporteBMBloque(Rep *reporte);
+        void ReporteSuperBloque(Rep *reporte);
         string toLowerCase(string palabra);
         vector<EBR> ListadoEBR(Particion extendida, string path);
         bool cadenaVacia(char cadena[]);

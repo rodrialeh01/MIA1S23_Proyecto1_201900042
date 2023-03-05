@@ -25,7 +25,6 @@ void Rmdisk::EliminarDisco(Rmdisk *disco){
     FILE *archivo;
     if(!(archivo = fopen(disco->path.c_str(),"rb"))){
         cout << "ERROR: El disco no se encoentró en el sistema" << endl;
-        fclose(archivo);
         return;
     }
 
