@@ -17,6 +17,8 @@ struct Nodo{
     string id = "";
     char type = '\0';
     time_t fecha_mount;
+    time_t fecha_unmount;
+    bool sistema_archivos;
     Nodo* siguiente;
     Nodo* anterior;
 };

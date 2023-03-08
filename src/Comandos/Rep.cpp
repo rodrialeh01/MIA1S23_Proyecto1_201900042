@@ -744,7 +744,7 @@ void Rep::ReporteSuperBloque(Rep *reporte){
     }
 
     Nodo particion_reporte = lista_particiones_montadas.obtenerNodoParticion(reporte->id);
-
+    string path_princ = reporte->path;
     FILE *archivo2;
     archivo2 = fopen(particion_reporte.path.c_str(), "rb+");
     if(archivo2 == NULL){
@@ -755,24 +755,164 @@ void Rep::ReporteSuperBloque(Rep *reporte){
     MBR mbr;
     fseek(archivo2, 0, SEEK_SET);
     fread(&mbr, sizeof(MBR), 1, archivo2);
-    fclose(archivo2);
+
 
     vector<Particion> particiones = {mbr.mbr_particion_1, mbr.mbr_particion_2, mbr.mbr_particion_3, mbr.mbr_particion_4};
-    for(int i = 0; i < particiones.size(); i++){
-        cout << "Particion " << i+1 << endl;
-    }
-    
+    int inicio_particion = 0;
+
     vector<EBR> ebrs;
     for(int i = 0; i < particiones.size(); i++){
-        if(particiones[i].part_type == 'e'|| particiones[i].part_type == 'E'){
+        if(particiones[i].part_name == particion_reporte.name){
+            inicio_particion = particiones[i].part_start;
+        }else if(particiones[i].part_type == 'e'|| particiones[i].part_type == 'E'){
             ebrs = ListadoEBR(particiones[i], particion_reporte.path);
-            if(ebrs.size() > 0){
-
+            for(int j = 0; j < ebrs.size(); j++){
+                if(ebrs[j].part_name == particion_reporte.name){
+                    inicio_particion = ebrs[j].part_start;
+                    break;
+                }
             }
+            break;
         }
     }
+    if(inicio_particion == 0){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
 
+    fseek(archivo2, inicio_particion, SEEK_SET);
+    SuperBloque super_bloque;
+    fread(&super_bloque, sizeof(SuperBloque), 1, archivo2);
+    fclose(archivo2);
+
+    string reporte_sb = "digraph G {\n";
+    reporte_sb += "node [shape=plaintext]\n";
+    reporte_sb += "tablambr[label=<\n";
+    reporte_sb += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+    reporte_sb += "<tr><td bgcolor=\"\#0d7236\" ><FONT COLOR=\"white\">REPORTE DE SUPERBLOQUE</FONT></td>\n";
+    reporte_sb += "<td bgcolor=\"\#0d7236\" ><FONT COLOR=\"\#0d7236\">a</FONT></td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_filesystem_type</td>\n";
+    reporte_sb += "<td border=\"1\">" + to_string(super_bloque.s_filesystem_type) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\" bgcolor=\"\#94ffc0\">s_inodes_count</td>\n";
+    reporte_sb += "<td border=\"1\" bgcolor=\"\#94ffc0\">" + to_string(super_bloque.s_inodes_count) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_blocks_count</td>\n";
+    reporte_sb += "<td border=\"1\">" + to_string(super_bloque.s_blocks_count) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\" bgcolor=\"\#94ffc0\">s_free_blocks_count</td>\n";
+    reporte_sb += "<td border=\"1\" bgcolor=\"\#94ffc0\">" + to_string(super_bloque.s_free_blocks_count) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_free_inodes_count</td>\n";
+    reporte_sb += "<td border=\"1\">" + to_string(super_bloque.s_free_inodes_count) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\" bgcolor=\"\#94ffc0\">s_mtime</td>\n";
+    reporte_sb += "<td border=\"1\" bgcolor=\"\#94ffc0\">" + getFecha(super_bloque.s_mtime) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_umtime</td>\n";
+    reporte_sb += "<td border=\"1\">" + getFecha(super_bloque.s_umtime) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\" bgcolor=\"\#94ffc0\">s_mnt_count</td>\n";
+    reporte_sb += "<td border=\"1\" bgcolor=\"\#94ffc0\">" + to_string(super_bloque.s_mnt_count) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_magic</td>\n";
+    reporte_sb += "<td border=\"1\">" + to_string(super_bloque.s_magic) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\" bgcolor=\"\#94ffc0\">s_inode_s</td>\n";
+    reporte_sb += "<td border=\"1\" bgcolor=\"\#94ffc0\">" + to_string(super_bloque.s_inode_s) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_block_s</td>\n";
+    reporte_sb += "<td border=\"1\">" + to_string(super_bloque.s_block_s) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\" bgcolor=\"\#94ffc0\">s_firts_ino</td>\n";
+    reporte_sb += "<td border=\"1\" bgcolor=\"\#94ffc0\">" + to_string(super_bloque.s_first_ino) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_first_blo</td>\n";
+    reporte_sb += "<td border=\"1\">" + to_string(super_bloque.s_first_blo) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\" bgcolor=\"\#94ffc0\">s_bm_inode_start</td>\n";
+    reporte_sb += "<td border=\"1\" bgcolor=\"\#94ffc0\">" + to_string(super_bloque.s_bm_inode_start) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_bm_block_start</td>\n";
+    reporte_sb += "<td border=\"1\">" + to_string(super_bloque.s_bm_block_start) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\" bgcolor=\"\#94ffc0\">s_inode_start</td>\n";
+    reporte_sb += "<td border=\"1\" bgcolor=\"\#94ffc0\">" + to_string(super_bloque.s_inode_start) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "<tr><td border=\"1\">s_block_start</td>\n";
+    reporte_sb += "<td border=\"1\">" + to_string(super_bloque.s_block_start) + "</td>\n";
+    reporte_sb += "</tr>\n";
+    reporte_sb += "</table>>];\n";
+    reporte_sb += "}";
+
+    //GENERANDO EL ARCHIVO DE REPORTE
+    //VALIDACION Y CREACION DE CARPETAS 
+    bool ruta_complex = false;
+    if(reporte->path[0] == '"' && reporte->path[reporte->path.length()-1] == '"'){
+        ruta_complex = true;
+        reporte->path = reporte->path.substr(1,reporte->path.length()-2);
+    }
+
+
+    string path_temp =  reporte->path;
+    vector<string> carpetas_rep = split(reporte->path,'/');
+    string ruta = "";
+    if(path_temp[0] == '/' && ruta_complex == false){
+        ruta = "/";
+    }else if(path_temp[0] == '/' && ruta_complex == true){
+        ruta = "\"/";
+    }
     
+    for(int i = 0; i < carpetas_rep.size()-1; ++i){
+        if(carpetas_rep[i]!= ""){
+            ruta += carpetas_rep[i] + "/";
+        }
+    }
+    if(ruta_complex == true){
+        ruta += "\"";
+    }
+    string comando_linux = "mkdir -p " + ruta;
+    system(comando_linux.c_str());
+
+    //CREACION DEL ARCHIVO
+    FILE *archivo_reporte;
+    string nombre_rep = carpetas_rep[carpetas_rep.size()-1].substr(0,carpetas_rep[carpetas_rep.size()-1].length()-4);
+
+    string tipo_rep = carpetas_rep[carpetas_rep.size()-1].substr(carpetas_rep[carpetas_rep.size()-1].length()-4,carpetas_rep[carpetas_rep.size()-1].length());
+
+    string ruta2 = ruta; 
+    if(ruta_complex == true){
+        ruta2 = path_princ.substr(1,path_princ.length()-2);
+        ruta2 = ruta2.substr(0,ruta2.length()-5);
+    }
+    
+    string path_rep = ruta2 + ".dot";
+    string path_rep2 = ruta2;
+    cout << path_rep << endl;
+    archivo_reporte= fopen(path_rep.c_str(),"w");
+    fputs(reporte_sb.c_str(),archivo_reporte);
+    fclose(archivo_reporte);
+
+
+    if(tipo_rep == ".pdf"){
+        string comando_dot = "dot -Tpdf " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".png"){
+        string comando_dot = "dot -Tpng " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".jpg"){
+        string comando_dot = "dot -Tjpg " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".svg"){
+        string comando_dot = "dot -Tsvg " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }
+
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m El Reporte de SuperBloque fue generado con exito \e[m\n" << endl;
+
+    string comando_open = "xdg-open " + path_princ;
+    system(comando_open.c_str());
 }
 
 vector<EBR> Rep::ListadoEBR(Particion extendida, string path){

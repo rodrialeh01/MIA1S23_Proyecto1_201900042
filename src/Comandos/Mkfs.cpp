@@ -54,6 +54,10 @@ void Mkfs::FormatearExt2(string id){
     //OBTIENE EL MBR
     FILE *archivo;
     archivo = fopen(particion.path.c_str(), "rb+");
+    if(archivo == NULL){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado el disco \e[m\n" << endl;
+        return;
+    }
     MBR mbr;
     fseek(archivo, 0, SEEK_SET);
     fread(&mbr, sizeof(MBR), 1, archivo);
@@ -132,7 +136,7 @@ void Mkfs::FormatearExt2(string id){
     superbloque.s_free_inodes_count = tamanio_bitmap_inodos;
     superbloque.s_mtime = particion.fecha_mount;
     superbloque.s_umtime = time(0);
-    superbloque.s_mnt_count = 0;
+    superbloque.s_mnt_count = 1;
     superbloque.s_magic = 0xEF53;
     superbloque.s_inode_s = sizeof(Inodo);
     superbloque.s_block_s = sizeof(BloqueArchivo);

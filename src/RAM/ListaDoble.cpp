@@ -16,6 +16,8 @@ void ListaDoble::Insertar(string path, string name, string id, char type){
     nuevo->type = type;
     time_t fecha_hoy;
     nuevo->fecha_mount = time(&fecha_hoy);
+    nuevo->fecha_unmount = time(NULL);
+    bool sistema_archivos = false;
     nuevo->siguiente = NULL;
     nuevo->anterior = NULL;
     if(primero == NULL){
@@ -34,7 +36,7 @@ void ListaDoble::Mostrar(){
     cout << "\e[1;34m PARTICIONES MONTADAS EN EL SISTEMA: " << endl;
     Nodo* aux = primero;
     while(aux != NULL){
-        cout << "\e[1;37m Id: e[1;36m" << aux->id << endl;
+        cout << "\e[1;37m Id: \e[1;36m " << aux->id << endl;
         aux = aux->siguiente;
     }
     cout <<"\e[m\n"<< endl;

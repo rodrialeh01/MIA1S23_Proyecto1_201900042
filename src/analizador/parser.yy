@@ -154,6 +154,9 @@
          formatear->type = type;
          formatear->fs = fs;
          formatear->SistemaDeArchivos(formatear);
+         id = "";
+         type = "";
+         fs = "";
       }
       | LOGIN Lista_login
       {
