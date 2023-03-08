@@ -185,7 +185,7 @@ void Mkfs::FormatearExt2(string id){
     }
     inodo_raiz.i_block[0] = 0;
     inodo_raiz.i_type = '0';
-    inodo_raiz.i_perm = 001001664;
+    inodo_raiz.i_perm = 664;
 
     fseek(archivo, inicio_inodos, SEEK_SET);
     fwrite(&inodo_raiz, sizeof(Inodo), 1, archivo);
@@ -250,7 +250,7 @@ void Mkfs::FormatearExt2(string id){
     }
     inodo_users.i_block[0] = 1;
     inodo_users.i_type = '1';
-    inodo_users.i_perm = 001001664;
+    inodo_users.i_perm = 664;
 
     fseek(archivo, inicio_inodos + sizeof(Inodo), SEEK_SET);
     fwrite(&inodo_users, sizeof(Inodo), 1, archivo);

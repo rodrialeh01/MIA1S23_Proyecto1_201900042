@@ -33,6 +33,7 @@ class Rep {
         void ReporteSuperBloque(Rep *reporte);
         string toLowerCase(string palabra);
         vector<EBR> ListadoEBR(Particion extendida, string path);
+        vector <Inodo> ListadoInodos(int inicio, int final, string path);
         bool cadenaVacia(char cadena[]);
         vector<string> split(string texto, char parametro);
         string getFecha(time_t fecha);
