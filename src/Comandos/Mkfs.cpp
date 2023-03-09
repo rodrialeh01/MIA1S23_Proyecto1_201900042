@@ -183,7 +183,7 @@ void Mkfs::FormatearExt2(string id){
     for(int i = 0; i < 15; i++){
         inodo_raiz.i_block[i] = -1;
     }
-    inodo_raiz.i_block[0] = 0;
+    inodo_raiz.i_block[0] = superbloque.s_block_start;
     inodo_raiz.i_type = '0';
     inodo_raiz.i_perm = 664;
 
@@ -209,13 +209,16 @@ void Mkfs::FormatearExt2(string id){
     BloqueCarpeta carpeta_raiz;
     //SIGNIFICA EL .
     strcpy(carpeta_raiz.b_content[0].b_name, "/");
-    carpeta_raiz.b_content[0].b_inodo = 0;
+    carpeta_raiz.b_content[0].b_inodo = superbloque.s_inode_start;
     //SIGNIFICA EL ..
     strcpy(carpeta_raiz.b_content[1].b_name, "/");
-    carpeta_raiz.b_content[0].b_inodo = 0;
+    carpeta_raiz.b_content[1].b_inodo = superbloque.s_inode_start;
     //APUNTA AL INODO DEL USERS.TXT
     strcpy(carpeta_raiz.b_content[2].b_name, "users.txt");
-    carpeta_raiz.b_content[2].b_inodo = 1;
+    carpeta_raiz.b_content[2].b_inodo = superbloque.s_inode_start + sizeof(Inodo);
+    for(int i=0;i<12;i++){
+        carpeta_raiz.b_content[3].b_name[i] = '\0';
+    }
     //MANTIENE EL OTRO APUNTADOR EN -1
     carpeta_raiz.b_content[3].b_inodo = -1;
 
@@ -248,7 +251,7 @@ void Mkfs::FormatearExt2(string id){
     for(int i = 0; i < 15; i++){
         inodo_users.i_block[i] = -1;
     }
-    inodo_users.i_block[0] = 1;
+    inodo_users.i_block[0] = superbloque.s_block_start + sizeof(BloqueCarpeta);
     inodo_users.i_type = '1';
     inodo_users.i_perm = 664;
 
@@ -275,7 +278,7 @@ void Mkfs::FormatearExt2(string id){
     BloqueArchivo bloque_userstxt;
     strcpy(bloque_userstxt.b_content,"1,G,root\n1,U,root,root,123\n");
 
-    fseek(archivo, inicio_bloques + sizeof(BloqueArchivo), SEEK_SET);
+    fseek(archivo, superbloque.s_block_start + sizeof(BloqueArchivo), SEEK_SET);
     fwrite(&bloque_userstxt, sizeof(BloqueArchivo), 1, archivo);
 
     //ESCRITURA AL BITMAP DE BLOQUES
@@ -292,6 +295,7 @@ void Mkfs::FormatearExt2(string id){
     superbloque.s_first_blo = superbloque.s_first_blo + 1;
     fseek(archivo, pos_inicio, SEEK_SET);
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
+
     fclose(archivo);
 
     cout << "\e[1;32m [SUCCESS]: \e[1;37m Se acaba de formatear la partición y se creó el sistema de archivos EXT2 \e[m\n" << endl;

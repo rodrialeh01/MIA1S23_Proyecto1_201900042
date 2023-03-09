@@ -897,7 +897,676 @@ void Rep::ReporteInodo(Rep *reporte){
 }
 
 void Rep::ReporteBloque(Rep *reporte){
+    if(!lista_particiones_montadas.ExisteParticion(reporte->id)){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
+
+    Nodo particion_reporte = lista_particiones_montadas.obtenerNodoParticion(reporte->id);
+    string path_princ = reporte->path;
+    FILE *archivo2;
+    archivo2 = fopen(particion_reporte.path.c_str(), "rb+");
+    if(archivo2 == NULL){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado el disco \e[m\n" << endl;
+        return;
+    }
+
+    MBR mbr;
+    fseek(archivo2, 0, SEEK_SET);
+    fread(&mbr, sizeof(MBR), 1, archivo2);
+
+
+    vector<Particion> particiones = {mbr.mbr_particion_1, mbr.mbr_particion_2, mbr.mbr_particion_3, mbr.mbr_particion_4};
+    int inicio_particion = 0;
+
+    vector<EBR> ebrs;
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_name == particion_reporte.name){
+            inicio_particion = particiones[i].part_start;
+        }else if(particiones[i].part_type == 'e'|| particiones[i].part_type == 'E'){
+            ebrs = ListadoEBR(particiones[i], particion_reporte.path);
+            for(int j = 0; j < ebrs.size(); j++){
+                if(ebrs[j].part_name == particion_reporte.name){
+                    inicio_particion = ebrs[j].part_start;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if(inicio_particion == 0){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
+
+    fseek(archivo2, inicio_particion, SEEK_SET);
+    SuperBloque super_bloque;
+    fread(&super_bloque, sizeof(SuperBloque), 1, archivo2);
     
+   
+    //OBTENCION DE LOS INODOS
+    vector<Inodo> inodos = ListadoInodos(super_bloque.s_inode_start, super_bloque.s_inode_start+(super_bloque.s_inodes_count*sizeof(Inodo)), particion_reporte.path);
+
+    string reporte_block = "digraph G {\n";
+    reporte_block += "node [shape=plaintext]\n";
+    reporte_block += "rankdir=LR\n";
+    reporte_block += "label=\"Reporte Block\";\nfontsize=20;";
+    int contador_in = 0;
+    //REPORTA TODOS LOS BLOQUES DE CARPETA
+    for(int i = 0; i < inodos.size(); i++){
+        if(inodos[i].i_type == '0'){
+            int contador_apuntadores = 0;
+            while(contador_apuntadores != 12){
+                int apuntador = inodos[i].i_block[contador_apuntadores];
+                if(apuntador != -1){
+                    BloqueCarpeta bloquec;
+                    fseek(archivo2, apuntador, SEEK_SET);
+                    fread(&bloquec, sizeof(BloqueCarpeta), 1, archivo2);
+                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Name</td>\n";
+                    reporte_block += "<td border=\"1\" bgcolor=\"\#9dbaf9\"> Inodo </td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\"> . </td>\n";
+                    reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[0].b_inodo) + "</td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\">..</td>\n";
+                    reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[1].b_inodo) + "</td>\n";
+                    reporte_block += "</tr>\n";
+                    string name_block2="";
+                    if(cadenaVacia(bloquec.b_content[2].b_name)){
+                        name_block2 = "";
+                    }else{
+                        string nb(bloquec.b_content[2].b_name);
+                        name_block2 = nb;
+                    }
+                    reporte_block += "<tr><td border=\"1\">"+name_block2+"</td>\n";
+                    reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[2].b_inodo) + "</td>\n";
+                    reporte_block += "</tr>\n";
+                    string name_block3="";
+                    if(cadenaVacia(bloquec.b_content[3].b_name)){
+                        name_block3 = "";
+                    }else{
+                        string nb(bloquec.b_content[3].b_name);
+                        name_block3 = nb;
+                    }
+                    reporte_block += "<tr><td border=\"1\">"+name_block3+"</td>\n";
+                    reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[3].b_inodo) + "</td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "</table>>];\n";
+                    contador_in ++;
+                }
+                contador_apuntadores ++;
+            }
+            if(contador_apuntadores == 12){
+                int apuntador = inodos[i].i_block[12];
+                if(apuntador != -1){
+                    BloqueApuntador bloquea;
+                    fseek(archivo2, apuntador, SEEK_SET);
+                    fread(&bloquea, sizeof(BloqueApuntador), 1, archivo2);
+                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                    reporte_block += "</tr>\n";
+                    for(int j = 0; j < 16; j++){
+                        reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(j+1)+"</td>\n";
+                        reporte_block += "<td border=\"1\">" + to_string(bloquea.b_pointers[j])+"</td>\n";
+                        reporte_block += "</tr>\n";
+                    }
+                    reporte_block += "</table>>];\n";
+                    contador_in ++;
+                    for(int j = 0; j < 16; j++){
+                        int apuntador2 = bloquea.b_pointers[j];
+                        if(apuntador2 != -1){
+                            BloqueCarpeta bloquec;
+                            fseek(archivo2, apuntador2, SEEK_SET);
+                            fread(&bloquec, sizeof(BloqueCarpeta), 1, archivo2);
+                            reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                            reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                            reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                            reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Name</td>\n";
+                            reporte_block += "<td border=\"1\" bgcolor=\"\#9dbaf9\"> Inodo </td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "<tr><td border=\"1\"> . </td>\n";
+                            reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[0].b_inodo) + "</td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "<tr><td border=\"1\">..</td>\n";
+                            reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[1].b_inodo) + "</td>\n";
+                            reporte_block += "</tr>\n";
+                            string name_block2="";
+                            if(cadenaVacia(bloquec.b_content[2].b_name)){
+                                name_block2 = "";
+                            }else{
+                                string nb(bloquec.b_content[2].b_name);
+                                name_block2 = nb;
+                            }
+                            reporte_block += "<tr><td border=\"1\">"+name_block2+"</td>\n";
+                            reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[2].b_inodo) + "</td>\n";
+                            reporte_block += "</tr>\n";
+                            string name_block3="";
+                            if(cadenaVacia(bloquec.b_content[3].b_name)){
+                                name_block3 = "";
+                            }else{
+                                string nb(bloquec.b_content[3].b_name);
+                                name_block3 = nb;
+                            }
+                            reporte_block += "<tr><td border=\"1\">"+name_block3+"</td>\n";
+                            reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[3].b_inodo) + "</td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "</table>>];\n";
+                            contador_in ++;
+                        }
+                    }
+                }
+                contador_apuntadores ++;
+            }else if(contador_apuntadores == 13){
+                int apuntador = inodos[i].i_block[13];
+                if(apuntador != -1){
+                    BloqueApuntador bloquea;
+                    fseek(archivo2, apuntador, SEEK_SET);
+                    fread(&bloquea, sizeof(BloqueApuntador), 1, archivo2);
+                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                    reporte_block += "</tr>\n";
+                    for(int j = 0; j < 16; j++){
+                        reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(j+1)+"</td>\n";
+                        reporte_block += "<td border=\"1\">" + to_string(bloquea.b_pointers[j])+"</td>\n";
+                        reporte_block += "</tr>\n";
+                    }
+                    reporte_block += "</table>>];\n";
+                    contador_in ++;
+                    for(int j = 0; j < 16; j++){
+                        int apuntador2 = bloquea.b_pointers[j];
+                        if(apuntador2 != -1){
+                            BloqueApuntador bloquea2;
+                            fseek(archivo2, apuntador2, SEEK_SET);
+                            fread(&bloquea2, sizeof(BloqueApuntador), 1, archivo2);
+                            reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                            reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                            reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                            reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                            reporte_block += "</tr>\n";
+                            for(int k = 0; k < 16; k++){
+                                reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(j+1)+"</td>\n";
+                                reporte_block += "<td border=\"1\">" + to_string(bloquea.b_pointers[j])+"</td>\n";
+                                reporte_block += "</tr>\n";
+                            }
+                            reporte_block += "</table>>];\n";
+                            contador_in ++;
+                            for(int k = 0; k < 16; k++){
+                                int apuntador2 = bloquea.b_pointers[k];
+                                if(apuntador2 != -1){
+                                    BloqueCarpeta bloquec;
+                                    fseek(archivo2, apuntador2, SEEK_SET);
+                                    fread(&bloquec, sizeof(BloqueCarpeta), 1, archivo2);
+                                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                                    reporte_block += "</tr>\n";
+                                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Name</td>\n";
+                                    reporte_block += "<td border=\"1\" bgcolor=\"\#9dbaf9\"> Inodo </td>\n";
+                                    reporte_block += "</tr>\n";
+                                    reporte_block += "<tr><td border=\"1\"> . </td>\n";
+                                    reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[0].b_inodo) + "</td>\n";
+                                    reporte_block += "</tr>\n";
+                                    reporte_block += "<tr><td border=\"1\">..</td>\n";
+                                    reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[1].b_inodo) + "</td>\n";
+                                    reporte_block += "</tr>\n";
+                                    string name_block2="";
+                                    if(cadenaVacia(bloquec.b_content[2].b_name)){
+                                        name_block2 = "";
+                                    }else{
+                                        string nb(bloquec.b_content[2].b_name);
+                                        name_block2 = nb;
+                                    }
+                                    reporte_block += "<tr><td border=\"1\">"+name_block2+"</td>\n";
+                                    reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[2].b_inodo) + "</td>\n";
+                                    reporte_block += "</tr>\n";
+                                    string name_block3="";
+                                    if(cadenaVacia(bloquec.b_content[3].b_name)){
+                                        name_block3 = "";
+                                    }else{
+                                        string nb(bloquec.b_content[3].b_name);
+                                        name_block3 = nb;
+                                    }
+                                    reporte_block += "<tr><td border=\"1\">"+name_block3+"</td>\n";
+                                    reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[3].b_inodo) + "</td>\n";
+                                    reporte_block += "</tr>\n";
+                                    reporte_block += "</table>>];\n";
+                                    contador_in ++;
+                                }
+                            }
+                        }
+                    }
+                }
+                contador_apuntadores++;
+            }else if(contador_apuntadores == 14){
+                int apuntador = inodos[i].i_block[14];
+                if(apuntador != -1){
+                    BloqueApuntador bloquea;
+                    fseek(archivo2, apuntador, SEEK_SET);
+                    fread(&bloquea, sizeof(BloqueApuntador), 1, archivo2);
+                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                    reporte_block += "</tr>\n";
+                    for(int j = 0; j < 16; j++){
+                        reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(j+1)+"</td>\n";
+                        reporte_block += "<td border=\"1\">" + to_string(bloquea.b_pointers[j])+"</td>\n";
+                        reporte_block += "</tr>\n";
+                    }
+                    reporte_block += "</table>>];\n";
+                    contador_in ++;
+                    for(int j = 0; j < 16; j++){
+                        int apuntador2 = bloquea.b_pointers[j];
+                        if(apuntador2 != -1){
+                            BloqueApuntador bloquea2;
+                            fseek(archivo2, apuntador2, SEEK_SET);
+                            fread(&bloquea2, sizeof(BloqueApuntador), 1, archivo2);
+                            reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                            reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                            reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                            reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                            reporte_block += "</tr>\n";
+                            for(int k = 0; k < 16; k++){
+                                reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(k+1)+"</td>\n";
+                                reporte_block += "<td border=\"1\">" + to_string(bloquea2.b_pointers[k])+"</td>\n";
+                                reporte_block += "</tr>\n";
+                            }
+                            reporte_block += "</table>>];\n";
+                            contador_in ++;
+                            for(int k = 0; k < 16; k++){
+                                int apuntador3 = bloquea2.b_pointers[k];
+                                if(apuntador3 != -1){
+                                    BloqueApuntador bloquea3;
+                                    fseek(archivo2, apuntador3, SEEK_SET);
+                                    fread(&bloquea3, sizeof(BloqueApuntador), 1, archivo2);
+                                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                                    reporte_block += "</tr>\n";
+                                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                                    reporte_block += "</tr>\n";
+                                    for(int l = 0; l < 16; l++){
+                                        reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(l+1)+"</td>\n";
+                                        reporte_block += "<td border=\"1\">" + to_string(bloquea3.b_pointers[l])+"</td>\n";
+                                        reporte_block += "</tr>\n";
+                                    }
+                                    reporte_block += "</table>>];\n";
+                                    contador_in ++;
+                                    for(int l = 0; i <16; l++){
+                                        int apuntador4 = bloquea3.b_pointers[l];
+                                        if(apuntador4 != -1){
+                                            BloqueCarpeta bloquec;
+                                            fseek(archivo2, apuntador4, SEEK_SET);
+                                            fread(&bloquec, sizeof(BloqueCarpeta), 1, archivo2);
+                                            reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                                            reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                                            reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                                            reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                                            reporte_block += "</tr>\n";
+                                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Name</td>\n";
+                                            reporte_block += "<td border=\"1\" bgcolor=\"\#9dbaf9\"> Inodo </td>\n";
+                                            reporte_block += "</tr>\n";
+                                            reporte_block += "<tr><td border=\"1\"> . </td>\n";
+                                            reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[0].b_inodo) + "</td>\n";
+                                            reporte_block += "</tr>\n";
+                                            reporte_block += "<tr><td border=\"1\">..</td>\n";
+                                            reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[1].b_inodo) + "</td>\n";
+                                            reporte_block += "</tr>\n";
+                                            string name_block2="";
+                                            if(cadenaVacia(bloquec.b_content[2].b_name)){
+                                                name_block2 = "";
+                                            }else{
+                                                string nb(bloquec.b_content[2].b_name);
+                                                name_block2 = nb;
+                                            }
+                                            reporte_block += "<tr><td border=\"1\">"+name_block2+"</td>\n";
+                                            reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[2].b_inodo) + "</td>\n";
+                                            reporte_block += "</tr>\n";
+                                            string name_block3="";
+                                            if(cadenaVacia(bloquec.b_content[3].b_name)){
+                                                name_block3 = "";
+                                            }else{
+                                                string nb(bloquec.b_content[3].b_name);
+                                                name_block3 = nb;
+                                            }
+                                            reporte_block += "<tr><td border=\"1\">"+name_block3+"</td>\n";
+                                            reporte_block += "<td border=\"1\">" + to_string(bloquec.b_content[3].b_inodo) + "</td>\n";
+                                            reporte_block += "</tr>\n";
+                                            reporte_block += "</table>>];\n";
+                                            contador_in ++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                contador_apuntadores++;
+            }
+        }else if(inodos[i].i_type == '1'){
+            int contador_apuntadores = 0;
+            while(contador_apuntadores != 12){
+                int apuntador = inodos[i].i_block[contador_apuntadores];
+                if(apuntador != -1){
+                    BloqueArchivo bloquear;
+                    fseek(archivo2, apuntador, SEEK_SET);
+                    fread(&bloquear, sizeof(BloqueArchivo), 1, archivo2);
+                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Archivo</FONT></td>\n";
+                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Contenido</td>\n";
+                    string contenido(bloquear.b_content);
+                    reporte_block += "<td border=\"1\">"+contenido+"</td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "</table>>];\n";
+                    contador_in ++;
+                }
+                contador_apuntadores ++;
+            }
+            if(contador_apuntadores == 12){
+                int apuntador = inodos[i].i_block[12];
+                if(apuntador != -1){
+                    BloqueApuntador bloquea;
+                    fseek(archivo2, apuntador, SEEK_SET);
+                    fread(&bloquea, sizeof(BloqueApuntador), 1, archivo2);
+                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                    reporte_block += "</tr>\n";
+                    for(int j = 0; j < 16; j++){
+                        reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(j+1)+"</td>\n";
+                        reporte_block += "<td border=\"1\">" + to_string(bloquea.b_pointers[j])+"</td>\n";
+                        reporte_block += "</tr>\n";
+                    }
+                    reporte_block += "</table>>];\n";
+                    contador_in ++;
+                    for(int j = 0; j < 16; j++){
+                        int apuntador2 = bloquea.b_pointers[j];
+                        if(apuntador2 != -1){
+                            BloqueArchivo bloquear;
+                            fseek(archivo2, apuntador, SEEK_SET);
+                            fread(&bloquear, sizeof(BloqueArchivo), 1, archivo2);
+                            reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                            reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                            reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Archivo</FONT></td>\n";
+                            reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Contenido</td>\n";
+                            string contenido(bloquear.b_content);
+                            reporte_block += "<td border=\"1\">"+contenido+"</td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "</table>>];\n";
+                            contador_in ++;
+                        }
+                    }
+                }
+                contador_apuntadores ++;
+            }else if(contador_apuntadores == 13){
+                int apuntador = inodos[i].i_block[13];
+                if(apuntador != -1){
+                    BloqueApuntador bloquea;
+                    fseek(archivo2, apuntador, SEEK_SET);
+                    fread(&bloquea, sizeof(BloqueApuntador), 1, archivo2);
+                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                    reporte_block += "</tr>\n";
+                    for(int j = 0; j < 16; j++){
+                        reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(j+1)+"</td>\n";
+                        reporte_block += "<td border=\"1\">" + to_string(bloquea.b_pointers[j])+"</td>\n";
+                        reporte_block += "</tr>\n";
+                    }
+                    reporte_block += "</table>>];\n";
+                    contador_in ++;
+                    for(int j = 0; j < 16; j++){
+                        int apuntador2 = bloquea.b_pointers[j];
+                        if(apuntador2 != -1){
+                            BloqueApuntador bloquea2;
+                            fseek(archivo2, apuntador2, SEEK_SET);
+                            fread(&bloquea2, sizeof(BloqueApuntador), 1, archivo2);
+                            reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                            reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                            reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                            reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                            reporte_block += "</tr>\n";
+                            for(int k = 0; k < 16; k++){
+                                reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(j+1)+"</td>\n";
+                                reporte_block += "<td border=\"1\">" + to_string(bloquea.b_pointers[j])+"</td>\n";
+                                reporte_block += "</tr>\n";
+                            }
+                            reporte_block += "</table>>];\n";
+                            contador_in ++;
+                            for(int k = 0; k < 16; k++){
+                                int apuntador2 = bloquea.b_pointers[k];
+                                if(apuntador2 != -1){
+                                    BloqueArchivo bloquear;
+                                    fseek(archivo2, apuntador, SEEK_SET);
+                                    fread(&bloquear, sizeof(BloqueArchivo), 1, archivo2);
+                                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Archivo</FONT></td>\n";
+                                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                                    reporte_block += "</tr>\n";
+                                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Contenido</td>\n";
+                                    string contenido(bloquear.b_content);
+                                    reporte_block += "<td border=\"1\">"+contenido+"</td>\n";
+                                    reporte_block += "</tr>\n";
+                                    reporte_block += "</table>>];\n";
+                                    contador_in ++;
+                                }
+                            }
+                        }
+                    }
+                }
+                contador_apuntadores++;
+            }else if(contador_apuntadores == 14){
+                int apuntador = inodos[i].i_block[14];
+                if(apuntador != -1){
+                    BloqueApuntador bloquea;
+                    fseek(archivo2, apuntador, SEEK_SET);
+                    fread(&bloquea, sizeof(BloqueApuntador), 1, archivo2);
+                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                    reporte_block += "</tr>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                    reporte_block += "</tr>\n";
+                    for(int j = 0; j < 16; j++){
+                        reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(j+1)+"</td>\n";
+                        reporte_block += "<td border=\"1\">" + to_string(bloquea.b_pointers[j])+"</td>\n";
+                        reporte_block += "</tr>\n";
+                    }
+                    reporte_block += "</table>>];\n";
+                    contador_in ++;
+                    for(int j = 0; j < 16; j++){
+                        int apuntador2 = bloquea.b_pointers[j];
+                        if(apuntador2 != -1){
+                            BloqueApuntador bloquea2;
+                            fseek(archivo2, apuntador2, SEEK_SET);
+                            fread(&bloquea2, sizeof(BloqueApuntador), 1, archivo2);
+                            reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                            reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                            reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                            reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                            reporte_block += "</tr>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                            reporte_block += "</tr>\n";
+                            for(int k = 0; k < 16; k++){
+                                reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(k+1)+"</td>\n";
+                                reporte_block += "<td border=\"1\">" + to_string(bloquea2.b_pointers[k])+"</td>\n";
+                                reporte_block += "</tr>\n";
+                            }
+                            reporte_block += "</table>>];\n";
+                            contador_in ++;
+                            for(int k = 0; k < 16; k++){
+                                int apuntador3 = bloquea2.b_pointers[k];
+                                if(apuntador3 != -1){
+                                    BloqueApuntador bloquea3;
+                                    fseek(archivo2, apuntador3, SEEK_SET);
+                                    fread(&bloquea3, sizeof(BloqueApuntador), 1, archivo2);
+                                    reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                                    reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                                    reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Carpeta</FONT></td>\n";
+                                    reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                                    reporte_block += "</tr>\n";
+                                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Apuntador</td>\n";
+                                    reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Bloque/Inodo</td>\n";
+                                    reporte_block += "</tr>\n";
+                                    for(int l = 0; l < 16; l++){
+                                        reporte_block += "<tr><td border=\"1\">Apuntador"+to_string(l+1)+"</td>\n";
+                                        reporte_block += "<td border=\"1\">" + to_string(bloquea3.b_pointers[l])+"</td>\n";
+                                        reporte_block += "</tr>\n";
+                                    }
+                                    reporte_block += "</table>>];\n";
+                                    contador_in ++;
+                                    for(int l = 0; i <16; l++){
+                                        int apuntador4 = bloquea3.b_pointers[l];
+                                        if(apuntador4 != -1){
+                                            BloqueArchivo bloquear;
+                                            fseek(archivo2, apuntador, SEEK_SET);
+                                            fread(&bloquear, sizeof(BloqueArchivo), 1, archivo2);
+                                            reporte_block += "tablabloque"+to_string(contador_in)+"[label=<\n";
+                                            reporte_block += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+                                            reporte_block += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Bloque Archivo</FONT></td>\n";
+                                            reporte_block += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">"+to_string(contador_in)+"</FONT></td>\n";
+                                            reporte_block += "</tr>\n";
+                                            reporte_block += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Contenido</td>\n";
+                                            string contenido(bloquear.b_content);
+                                            reporte_block += "<td border=\"1\">"+contenido+"</td>\n";
+                                            reporte_block += "</tr>\n";
+                                            reporte_block += "</table>>];\n";
+                                            contador_in ++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                contador_apuntadores++;
+            }
+        }     
+    }
+    for(int i = 0; i < contador_in; i++){
+        if(i != contador_in-1){
+            reporte_block += "tablabloque"+to_string(i)+"->tablabloque"+to_string(i+1)+";\n";
+        }
+    }
+    reporte_block += "}";
+
+    fclose(archivo2);
+    //GENERANDO EL ARCHIVO DE REPORTE
+    //VALIDACION Y CREACION DE CARPETAS 
+    bool ruta_complex = false;
+    if(reporte->path[0] == '"' && reporte->path[reporte->path.length()-1] == '"'){
+        ruta_complex = true;
+        reporte->path = reporte->path.substr(1,reporte->path.length()-2);
+    }
+
+
+    string path_temp =  reporte->path;
+    vector<string> carpetas_rep = split(reporte->path,'/');
+    string ruta = "";
+    if(path_temp[0] == '/' && ruta_complex == false){
+        ruta = "/";
+    }else if(path_temp[0] == '/' && ruta_complex == true){
+        ruta = "\"/";
+    }
+    
+    for(int i = 0; i < carpetas_rep.size()-1; ++i){
+        if(carpetas_rep[i]!= ""){
+            ruta += carpetas_rep[i] + "/";
+        }
+    }
+    if(ruta_complex == true){
+        ruta += "\"";
+    }
+    string comando_linux = "mkdir -p " + ruta;
+    system(comando_linux.c_str());
+
+    //CREACION DEL ARCHIVO
+    FILE *archivo_reporte;
+    string nombre_rep = carpetas_rep[carpetas_rep.size()-1].substr(0,carpetas_rep[carpetas_rep.size()-1].length()-4);
+
+    string tipo_rep = carpetas_rep[carpetas_rep.size()-1].substr(carpetas_rep[carpetas_rep.size()-1].length()-4,carpetas_rep[carpetas_rep.size()-1].length());
+
+    string ruta2 = ruta; 
+    if(ruta_complex == true){
+        ruta2 = path_princ.substr(1,path_princ.length()-2);
+        ruta2 = ruta2.substr(0,ruta2.length()-5);
+    }
+    
+    string path_rep = ruta2 + ".dot";
+    string path_rep2 = ruta2;
+    cout << path_rep << endl;
+    archivo_reporte= fopen(path_rep.c_str(),"w");
+    fputs(reporte_block.c_str(),archivo_reporte);
+    fclose(archivo_reporte);
+
+
+    if(tipo_rep == ".pdf"){
+        string comando_dot = "dot -Tpdf " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".png"){
+        string comando_dot = "dot -Tpng " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".jpg"){
+        string comando_dot = "dot -Tjpg " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".svg"){
+        string comando_dot = "dot -Tsvg " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }
+
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m El Reporte Block fue generado con exito \e[m\n" << endl;
+
+    string comando_open = "xdg-open " + path_princ;
+    system(comando_open.c_str());
 }
 
 void Rep::ReporteBMInodo(Rep *reporte){
@@ -1126,6 +1795,60 @@ vector <Inodo> Rep:: ListadoInodos(int inicio, int final, string path){
     }
     fclose(archivo);
     return inodos;
+}
+
+vector <BloqueArchivo> Rep::ListadoBA(int inicio, int final, string path){
+    vector <BloqueArchivo> bas;
+    FILE *archivo;
+    archivo = fopen(path.c_str(),"rb+");
+    int pos = inicio;
+    while(pos < final){
+        fseek(archivo,pos,SEEK_SET);
+        BloqueArchivo ba;
+        fread(&ba,sizeof(BloqueArchivo),1,archivo);
+        if(typeid(ba) == typeid(BloqueArchivo) && !cadenaVacia(ba.b_content)){
+            bas.push_back(ba);
+        }
+        pos += sizeof(BloqueArchivo);
+    }
+    fclose(archivo);
+    return bas;
+}
+
+vector <BloqueCarpeta> Rep::ListadoBC(int inicio,int final, string path){
+    vector <BloqueCarpeta> bcs;
+    FILE *archivo;
+    archivo = fopen(path.c_str(),"rb+");
+    int pos = inicio;
+    while(pos < final){
+        fseek(archivo,pos,SEEK_SET);
+        BloqueCarpeta bc;
+        fread(&bc,sizeof(BloqueCarpeta),1,archivo);
+        if(typeid(bc) == typeid(BloqueCarpeta) && bc.b_content[0].b_inodo != 0 && !cadenaVacia(bc.b_content[0].b_name) && bc.b_content[1].b_inodo != 0 && !cadenaVacia(bc.b_content[1].b_name)){
+            bcs.push_back(bc);
+        }
+        pos += sizeof(BloqueCarpeta);
+    }
+    fclose(archivo);
+    return bcs;
+}
+
+vector<BloqueApuntador> Rep::ListadoBAp(int inicio, int final, string path){
+    vector <BloqueApuntador> baps;
+    FILE *archivo;
+    archivo = fopen(path.c_str(),"rb+");
+    int pos = inicio;
+    while(pos < final){
+        fseek(archivo,pos,SEEK_SET);
+        BloqueApuntador ba;
+        fread(&ba,sizeof(BloqueApuntador),1,archivo);
+        if(typeid(ba) == typeid(BloqueApuntador) && ba.b_pointers[0] != 0){
+            baps.push_back(ba);
+        }
+        pos += sizeof(BloqueApuntador);
+    }
+    fclose(archivo);
+    return baps;
 }
 
 bool Rep::cadenaVacia(char cadena[]){

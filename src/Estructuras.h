@@ -84,7 +84,7 @@ typedef struct {
 }BloqueArchivo;
 
 typedef struct {
-    char b_content[64];
+    int b_pointers[16];
 }BloqueApuntador;
 
 class Estructuras{
