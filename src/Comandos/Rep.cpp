@@ -1570,11 +1570,335 @@ void Rep::ReporteBloque(Rep *reporte){
 }
 
 void Rep::ReporteBMInodo(Rep *reporte){
+    if(!lista_particiones_montadas.ExisteParticion(reporte->id)){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
+
+    Nodo particion_reporte = lista_particiones_montadas.obtenerNodoParticion(reporte->id);
+    string path_princ = reporte->path;
+    FILE *archivo2;
+    archivo2 = fopen(particion_reporte.path.c_str(), "rb+");
+    if(archivo2 == NULL){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado el disco \e[m\n" << endl;
+        return;
+    }
+
+    MBR mbr;
+    fseek(archivo2, 0, SEEK_SET);
+    fread(&mbr, sizeof(MBR), 1, archivo2);
+
+
+    vector<Particion> particiones = {mbr.mbr_particion_1, mbr.mbr_particion_2, mbr.mbr_particion_3, mbr.mbr_particion_4};
+    int inicio_particion = 0;
+
+    vector<EBR> ebrs;
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_name == particion_reporte.name){
+            inicio_particion = particiones[i].part_start;
+        }else if(particiones[i].part_type == 'e'|| particiones[i].part_type == 'E'){
+            ebrs = ListadoEBR(particiones[i], particion_reporte.path);
+            for(int j = 0; j < ebrs.size(); j++){
+                if(ebrs[j].part_name == particion_reporte.name){
+                    inicio_particion = ebrs[j].part_start;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if(inicio_particion == 0){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
+
+    fseek(archivo2, inicio_particion, SEEK_SET);
+    SuperBloque super_bloque;
+    fread(&super_bloque, sizeof(SuperBloque), 1, archivo2);
+    string reporte_txt = "";
+    string reporte_bm_inodo = "digraph G{\n";
+    reporte_bm_inodo += "node [shape=plaintext]\n";
+    reporte_bm_inodo += "rankdir=LR\n";
+    reporte_bm_inodo += "label = \"Bitmap Inodo\"\n";
+    reporte_bm_inodo += "bminodo [shape=none, margin=0, label=<\n";
+    reporte_bm_inodo += "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
+    reporte_bm_inodo += "<TR>\n";
+    reporte_bm_inodo += "<TD COLSPAN=\"50\" BGCOLOR=\"\#000000\"><FONT COLOR=\"white\"><B>BITMAP INNODOS</B></FONT></TD>\n";
+    reporte_bm_inodo += "</TR>\n";
+
+    int contador = 0;
+    int contador2 = super_bloque.s_bm_inode_start;
+    int cfinal = super_bloque.s_bm_inode_start + super_bloque.s_inodes_count;
+    while(contador < cfinal){
+        int contador3 = 0;
+        reporte_bm_inodo += "<TR>\n";
+        while(contador3 < 20){
+            char caracter;
+            fseek(archivo2, contador2, SEEK_SET);
+            fread(&caracter, contador2, 1, archivo2);
+            if(caracter == '1'){
+                reporte_txt += "1";
+                reporte_bm_inodo += "<TD>1</TD>\n";
+            }else{
+                reporte_txt += "0";
+                reporte_bm_inodo += "<TD>1</TD>\n";
+            }
+            contador++;
+            contador2+= sizeof(char);
+            contador3++;
+            reporte_txt +=" ";
+        }
+        reporte_txt += "\n";
+        reporte_bm_inodo += "</TR>\n";
+    }
+    reporte_bm_inodo += "</TABLE>\n";
+    reporte_bm_inodo += ">];\n";
+    reporte_bm_inodo += "}";
+
+    fclose(archivo2);
+    //GENERANDO EL ARCHIVO DE REPORTE
+    //VALIDACION Y CREACION DE CARPETAS 
+    bool ruta_complex = false;
+    if(reporte->path[0] == '"' && reporte->path[reporte->path.length()-1] == '"'){
+        ruta_complex = true;
+        reporte->path = reporte->path.substr(1,reporte->path.length()-2);
+    }
+
+
+    string path_temp =  reporte->path;
+    vector<string> carpetas_rep = split(reporte->path,'/');
+    string ruta = "";
+    if(path_temp[0] == '/' && ruta_complex == false){
+        ruta = "/";
+    }else if(path_temp[0] == '/' && ruta_complex == true){
+        ruta = "\"/";
+    }
     
+    for(int i = 0; i < carpetas_rep.size()-1; ++i){
+        if(carpetas_rep[i]!= ""){
+            ruta += carpetas_rep[i] + "/";
+        }
+    }
+    if(ruta_complex == true){
+        ruta += "\"";
+    }
+    string comando_linux = "mkdir -p " + ruta;
+    system(comando_linux.c_str());
+
+    //CREACION DEL ARCHIVO
+    FILE *archivo_reporte;
+    string nombre_rep = carpetas_rep[carpetas_rep.size()-1].substr(0,carpetas_rep[carpetas_rep.size()-1].length()-4);
+
+    string tipo_rep = carpetas_rep[carpetas_rep.size()-1].substr(carpetas_rep[carpetas_rep.size()-1].length()-4,carpetas_rep[carpetas_rep.size()-1].length());
+
+    string ruta2 = ruta; 
+    if(ruta_complex == true){
+        ruta2 = path_princ.substr(1,path_princ.length()-2);
+        ruta2 = ruta2.substr(0,ruta2.length()-5);
+    }
+    if(tipo_rep == ".txt"){
+        string path_rep = ruta2 + ".txt";
+        string path_rep2 = ruta2;
+        cout << path_rep << endl;
+        archivo_reporte= fopen(path_rep.c_str(),"w");
+        fputs(reporte_txt.c_str(),archivo_reporte);
+        fclose(archivo_reporte);
+    }else{
+        string path_rep = ruta2 + ".dot";
+        string path_rep2 = ruta2;
+        cout << path_rep << endl;
+        archivo_reporte= fopen(path_rep.c_str(),"w");
+        fputs(reporte_bm_inodo.c_str(),archivo_reporte);
+        fclose(archivo_reporte);
+
+
+        if(tipo_rep == ".pdf"){
+            string comando_dot = "dot -Tpdf " + path_rep + " -o " + reporte->path;
+            system(comando_dot.c_str());
+        }else if(tipo_rep == ".png"){
+            string comando_dot = "dot -Tpng " + path_rep + " -o " + reporte->path;
+            system(comando_dot.c_str());
+        }else if(tipo_rep == ".jpg"){
+            string comando_dot = "dot -Tjpg " + path_rep + " -o " + reporte->path;
+            system(comando_dot.c_str());
+        }else if(tipo_rep == ".svg"){
+            string comando_dot = "dot -Tsvg " + path_rep + " -o " + reporte->path;
+            system(comando_dot.c_str());
+        }else if(tipo_rep == ".txt"){
+
+        }
+    }
+
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m El Reporte de BitMap de Innodos fue generado con exito \e[m\n" << endl;
+
+    string comando_open = "xdg-open " + path_princ;
+    system(comando_open.c_str());
 }
 
 void Rep::ReporteBMBloque(Rep *reporte){
+    if(!lista_particiones_montadas.ExisteParticion(reporte->id)){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
+
+    Nodo particion_reporte = lista_particiones_montadas.obtenerNodoParticion(reporte->id);
+    string path_princ = reporte->path;
+    FILE *archivo2;
+    archivo2 = fopen(particion_reporte.path.c_str(), "rb+");
+    if(archivo2 == NULL){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado el disco \e[m\n" << endl;
+        return;
+    }
+
+    MBR mbr;
+    fseek(archivo2, 0, SEEK_SET);
+    fread(&mbr, sizeof(MBR), 1, archivo2);
+
+
+    vector<Particion> particiones = {mbr.mbr_particion_1, mbr.mbr_particion_2, mbr.mbr_particion_3, mbr.mbr_particion_4};
+    int inicio_particion = 0;
+
+    vector<EBR> ebrs;
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_name == particion_reporte.name){
+            inicio_particion = particiones[i].part_start;
+        }else if(particiones[i].part_type == 'e'|| particiones[i].part_type == 'E'){
+            ebrs = ListadoEBR(particiones[i], particion_reporte.path);
+            for(int j = 0; j < ebrs.size(); j++){
+                if(ebrs[j].part_name == particion_reporte.name){
+                    inicio_particion = ebrs[j].part_start;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if(inicio_particion == 0){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
+
+    fseek(archivo2, inicio_particion, SEEK_SET);
+    SuperBloque super_bloque;
+    fread(&super_bloque, sizeof(SuperBloque), 1, archivo2);
+    string reporte_txt = "";
+    string reporte_bm_bloque = "digraph G{\n";
+    reporte_bm_bloque += "node [shape=plaintext]\n";
+    reporte_bm_bloque += "rankdir=LR\n";
+    reporte_bm_bloque += "label = \"Bitmap Inodo\"\n";
+    reporte_bm_bloque += "bminodo [shape=none, margin=0, label=<\n";
+    reporte_bm_bloque += "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
+    reporte_bm_bloque += "<TR>\n";
+    reporte_bm_bloque += "<TD COLSPAN=\"50\" BGCOLOR=\"\#000000\"><FONT COLOR=\"white\"><B>BITMAP BLOQUES</B></FONT></TD>\n";
+    reporte_bm_bloque += "</TR>\n";
+
+    int contador = 0;
+    int contador2 = super_bloque.s_bm_block_start;
+    int cfinal = super_bloque.s_bm_block_start+ super_bloque.s_blocks_count;
+    while(contador < cfinal){
+        int contador3 = 0;
+        reporte_bm_bloque += "<TR>\n";
+        while(contador3 < 20){
+            char caracter;
+            fseek(archivo2, contador2, SEEK_SET);
+            fread(&caracter, contador2, 1, archivo2);
+            if(caracter == '1'){
+                reporte_txt += "1";
+                reporte_bm_bloque += "<TD>1</TD>\n";
+            }else{
+                reporte_txt += "0";
+                reporte_bm_bloque += "<TD>1</TD>\n";
+            }
+            contador++;
+            contador2+= sizeof(char);
+            contador3++;
+            reporte_txt +=" ";
+        }
+        reporte_txt += "\n";
+        reporte_bm_bloque += "</TR>\n";
+    }
+    reporte_bm_bloque += "</TABLE>\n";
+    reporte_bm_bloque += ">];\n";
+    reporte_bm_bloque += "}";
+
+    fclose(archivo2);
+    //GENERANDO EL ARCHIVO DE REPORTE
+    //VALIDACION Y CREACION DE CARPETAS 
+    bool ruta_complex = false;
+    if(reporte->path[0] == '"' && reporte->path[reporte->path.length()-1] == '"'){
+        ruta_complex = true;
+        reporte->path = reporte->path.substr(1,reporte->path.length()-2);
+    }
+
+
+    string path_temp =  reporte->path;
+    vector<string> carpetas_rep = split(reporte->path,'/');
+    string ruta = "";
+    if(path_temp[0] == '/' && ruta_complex == false){
+        ruta = "/";
+    }else if(path_temp[0] == '/' && ruta_complex == true){
+        ruta = "\"/";
+    }
     
+    for(int i = 0; i < carpetas_rep.size()-1; ++i){
+        if(carpetas_rep[i]!= ""){
+            ruta += carpetas_rep[i] + "/";
+        }
+    }
+    if(ruta_complex == true){
+        ruta += "\"";
+    }
+    string comando_linux = "mkdir -p " + ruta;
+    system(comando_linux.c_str());
+
+    //CREACION DEL ARCHIVO
+    FILE *archivo_reporte;
+    string nombre_rep = carpetas_rep[carpetas_rep.size()-1].substr(0,carpetas_rep[carpetas_rep.size()-1].length()-4);
+
+    string tipo_rep = carpetas_rep[carpetas_rep.size()-1].substr(carpetas_rep[carpetas_rep.size()-1].length()-4,carpetas_rep[carpetas_rep.size()-1].length());
+
+    string ruta2 = ruta; 
+    if(ruta_complex == true){
+        ruta2 = path_princ.substr(1,path_princ.length()-2);
+        ruta2 = ruta2.substr(0,ruta2.length()-5);
+    }
+    if(tipo_rep == ".txt"){
+        string path_rep = ruta2 + ".txt";
+        string path_rep2 = ruta2;
+        cout << path_rep << endl;
+        archivo_reporte= fopen(path_rep.c_str(),"w");
+        fputs(reporte_txt.c_str(),archivo_reporte);
+        fclose(archivo_reporte);
+    }else{
+        string path_rep = ruta2 + ".dot";
+        string path_rep2 = ruta2;
+        cout << path_rep << endl;
+        archivo_reporte= fopen(path_rep.c_str(),"w");
+        fputs(reporte_bm_bloque.c_str(),archivo_reporte);
+        fclose(archivo_reporte);
+
+
+        if(tipo_rep == ".pdf"){
+            string comando_dot = "dot -Tpdf " + path_rep + " -o " + reporte->path;
+            system(comando_dot.c_str());
+        }else if(tipo_rep == ".png"){
+            string comando_dot = "dot -Tpng " + path_rep + " -o " + reporte->path;
+            system(comando_dot.c_str());
+        }else if(tipo_rep == ".jpg"){
+            string comando_dot = "dot -Tjpg " + path_rep + " -o " + reporte->path;
+            system(comando_dot.c_str());
+        }else if(tipo_rep == ".svg"){
+            string comando_dot = "dot -Tsvg " + path_rep + " -o " + reporte->path;
+            system(comando_dot.c_str());
+        }else if(tipo_rep == ".txt"){
+
+        }
+    }
+
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m El Reporte de BitMap de Bloques fue generado con exito \e[m\n" << endl;
+
+    string comando_open = "xdg-open " + path_princ;
+    system(comando_open.c_str());
 }
 
 void Rep::ReporteSuperBloque(Rep *reporte){
