@@ -40,6 +40,10 @@ void Rep::controlReportes(Rep *reporte){
         ReporteBMBloque(reporte);
     }else if (toLowerCase(reporte->name) == "sb"){
         ReporteSuperBloque(reporte);
+    }else if (toLowerCase(reporte->name) == "tree"){
+        ReporteTree(reporte);
+    }else if (toLowerCase(reporte->name) == "journaling"){
+        ReporteJournaling(reporte);
     }else{
         cout << "\e[1;31m[ERROR]:\e[1;37m El tipo de reporte no existe \e[m\n" << endl;
     }
@@ -1583,7 +1587,6 @@ void Rep::ReporteBMInodo(Rep *reporte){
         cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado el disco \e[m\n" << endl;
         return;
     }
-
     MBR mbr;
     fseek(archivo2, 0, SEEK_SET);
     fread(&mbr, sizeof(MBR), 1, archivo2);
@@ -1611,7 +1614,7 @@ void Rep::ReporteBMInodo(Rep *reporte){
         cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
         return;
     }
-
+    
     fseek(archivo2, inicio_particion, SEEK_SET);
     SuperBloque super_bloque;
     fread(&super_bloque, sizeof(SuperBloque), 1, archivo2);
@@ -1625,27 +1628,34 @@ void Rep::ReporteBMInodo(Rep *reporte){
     reporte_bm_inodo += "<TR>\n";
     reporte_bm_inodo += "<TD COLSPAN=\"50\" BGCOLOR=\"\#000000\"><FONT COLOR=\"white\"><B>BITMAP INNODOS</B></FONT></TD>\n";
     reporte_bm_inodo += "</TR>\n";
-
     int contador = 0;
     int contador2 = super_bloque.s_bm_inode_start;
-    int cfinal = super_bloque.s_bm_inode_start + super_bloque.s_inodes_count;
+    int cfinal = super_bloque.s_bm_inode_start + (super_bloque.s_inodes_count*sizeof(char));
     while(contador < cfinal){
         int contador3 = 0;
         reporte_bm_inodo += "<TR>\n";
         while(contador3 < 20){
+            cout << "CONTADOR: " << contador << endl;
+            cout << "CONTADOR2: " << contador2 << endl;
+            cout << "CONTADOR3: " << contador3 << endl;
             char caracter;
             fseek(archivo2, contador2, SEEK_SET);
-            fread(&caracter, contador2, 1, archivo2);
+            fread(&caracter, sizeof(char), 1, archivo2);
+            cout << "CARACTER: " << caracter << endl;
             if(caracter == '1'){
                 reporte_txt += "1";
                 reporte_bm_inodo += "<TD>1</TD>\n";
-            }else{
+            }else if(caracter == '0'){
                 reporte_txt += "0";
-                reporte_bm_inodo += "<TD>1</TD>\n";
+                reporte_bm_inodo += "<TD>0</TD>\n";
             }
+            cout << "CARACTER: " << caracter << endl;
             contador++;
-            contador2+= sizeof(char);
+            contador2 += sizeof(char);
             contador3++;
+            cout << "CONTADOR: " << contador << endl;
+            cout << "CONTADOR2: " << contador2 << endl;
+            cout << "CONTADOR3: " << contador3 << endl;
             reporte_txt +=" ";
         }
         reporte_txt += "\n";
@@ -1654,7 +1664,7 @@ void Rep::ReporteBMInodo(Rep *reporte){
     reporte_bm_inodo += "</TABLE>\n";
     reporte_bm_inodo += ">];\n";
     reporte_bm_inodo += "}";
-
+    cout << reporte_bm_inodo << endl;
     fclose(archivo2);
     //GENERANDO EL ARCHIVO DE REPORTE
     //VALIDACION Y CREACION DE CARPETAS 
@@ -1711,7 +1721,6 @@ void Rep::ReporteBMInodo(Rep *reporte){
         fputs(reporte_bm_inodo.c_str(),archivo_reporte);
         fclose(archivo_reporte);
 
-
         if(tipo_rep == ".pdf"){
             string comando_dot = "dot -Tpdf " + path_rep + " -o " + reporte->path;
             system(comando_dot.c_str());
@@ -1724,11 +1733,9 @@ void Rep::ReporteBMInodo(Rep *reporte){
         }else if(tipo_rep == ".svg"){
             string comando_dot = "dot -Tsvg " + path_rep + " -o " + reporte->path;
             system(comando_dot.c_str());
-        }else if(tipo_rep == ".txt"){
-
         }
     }
-
+    
     cout << "\e[1;32m [SUCCESS]: \e[1;37m El Reporte de BitMap de Innodos fue generado con exito \e[m\n" << endl;
 
     string comando_open = "xdg-open " + path_princ;
@@ -1801,7 +1808,7 @@ void Rep::ReporteBMBloque(Rep *reporte){
         while(contador3 < 20){
             char caracter;
             fseek(archivo2, contador2, SEEK_SET);
-            fread(&caracter, contador2, 1, archivo2);
+            fread(&caracter, sizeof(char), 1, archivo2);
             if(caracter == '1'){
                 reporte_txt += "1";
                 reporte_bm_bloque += "<TD>1</TD>\n";
@@ -1890,8 +1897,6 @@ void Rep::ReporteBMBloque(Rep *reporte){
         }else if(tipo_rep == ".svg"){
             string comando_dot = "dot -Tsvg " + path_rep + " -o " + reporte->path;
             system(comando_dot.c_str());
-        }else if(tipo_rep == ".txt"){
-
         }
     }
 
@@ -2080,6 +2085,183 @@ void Rep::ReporteSuperBloque(Rep *reporte){
     system(comando_open.c_str());
 }
 
+void Rep::ReporteTree(Rep* reporte){
+
+}
+
+void Rep::ReporteJournaling(Rep* reporte){
+    if(!lista_particiones_montadas.ExisteParticion(reporte->id)){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
+
+    Nodo particion_reporte = lista_particiones_montadas.obtenerNodoParticion(reporte->id);
+    string path_princ = reporte->path;
+    FILE *archivo2;
+    archivo2 = fopen(particion_reporte.path.c_str(), "rb+");
+    if(archivo2 == NULL){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado el disco \e[m\n" << endl;
+        return;
+    }
+
+    MBR mbr;
+    fseek(archivo2, 0, SEEK_SET);
+    fread(&mbr, sizeof(MBR), 1, archivo2);
+
+
+    vector<Particion> particiones = {mbr.mbr_particion_1, mbr.mbr_particion_2, mbr.mbr_particion_3, mbr.mbr_particion_4};
+    int inicio_particion = 0;
+
+    vector<EBR> ebrs;
+    for(int i = 0; i < particiones.size(); i++){
+        if(particiones[i].part_name == particion_reporte.name){
+            inicio_particion = particiones[i].part_start;
+        }else if(particiones[i].part_type == 'e'|| particiones[i].part_type == 'E'){
+            ebrs = ListadoEBR(particiones[i], particion_reporte.path);
+            for(int j = 0; j < ebrs.size(); j++){
+                if(ebrs[j].part_name == particion_reporte.name){
+                    inicio_particion = ebrs[j].part_start;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if(inicio_particion == 0){
+        cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado la particion con el id: " << reporte->id << "\e[m\n"<< endl;
+        return;
+    }
+
+    fseek(archivo2, inicio_particion, SEEK_SET);
+    SuperBloque super_bloque;
+    fread(&super_bloque, sizeof(SuperBloque), 1, archivo2);
+
+    if(super_bloque.s_filesystem_type != 3){
+        cout << "\e[1;31m[ERROR]:\e[1;37m El sistema de archivos que contiene esta partición no es de tipo EXT3 \e[m\n" << endl;
+        return;
+    }
+
+    int inicio_journaling = inicio_particion + sizeof(SuperBloque);
+    int fin_journaling = inicio_journaling + (super_bloque.s_inodes_count * sizeof(Journaling));
+
+    vector<Journaling> journalings = ListadoJournaling(inicio_journaling,fin_journaling, particion_reporte.path);
+    string reporte_journaling = "digraph G{\n";
+    reporte_journaling += "node [shape=plaintext]\n";
+    reporte_journaling += "rankdir=LR\n";
+    reporte_journaling += "label = \"Reporte Journaling\"\n";
+    reporte_journaling += "journaling [shape=none, margin=0, label=<\n";
+    reporte_journaling += "<table border=\"1\" cellborder=\"1\" cellspacing=\"0\">\n";
+    reporte_journaling += "<TR><TD COLSPAN=\"50\" BGCOLOR=\"\#02c5f9\"><FONT COLOR=\"white\"><B>JOURNALING</B></FONT></TD></TR>\n";
+    reporte_journaling += "<TR>\n";
+    reporte_journaling += "<TD BGCOLOR=\"\#b2efff\">ID</TD>";
+    reporte_journaling += "<TD BGCOLOR=\"\#b2efff\">Acción</TD>";
+    reporte_journaling += "<TD BGCOLOR=\"\#b2efff\">Tipo</TD>";
+    reporte_journaling += "<TD BGCOLOR=\"\#b2efff\">Nombre</TD>";
+    reporte_journaling += "<TD BGCOLOR=\"\#b2efff\">Archivo Destino</TD>";
+    reporte_journaling += "<TD BGCOLOR=\"\#b2efff\">Contenido</TD>";
+    reporte_journaling += "<TD BGCOLOR=\"\#b2efff\">Fecha</TD>";
+    reporte_journaling += "</TR>\n";
+    for(int i = 0; i < journalings.size(); i++){
+        reporte_journaling += "<TR>\n";
+        reporte_journaling += "<TD>" + to_string(i+1) + "</TD>";
+        string accion(journalings[i].accion);
+        reporte_journaling += "<TD>" + accion + "</TD>";
+        string tipo(journalings[i].tipo);
+        reporte_journaling += "<TD>" + tipo + "</TD>";
+        string nombre(journalings[i].nombre);
+        reporte_journaling += "<TD>" + nombre + "</TD>";
+        string destino="";
+        if(cadenaVacia(journalings[i].destino)){
+            destino = "";
+        }else{
+            string de(journalings[i].destino);
+            destino = de;
+        }
+        reporte_journaling += "<TD>" + destino + "</TD>";
+        string contenido="";
+        if(cadenaVacia(journalings[i].contenido)){
+            contenido = "";
+        }else{
+            string co(journalings[i].contenido);
+            contenido = co;
+        }
+        reporte_journaling += "<TD>" + contenido + "</TD>";
+        reporte_journaling += "<TD>" + getOnlyFecha(journalings[i].fecha) + "</TD>";
+        reporte_journaling += "</TR>\n";
+    }
+    reporte_journaling += "</table>\n";
+    reporte_journaling += ">];\n";
+    reporte_journaling += "}";
+
+    //GENERANDO EL ARCHIVO DE REPORTE
+    //VALIDACION Y CREACION DE CARPETAS 
+    bool ruta_complex = false;
+    if(reporte->path[0] == '"' && reporte->path[reporte->path.length()-1] == '"'){
+        ruta_complex = true;
+        reporte->path = reporte->path.substr(1,reporte->path.length()-2);
+    }
+
+
+    string path_temp =  reporte->path;
+    vector<string> carpetas_rep = split(reporte->path,'/');
+    string ruta = "";
+    if(path_temp[0] == '/' && ruta_complex == false){
+        ruta = "/";
+    }else if(path_temp[0] == '/' && ruta_complex == true){
+        ruta = "\"/";
+    }
+    
+    for(int i = 0; i < carpetas_rep.size()-1; ++i){
+        if(carpetas_rep[i]!= ""){
+            ruta += carpetas_rep[i] + "/";
+        }
+    }
+    if(ruta_complex == true){
+        ruta += "\"";
+    }
+    string comando_linux = "mkdir -p " + ruta;
+    system(comando_linux.c_str());
+
+    //CREACION DEL ARCHIVO
+    FILE *archivo_reporte;
+    string nombre_rep = carpetas_rep[carpetas_rep.size()-1].substr(0,carpetas_rep[carpetas_rep.size()-1].length()-4);
+
+    string tipo_rep = carpetas_rep[carpetas_rep.size()-1].substr(carpetas_rep[carpetas_rep.size()-1].length()-4,carpetas_rep[carpetas_rep.size()-1].length());
+
+    string ruta2 = ruta; 
+    if(ruta_complex == true){
+        ruta2 = path_princ.substr(1,path_princ.length()-2);
+        ruta2 = ruta2.substr(0,ruta2.length()-5);
+    }
+    
+    string path_rep = ruta2 + ".dot";
+    string path_rep2 = ruta2;
+    cout << path_rep << endl;
+    archivo_reporte= fopen(path_rep.c_str(),"w");
+    fputs(reporte_journaling.c_str(),archivo_reporte);
+    fclose(archivo_reporte);
+
+
+    if(tipo_rep == ".pdf"){
+        string comando_dot = "dot -Tpdf " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".png"){
+        string comando_dot = "dot -Tpng " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".jpg"){
+        string comando_dot = "dot -Tjpg " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }else if(tipo_rep == ".svg"){
+        string comando_dot = "dot -Tsvg " + path_rep + " -o " + reporte->path;
+        system(comando_dot.c_str());
+    }
+
+    cout << "\e[1;32m [SUCCESS]: \e[1;37m El Reporte de Journaling fue generado con exito \e[m\n" << endl;
+
+    string comando_open = "xdg-open " + path_princ;
+    system(comando_open.c_str());
+}
+
 vector<EBR> Rep::ListadoEBR(Particion extendida, string path){
     vector<EBR> ebrs;
     FILE *archivo;
@@ -2198,6 +2380,32 @@ string Rep::getFecha(time_t fecha){
     time_t date = fecha;
     char time_string[100];
     strftime(time_string, sizeof(time_string), "%d/%m/%Y %H:%M:%S", localtime(&date));
+    string final_date(time_string);
+    return final_date;
+}
+
+vector<Journaling> Rep::ListadoJournaling(int inicio, int final, string path){
+    vector <Journaling> journalings;
+    FILE *archivo;
+    archivo = fopen(path.c_str(),"rb+");
+    int pos = inicio;
+    while(pos < final){
+        fseek(archivo,pos,SEEK_SET);
+        Journaling journaling;
+        fread(&journaling,sizeof(Journaling),1,archivo);
+        if(!cadenaVacia(journaling.accion)){
+            journalings.push_back(journaling);
+        }
+        pos += sizeof(Journaling);
+    }
+    fclose(archivo);
+    return journalings;
+}
+
+string Rep::getOnlyFecha(time_t fecha){
+    time_t date = fecha;
+    char time_string[100];
+    strftime(time_string, sizeof(time_string), "%d/%m/%Y", localtime(&date));
     string final_date(time_string);
     return final_date;
 }

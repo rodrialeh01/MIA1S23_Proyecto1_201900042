@@ -245,8 +245,8 @@ rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_sb.pdf" 
 rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_tree.jpg" >name=tree
 rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_inode.pdf" >name=inode
 rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_block.pdf" >name=block
-rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_bm_inode.pdf" >name=bm_inode
-rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_bm_block.pdf" >name=bm_block
+rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_bm_inode.txt" >name=bm_inode
+rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_bm_block.txt" >name=bm_block
 rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_journaling.pdf" >name=journaling
 
 pause
@@ -258,8 +258,8 @@ rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_sb.pdf
 rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_tree.jpg" >name=tree
 rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_inode.pdf" >name=inode
 rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_block.pdf" >name=block
-rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_bm_inode.pdf" >name=bm_inode
-rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_bm_block.pdf" >name=bm_block
+rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_bm_inode.txt" >name=bm_inode
+rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_bm_block.txt" >name=bm_block
 rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_journaling.pdf" >name=journaling
 
 pause

@@ -87,6 +87,15 @@ typedef struct {
     int b_pointers[16];
 }BloqueApuntador;
 
+typedef struct{
+    char accion[10];
+    char tipo[10];
+    char nombre[64];
+    char destino[64];
+    char contenido[64];
+    time_t fecha;
+}Journaling;
+
 class Estructuras{
     public:
         Estructuras();

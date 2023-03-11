@@ -11,11 +11,11 @@ mount >path=/home/parte2/disco.dsk >name=Part4 #id 424disco
 
 #MKFS A PARTICIONES
 mkfs >type=full >id=421disco
-mkfs >type=full >id=422disco -fs=3fs
+mkfs >type=full >id=422disco >fs=3fs
 
 #REPORTES INICIALES
 rep >id=421disco >path="/home/parte2/inicial/ext2_sb_1.pdf" >name=sb
 #rep >id=421disco >path="/home/parte2/inicial/ext2_tree_1.pdf" >name=tree
 
-#rep >id=422disco >path="/home/parte2/inicial/ext3_sb_1.pdf" >name=sb
+rep >id=422disco >path="/home/parte2/inicial/ext3_sb_1.pdf" >name=sb
 #rep >id=422disco >path="/home/parte2/inicial/ext3_tree_1.pdf" >name=tree
