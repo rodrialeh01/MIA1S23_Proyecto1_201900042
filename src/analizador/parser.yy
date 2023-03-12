@@ -21,6 +21,8 @@
    class Unmount;
    class Rep;
    class Mkfs;
+   class Login;
+   class Logout;
 }
 
 %{
@@ -38,6 +40,8 @@
    #include "../Comandos/Unmount.h"
    #include "../Comandos/Rep.h"
    #include "../Comandos/Mkfs.h"
+   #include "../Comandos/Login.h"
+   #include "../Comandos/Logout.h"
 
    std::string dsk_size = "";
    std::string path = "";
@@ -50,7 +54,8 @@
    std::string id = "";
    std::string comruta = "";
    std::string fs = "";
-
+   std::string user = "";
+   std::string pass = "";
 %}
 
 
@@ -160,11 +165,19 @@
       }
       | LOGIN Lista_login
       {
-         std::cout << "COMANDO LOGIN" << std::endl;
+         Login *inicio = new Login();
+         inicio->user = user;
+         inicio->password = pass;
+         inicio->id = id;
+         inicio->IniciarSesion(inicio);
+         user = "";
+         pass = "";
+         id = "";
       }
       | LOGOUT
       {
-         std::cout << "COMANDO LOGOUT" << std::endl;
+         Logout *cerrar = new Logout();
+         cerrar->CerrarSesion(cerrar);
       }
       | MKGRP NAME IGUAL CADENA
       {
@@ -473,19 +486,19 @@
    param_login
       : USER IGUAL CADENA
       {
-         std::cout << "USER: " << $3 << std::endl;
+         user = $3;
       }
       | PASS IGUAL CADENA
       {
-         std::cout << "PASSWORD: " << $3 << std::endl;
+         pass = $3;
       }
       | PASS IGUAL NUM
       {
-         std::cout << "PASSWORD: " << $3 << std::endl;
+         pass = $3;
       }
       | ID IGUAL CADENA
       {
-         std::cout << "ID: " << $3 << std::endl;
+         id = $3;
       }
    ;
 

@@ -89,9 +89,8 @@ void Login::IniciarSesion(Login *login){
         if(no_bloque == -1){
             break;
         }
-        int pos_bloque = super_bloque.s_block_start + (no_bloque * sizeof(BloqueArchivo));
         BloqueArchivo bloque;
-        fseek(archivo, pos_bloque, SEEK_SET);
+        fseek(archivo, no_bloque, SEEK_SET);
         fread(&bloque, sizeof(BloqueArchivo), 1, archivo);
         usuariostxt += bloque.b_content;
     }
@@ -104,7 +103,7 @@ void Login::IniciarSesion(Login *login){
     for(int i = 0; i < usuarios_grupos.size(); i++){
         vector<string> datos;
         datos = split(usuarios_grupos[i], ',');
-        if(datos.size() == 5 || datos[1] == "U"){
+        if(datos[1] == "U"){
             if(toLowerCase(datos[3]) == toLowerCase(user)){
                 if(toLowerCase(datos[4]) == toLowerCase(password)){
                     if(logueado == false){
