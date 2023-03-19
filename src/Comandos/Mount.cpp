@@ -16,6 +16,9 @@ void Mount::MontarParticion(Mount *montar){
 
     //LEE EL ARCHIVO
     FILE *archivo;
+    if(montar->path[0] == '\"'){
+        montar->path = montar->path.substr(1,montar->path.length()-2);
+    }
     archivo = fopen(montar->path.c_str(), "rb+");
     if(archivo == NULL){
         cout << "\e[1;31m[ERROR]:\e[1;37m No se ha encontrado el disco \e[m\n" << endl;
@@ -95,7 +98,13 @@ string Mount::nombre_disco(string path){
     }
     vector<string> partes_path = split(path,'/');
     nombre = partes_path[partes_path.size()-1];
-    nombre = nombre.substr(0,nombre.length()-4);
+    if(nombre[nombre.length()-4] == '.'){
+        nombre = nombre.substr(0,nombre.length()-4);
+    }else if(nombre[nombre.length()-5] == '.'){
+        nombre = nombre.substr(0,nombre.length()-5);
+    }else if(nombre[nombre.length()-3] == '.'){
+        nombre = nombre.substr(0,nombre.length()-3);
+    }
     return nombre;
 }
 

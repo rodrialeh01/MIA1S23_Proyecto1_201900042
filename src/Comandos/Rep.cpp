@@ -2409,3 +2409,61 @@ string Rep::getOnlyFecha(time_t fecha){
     string final_date(time_string);
     return final_date;
 }
+
+string Rep::dottree(int posicion, string dot, string path){
+    FILE *archivo;
+    archivo = fopen(path.c_str(),"rb+");
+    fseek(archivo,posicion,SEEK_SET);
+    Inodo inode;
+    fread(&inode,sizeof(Inodo),1,archivo);
+    dot += "nodo" + to_string(posicion) + " [label=<";
+    dot += "<table fontname=\"Quicksand\" border=\"0\" cellspacing=\"0\">\n";
+    dot += "<tr><td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"white\">Inodo</FONT></td>\n";
+    dot += "<td bgcolor=\"\#0f3fa5\" ><FONT COLOR=\"\#0f3fa5\">a</FONT></td>\n";
+    dot += "</tr>\n";
+    dot += "<tr><td border=\"1\">UID</td>\n";
+    dot += "<td border=\"1\">" + to_string(inode.i_uid) + "</td>\n";
+    dot += "</tr>\n";
+    dot += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">GID</td>\n";
+    dot += "<td border=\"1\" bgcolor=\"\#9dbaf9\">" + to_string(inode.i_gid) + "</td>\n";
+    dot += "</tr>\n";
+    dot += "<tr><td border=\"1\">Size</td>\n";
+    dot += "<td border=\"1\">" + to_string(inode.i_s) + "</td>\n";
+    dot += "</tr>\n";
+    dot += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">aTime</td>\n";
+    dot += "<td border=\"1\" bgcolor=\"\#9dbaf9\">" + getFecha(inode.i_atime) + "</td>\n";
+    dot += "</tr>\n";
+    dot += "<tr><td border=\"1\">cTime</td>\n";
+    dot += "<td border=\"1\">" + getFecha(inode.i_ctime) + "</td>\n";
+    dot += "</tr>\n";
+    dot += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">mTIme</td>\n";
+    dot += "<td border=\"1\" bgcolor=\"\#9dbaf9\">" + getFecha(inode.i_mtime) + "</td>\n";
+    dot += "</tr>\n";
+    for(int j = 0; j < 15; j++){
+        if(j%2== 0){
+            dot += "<tr><td border=\"1\">Block "+to_string(j+1)+"</td>\n";
+            dot += "<td border=\"1\">" + to_string(inode.i_block[j]) + "</td>\n";
+            dot += "</tr>\n";
+        }else{
+            dot += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Block "+to_string(j+1)+"</td>\n";
+            dot += "<td border=\"1\" bgcolor=\"\#9dbaf9\">" + to_string(inode.i_block[j]) + "</td>\n";
+            dot += "</tr>\n";
+        }
+    }
+    dot += "<tr><td border=\"1\" bgcolor=\"\#9dbaf9\">Type</td>\n";
+    dot += "<td border=\"1\" bgcolor=\"\#9dbaf9\">" + string(1,inode.i_type) + "</td>\n";
+    dot += "</tr>\n";
+    dot += "<tr><td border=\"1\">Perm</td>\n";
+    dot += "<td border=\"1\">" + to_string(inode.i_perm) + "</td>\n";
+    dot += "</tr>\n";
+    dot += "</table>>];\n";
+    for(int i = 0; i <15;i++){
+        if(inode.i_block[i] != -1){
+            if(i < 12){
+                if(inode.i_type == '0'){
+                    dot += "";
+                }
+            }
+        }
+    }
+}

@@ -45,6 +45,7 @@ class Rep {
         vector<string> split(string texto, char parametro);
         string getFecha(time_t fecha);
         string getOnlyFecha(time_t fecha);
+        string dottree(int posicion, string dot, string path);
 };
 
 #endif

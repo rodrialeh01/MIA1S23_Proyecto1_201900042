@@ -56,6 +56,9 @@ void Fdisk::SistemaDeParticiones(Fdisk *particion){
     }
 
     FILE *archivo;
+    if(particion->path[0] == '\"'){
+        particion->path= particion->path.substr(1,particion->path.length()-2);
+    }
     if(!(archivo = fopen(particion->path.c_str(),"rb"))){
         cout << "\e[1;31m[ERROR]:\e[1;37m El disco no se encuentro en el sistema\e[m\n" << endl;
         return;
