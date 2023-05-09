@@ -1,0 +1,16 @@
+#Parte 1
+
+1-crear-discos
+2-crear-particiones
+3-montar-particiones
+4-editar-particiones
+5-eliminar-particiones-discos
+6-reportes-parte-1
+
+o parte-1-completa
+
+#Parte 2
+
+inicio-parte-2
+
+o parte-2-completa

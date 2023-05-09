@@ -1,6 +1,5 @@
-
-#ifndef LOGIN_H
-#define LOGIN_H
+#ifndef RMGRP_H
+#define RMGRP_H
 
 #include "vector"
 #include "string"
@@ -8,6 +7,11 @@
 #include <iostream>
 #include <unistd.h>
 #include <dirent.h>
+#include <cmath>
+#include <iomanip>
+#include "time.h"
+#include <typeinfo>
+#include <string.h>
 
 #include "../Estructuras.h"
 #include "../RAM/ListaDoble.h"
@@ -19,17 +23,19 @@ extern bool logueado;
 extern string userlogueado;
 extern string idlogueado;
 
-class Login {
+class Rmgrp {
     public:
-        Login();
-        string user = "";
-        string password = "";
-        string id = "";
-        void IniciarSesion(Login *login);
+        Rmgrp();
+        string name = "";
+        void EliminarGrupo(Rmgrp *rmgrp);
         vector<EBR> ListadoEBRS(Particion extendida, string path);
         bool cadenaVacia(char cadena[]);
         vector<string> split(string texto, char  parametro);
         string toLowerCase(string palabra);
+        int NumeroGrupo();
+        bool ExisteGrupo(string name);
+        void DeleteGrupo(string name);
+        int tamanio_disponible(BloqueArchivo contenido);
 };
 
 #endif

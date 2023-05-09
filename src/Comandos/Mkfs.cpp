@@ -140,8 +140,8 @@ void Mkfs::FormatearExt2(string id){
     superbloque.s_magic = 0xEF53;
     superbloque.s_inode_s = sizeof(Inodo);
     superbloque.s_block_s = sizeof(BloqueArchivo);
-    superbloque.s_first_ino = 0;
-    superbloque.s_first_blo = 0;
+    superbloque.s_first_ino = inicio_inodos;
+    superbloque.s_first_blo = inicio_bloques;
     superbloque.s_bm_inode_start = inicio_bitmap_inodos;
     superbloque.s_bm_block_start = inicio_bitmap_bloques;
     superbloque.s_inode_start = inicio_inodos;
@@ -204,7 +204,7 @@ void Mkfs::FormatearExt2(string id){
 
     //ACTUALIZACION DEL SUPERBLOQUE
     superbloque.s_free_inodes_count = superbloque.s_free_inodes_count - 1;
-    superbloque.s_first_ino = superbloque.s_first_ino + 1;
+    superbloque.s_first_ino = superbloque.s_first_ino + sizeof(Inodo);
     fseek(archivo, pos_inicio, SEEK_SET);
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
 
@@ -235,7 +235,7 @@ void Mkfs::FormatearExt2(string id){
 
     //ACTUALIZACION DEL SUPERBLOQUE
     superbloque.s_free_blocks_count = superbloque.s_free_blocks_count - 1;
-    superbloque.s_first_blo = superbloque.s_first_blo + 1;
+    superbloque.s_first_blo = superbloque.s_first_blo + sizeof(BloqueCarpeta);
     fseek(archivo, pos_inicio, SEEK_SET);
 
     //ESCRITURA DEL INODO DEL ARCHIVO USERS.TXT
@@ -262,7 +262,7 @@ void Mkfs::FormatearExt2(string id){
 
     //ACTUALIZACION DEL SUPERBLOQUE
     superbloque.s_free_inodes_count = superbloque.s_free_inodes_count - 1;
-    superbloque.s_first_ino = superbloque.s_first_ino + 1;
+    superbloque.s_first_ino = superbloque.s_first_ino + sizeof(Inodo);
     fseek(archivo, pos_inicio, SEEK_SET);
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
 
@@ -280,7 +280,7 @@ void Mkfs::FormatearExt2(string id){
 
     //ACTUALIZACION DEL SUPERBLOQUE
     superbloque.s_free_blocks_count = superbloque.s_free_blocks_count - 1;
-    superbloque.s_first_blo = superbloque.s_first_blo + 1;
+    superbloque.s_first_blo = superbloque.s_first_blo + sizeof(BloqueArchivo);
     fseek(archivo, pos_inicio, SEEK_SET);
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
 
@@ -385,8 +385,8 @@ void Mkfs::FormatearExt3(string id){
     superbloque.s_magic = 0xEF53;
     superbloque.s_inode_s = sizeof(Inodo);
     superbloque.s_block_s = sizeof(BloqueArchivo);
-    superbloque.s_first_ino = 0;
-    superbloque.s_first_blo = 0;
+    superbloque.s_first_ino = inicio_inodos;
+    superbloque.s_first_blo = inicio_bloques;
     superbloque.s_bm_inode_start = inicio_bitmap_inodos;
     superbloque.s_bm_block_start = inicio_bitmap_bloques;
     superbloque.s_inode_start = inicio_inodos;
@@ -467,7 +467,7 @@ void Mkfs::FormatearExt3(string id){
 
     //ACTUALIZACION DEL SUPERBLOQUE
     superbloque.s_free_inodes_count = superbloque.s_free_inodes_count - 1;
-    superbloque.s_first_ino = superbloque.s_first_ino + 1;
+    superbloque.s_first_ino = superbloque.s_first_ino + sizeof(Inodo);
     fseek(archivo, pos_inicio, SEEK_SET);
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
 
@@ -498,7 +498,7 @@ void Mkfs::FormatearExt3(string id){
 
     //ACTUALIZACION DEL SUPERBLOQUE
     superbloque.s_free_blocks_count = superbloque.s_free_blocks_count - 1;
-    superbloque.s_first_blo = superbloque.s_first_blo + 1;
+    superbloque.s_first_blo = superbloque.s_first_blo + sizeof(BloqueCarpeta);
     fseek(archivo, pos_inicio, SEEK_SET);
 
     //ESCRITURA DEL INODO DEL ARCHIVO USERS.TXT
@@ -525,7 +525,7 @@ void Mkfs::FormatearExt3(string id){
 
     //ACTUALIZACION DEL SUPERBLOQUE
     superbloque.s_free_inodes_count = superbloque.s_free_inodes_count - 1;
-    superbloque.s_first_ino = superbloque.s_first_ino + 1;
+    superbloque.s_first_ino = superbloque.s_first_ino + sizeof(Inodo);
     fseek(archivo, pos_inicio, SEEK_SET);
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
 
@@ -560,7 +560,7 @@ void Mkfs::FormatearExt3(string id){
 
     //ACTUALIZACION DEL SUPERBLOQUE
     superbloque.s_free_blocks_count = superbloque.s_free_blocks_count - 1;
-    superbloque.s_first_blo = superbloque.s_first_blo + 1;
+    superbloque.s_first_blo = superbloque.s_first_blo + sizeof(BloqueArchivo);
     fseek(archivo, pos_inicio, SEEK_SET);
     fwrite(&superbloque, sizeof(SuperBloque), 1, archivo);
 

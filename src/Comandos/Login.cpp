@@ -104,11 +104,12 @@ void Login::IniciarSesion(Login *login){
         vector<string> datos;
         datos = split(usuarios_grupos[i], ',');
         if(datos[1] == "U"){
-            if(toLowerCase(datos[3]) == toLowerCase(user)){
-                if(toLowerCase(datos[4]) == toLowerCase(password)){
+            if(datos[3] == user){
+                if(datos[4] == password){
                     if(logueado == false){
                         logueado = true;
                         userlogueado = datos[3];
+                        idlogueado = id;
                         cout << "\e[1;32m [SUCCESS]: \e[1;37m Se ha iniciado sesion con el usuario: " << datos[3] << "\e[m\n" << endl;
                         return;
                     }else{

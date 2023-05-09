@@ -34,6 +34,7 @@ class Rep {
         void ReporteSuperBloque(Rep *reporte);
         void ReporteJournaling(Rep *reporte);
         void ReporteTree(Rep *reporte);
+        void ReporteFile(Rep *reporte);
         string toLowerCase(string palabra);
         vector<EBR> ListadoEBR(Particion extendida, string path);
         vector <Inodo> ListadoInodos(int inicio, int final, string path);

@@ -104,7 +104,7 @@ FILEN                   ">file"({DIGIT}+)
 
 
 [[:blank:]]     {}
-.               {printf("XXXXXXXXXXXX Caracter no reconocido: XXXXXXXXXXXX%s\n",yytext);}
+.               {printf("\e[1;31m[ERROR]:\e[1;37m Caracter NO reconocido: \e[m%s\n",yytext);}
 <<EOF>>		      {return yy::Parser::make_FIN();}
 %%
 

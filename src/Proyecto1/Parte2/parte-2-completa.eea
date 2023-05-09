@@ -1,0 +1,360 @@
+#-----------------
+# Parte 2 - SISTEMA DE ARCHIVOS
+#----------------
+
+#CONFIGURACION INICIAL
+mkdisk >size=112 >unit=M >path=/home/parte2/disco.dsk
+
+fdisk >type=P >unit=M >name=Part1 >size=25 >path=/home/parte2/disco.dsk
+fdisk >type=P >unit=M >name=Part2 >size=25 >path=/home/parte2/disco.dsk
+fdisk >type=P >unit=M >name=Part3 >size=25 >path=/home/parte2/disco.dsk
+fdisk >type=P >unit=M >name=Part4 >size=25 >path=/home/parte2/disco.dsk
+
+mount >path=/home/parte2/disco.dsk >name=Part1 #id 421disco
+mount >path=/home/parte2/disco.dsk >name=Part2 #id 422disco
+mount >path=/home/parte2/disco.dsk >name=Part3 #id 423disco
+mount >path=/home/parte2/disco.dsk >name=Part4 #id 424disco
+
+#MKFS A PARTICIONES
+mkfs >type=full >id=421disco
+mkfs >type=full >id=422disco >fs=3fs
+
+#REPORTES INICIALES
+rep >id=421disco >path="/home/parte2/inicial/ext2_sb_1.pdf" >name=sb
+rep >id=421disco >path="/home/parte2/inicial/ext2_tree_1.pdf" >name=tree
+
+rep >id=422disco >path="/home/parte2/inicial/ext3_sb_1.pdf" >name=sb
+rep >id=422disco >path="/home/parte2/inicial/ext3_tree_1.pdf" >name=tree
+
+#INICIO DE SESION
+
+#Debe dar error porque no existe el usuario roca
+Login >pass=567 >user=roca >id=421disco
+#Debe dar error porque no existe nada activo
+logout
+
+Login >pass=123 >user=root >id=421disco
+
+pause
+
+#CREACION DE GRUPOS
+mkgrp >name=Archivos
+mkgrp >name=Arqui
+mkgrp >name="Orga"
+mkgrp >name="Compi 2"
+
+#Validar cambios en el archivo
+Cat >file1=/users.txt
+
+#ELIMINACION DE GRUPOS
+#rmgrp >name=Arqui
+
+#Validar cambios en el archivo
+Cat >file1=/users.txt
+
+#CREACION DE USUARIOS
+Mkusr >user="user1" >grp=root >pass=user1
+Mkusr >user="user2" >grp="Compi 2" >pass=user2
+Mkusr >user="user3" >grp="Compi 2" >pass=user3
+Mkusr >user="user4" >grp="Compi 2" >pass=user4
+
+#Validar cambios en el archivo
+Cat >file1=/users.txt
+
+#ELIMINACION DE USUARIOS
+#rmusr >user=user3
+
+#Validar cambios en el archivo
+Cat >file1=/users.txt
+
+#CAMBIAR USUARIO DE GRUPO
+#chgrp >user=user4 >grp=Archivos
+
+#Validar cambios en el archivo
+Cat >file1=/users.txt
+
+pause
+
+#CREACION DE CARPETAS
+#Mkdir >R >path=/home/archivos/mia/fase2
+#Mkdir >R >path=/home/archivos/mia/carpeta2
+#Mkdir >R >path=/home/archivos/mia/z
+#Mkdir >R >path=/home/archivos/mia/carpeta3/carpeta7/carpeta8/carpeta9/carpeta10/carpeta11
+#Mkdir >R >path=/home/archivos/mia/carpeta4/carpeta7/carpeta8/carpeta9/carpeta10/carpeta11/carpeta7/carpeta8/carpeta9/carpeta10/carpeta11
+#Mkdir >path=/home/archivos/mia/carpeta2/a1
+#Mkdir >path=/home/archivos/mia/carpeta2/a2
+#Mkdir >path=/home/archivos/mia/carpeta2/a3
+#Mkdir >path=/home/archivos/mia/carpeta2/a4
+#Mkdir >path=/home/archivos/mia/carpeta2/a5
+#Mkdir >path=/home/archivos/mia/carpeta2/a6
+#Mkdir >path=/home/archivos/mia/carpeta2/a7
+#Mkdir >path=/home/archivos/mia/carpeta2/a8
+#Mkdir >path=/home/archivos/mia/carpeta2/a9
+#Mkdir >path=/home/archivos/mia/carpeta2/a10
+#Mkdir >path=/home/archivos/mia/fase2/a1
+#Mkdir >path=/home/archivos/mia/fase2/a2
+#Mkdir >path=/home/archivos/mia/fase2/a3
+#Mkdir >path=/home/archivos/mia/fase2/a4
+#Mkdir >path=/home/archivos/mia/fase2/a5
+#Mkdir >path=/home/archivos/mia/fase2/a6
+#Mkdir >path=/home/archivos/mia/fase2/a7
+#Mkdir >path=/home/archivos/mia/fase2/a8
+#Mkdir >path=/home/archivos/mia/fase2/a9
+#Mkdir >path=/home/archivos/mia/fase2/a10
+#Mkdir >path=/home/archivos/mia/fase2/a11
+#Mkdir >path=/home/archivos/mia/fase2/a12
+#Mkdir >path=/home/archivos/mia/fase2/a13
+#Mkdir >path=/home/archivos/mia/fase2/a14
+#Mkdir >path=/home/archivos/mia/fase2/a15
+#Mkdir >path=/home/archivos/mia/fase2/a16
+#Mkdir >path=/home/archivos/mia/fase2/a17
+#Mkdir >path=/home/archivos/mia/fase2/a18
+#Mkdir >path=/home/archivos/mia/fase2/a19
+#Mkdir >path=/home/archivos/mia/fase2/a20
+#Mkdir >path=/home/archivos/mia/fase2/a21
+#Mkdir >path=/home/archivos/mia/fase2/a22
+#Mkdir >path=/home/archivos/mia/fase2/a23
+#Mkdir >path=/home/archivos/mia/fase2/a24
+#Mkdir >path=/home/archivos/mia/fase2/a25
+#Mkdir >path=/home/archivos/mia/fase2/a26
+#Mkdir >path=/home/archivos/mia/fase2/a27
+#Mkdir >path=/home/archivos/mia/fase2/a28
+#Mkdir >path=/home/archivos/mia/fase2/a29
+#Mkdir >path=/home/archivos/mia/fase2/a30
+#Mkdir >path=/home/archivos/mia/fase2/a31
+#Mkdir >path=/home/archivos/mia/fase2/a32
+#Mkdir >path=/home/archivos/mia/fase2/a33
+#Mkdir >path=/home/archivos/mia/fase2/a34
+#Mkdir >path=/home/archivos/mia/fase2/a35
+#Mkdir >path=/home/archivos/mia/fase2/a36
+#Mkdir >path=/home/archivos/mia/fase2/a37
+#Mkdir >path=/home/archivos/mia/fase2/a38
+#Mkdir >path=/home/archivos/mia/fase2/a39
+#Mkdir >path=/home/archivos/mia/fase2/a40
+#Mkdir >path=/home/archivos/mia/fase2/a41
+#Mkdir >path=/home/archivos/mia/fase2/a42
+#Mkdir >path=/home/archivos/mia/fase2/a43
+#Mkdir >path=/home/archivos/mia/fase2/a44
+#Mkdir >path=/home/archivos/mia/fase2/a45
+#Mkdir >path=/home/archivos/mia/fase2/a46
+#Debe dar error porque ya existe a46
+#Mkdir >path=/home/archivos/mia/fase2/a46
+
+#Primer indirecto
+#Mkdir >path="/home/archivos/mia/fase2/b1"
+#Mkdir >path="/home/archivos/mia/fase2/b2"
+#Mkdir >path="/home/archivos/mia/fase2/b3"
+#Mkdir >path="/home/archivos/mia/fase2/b4"
+#Mkdir >path="/home/archivos/mia/fase2/b5"
+#Mkdir >path="/home/archivos/mia/fase2/b6"
+#Mkdir >path="/home/archivos/mia/fase2/b7"
+#Mkdir >path="/home/archivos/mia/fase2/b8"
+#Mkdir >path="/home/archivos/mia/fase2/b9"
+#Mkdir >path="/home/archivos/mia/fase2/b10"
+#Mkdir >path="/home/archivos/mia/fase2/b11"
+#Mkdir >path="/home/archivos/mia/fase2/b12"
+#Mkdir >path="/home/archivos/mia/fase2/b13"
+#Mkdir >path="/home/archivos/mia/fase2/b14"
+#Mkdir >path="/home/archivos/mia/fase2/b15"
+#Mkdir >path="/home/archivos/mia/fase2/b16"
+#Mkdir >path="/home/archivos/mia/fase2/b17"
+#Mkdir >path="/home/archivos/mia/fase2/b18"
+#Mkdir >path="/home/archivos/mia/fase2/b19"
+#Mkdir >path="/home/archivos/mia/fase2/b20"
+#Mkdir >path="/home/archivos/mia/fase2/b21"
+#Mkdir >path="/home/archivos/mia/fase2/b22"
+#Mkdir >path="/home/archivos/mia/fase2/b23"
+#Mkdir >path="/home/archivos/mia/fase2/b24"
+#Mkdir >path="/home/archivos/mia/fase2/b25"
+#Mkdir >path="/home/archivos/mia/fase2/b26"
+#Mkdir >path="/home/archivos/mia/fase2/b27"
+#Mkdir >path="/home/archivos/mia/fase2/b28"
+#Mkdir >path="/home/archivos/mia/fase2/b29"
+#Mkdir >path="/home/archivos/mia/fase2/b30"
+#Mkdir >path="/home/archivos/mia/fase2/b31"
+#Mkdir >path="/home/archivos/mia/fase2/b32"
+#Mkdir >path="/home/archivos/mia/fase2/b33"
+#Mkdir >path="/home/archivos/mia/fase2/b34"
+#Mkdir >path="/home/archivos/mia/fase2/b35"
+#Mkdir >path="/home/archivos/mia/fase2/b36"
+#Mkdir >path="/home/archivos/mia/fase2/b37"
+#Mkdir >path="/home/archivos/mia/fase2/b38"
+#Mkdir >path="/home/archivos/mia/fase2/b39"
+#Mkdir >path="/home/archivos/mia/fase2/b40"
+#Mkdir >path="/home/archivos/mia/fase2/b41"
+#Mkdir >path="/home/archivos/mia/fase2/b42"
+#Mkdir >path="/home/archivos/mia/fase2/b43"
+#Mkdir >path="/home/archivos/mia/fase2/b44"
+#Mkdir >path="/home/archivos/mia/fase2/b45"
+#Mkdir >path="/home/archivos/mia/fase2/b46"
+#Mkdir >path="/home/archivos/mia/fase2/b47"
+#Mkdir >path="/home/archivos/mia/fase2/b48"
+#Mkdir >path="/home/archivos/mia/fase2/b49"
+#Mkdir >path="/home/archivos/mia/fase2/b50"
+
+pause
+
+#REPORTES PARA VERIFICAR INDIRECTOS
+rep >id=421disco >path="/home/parte2/#Mkdir_ind/ext2_sb_1.pdf" >name=sb
+rep >id=421disco >path="/home/parte2/#Mkdir_ind/ext2_tree_1.pdf" >name=tree
+#CREACION DE ARCHIVOS
+logout
+#Cambiamos de usuario para despues validar #chown y #chmod
+loGin >user=user1 >pass=user1 >id=421disco
+#Archivo 
+#mkfile >path="/home/b1.txt" >size=75
+#Debe dar error ruta no existe
+#mkfile >path="/home/Noexiste/b1.txt" >size=75
+#Debe dar error size negativo
+#mkfile >path="/home/b1.txt" >size=-45
+#indirectos
+#mkfile >path="/home/b1_1.txt" >size=10000
+#archivo con archivo de la pc
+#mkfile >path="/home/entrada.txt" >cont="/home/bcont.txt"
+
+#REPORTES PARA VERIFICAR INDIRECTOS
+rep >id=421disco >path="/home/parte2/#mkfile_ind/ext2_sb_1.pdf" >name=sb
+rep >id=421disco >path="/home/parte2/#mkfile_ind/ext2_tree_1.pdf" >name=tree
+
+pause
+
+#ELIMINACION DE CONTENIDO
+#Carpeta Directos
+#re#move >path=/home/archivos/mia/fase2/a46
+#Carpeta indirectos
+#re#move >path="/home/archivos/mia/fase2/b1"
+
+#REPORTES PARA VERIFICAR CAMBIOS
+rep >id=421disco >path="/home/parte2/rem/ext2_sb_1.pdf" >name=sb
+rep >id=421disco >path="/home/parte2/rem/ext2_tree_1.pdf" >name=tree
+
+pause
+
+#MOVER CONTENIDO
+#move >path="/home/archivos/mia/fase2/b50" >destino="/home"
+
+#REPORTES PARA VERIFICAR CAMBIOS
+rep >id=421disco >path="/home/parte2/mover/ext2_sb_1.pdf" >name=sb
+rep >id=421disco >path="/home/parte2/mover/ext2_tree_1.pdf" >name=tree
+
+pause
+
+#REPORTES ANTES DE LA PERDIDA
+#Ultimo reporte antes de la perdida
+#rep >id=421disco >path="/home/archivos/antes_perdida/users.txt" >ruta="/users.txt" >name=file
+#rep >id=421disco >path="/home/archivos/antes_perdida/ls.pdf" >ruta="/" >name=ls
+#rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_sb.pdf" >name=sb
+#rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_tree.jpg" >name=tree
+#rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_inode.pdf" >name=inode
+#rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_block.pdf" >name=block
+#rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_bm_inode.txt" >name=bm_inode
+#rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_bm_block.txt" >name=bm_block
+rep >id=421disco >path="/home/archivos/antes_perdida/reporte5_42YDiscoZ_journaling.pdf" >name=journaling
+
+pause
+
+#PERDIDA
+#Loss >id=422disco
+
+#rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_sb.pdf" >name=sb
+#rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_tree.jpg" >name=tree
+#rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_inode.pdf" >name=inode
+#rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_block.pdf" >name=block
+#rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_bm_inode.txt" >name=bm_inode
+#rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_bm_block.txt" >name=bm_block
+rep >id=422disco >path="/home/archivos/despues_perdida/reporte6_42YDiscoZ_journaling.pdf" >name=journaling
+
+pause
+
+#Recovery
+#Recovery >id=422disco
+
+rep >id=422disco >path="/home/archivos/recuperacion/reporte7_42YDiscoZ_sb.pdf" >name=sb
+rep >id=422disco >path="/home/archivos/recuperacion/reporte7_42YDiscoZ_tree.jpg" >name=tree
+rep >id=422disco >path="/home/archivos/recuperacion/reporte7_42YDiscoZ_inode.pdf" >name=inode
+rep >id=422disco >path="/home/archivos/recuperacion/reporte7_42YDiscoZ_block.pdf" >name=block
+rep >id=422disco >path="/home/archivos/recuperacion/reporte7_42YDiscoZ_bm_inode.txt" >name=bm_inode
+rep >id=422disco >path="/home/archivos/recuperacion/reporte7_42YDiscoZ_bm_block.txt" >name=bm_block
+rep >id=422disco >path="/home/archivos/reporecuperacionrts2/reporte7_42YDiscoZ_journaling.pdf" >name=journaling
+pause
+
+logout
+Login >pass=123 >user=root >id=421disco
+
+#chmod
+#chmod >path=/home/archivos/mia/carpeta2 >ugo=001 >R
+#chmod >path="/home/b1.txt" >ugo=001
+logout
+loGin >user=user1 >pass=user1 >id=421disco
+#No debe dejar por permisos de escritura
+#Mkdir >R  >path=/home/archivos/mia/carpeta2/Esta/no/se/debe/crear/por/permisos
+#No debe dejar por permisos de lectura
+#cat >file1="/home/b1.txt"
+logout
+pause
+
+#Renombrar
+Login >pass=123 >user=root >id=421disco
+#rename >path=/home/archivos/mia/fase1 >name=fase1renombre
+#rename >path="/home/archivos/mia/fase2/b1" >name=renindirecto
+logout
+loGin >user=user1 >pass=user1 >id=421disco
+#Este debe fallar por permisos de escritura
+#rename >path="/home/b1.txt" >name=brenombre.txt
+logoUt
+#Pausa para el renombrar
+pause
+
+Login >pass=123 >user=root >id=421disco
+
+#Indirectos dobles
+#mkfile >path="/home/b2ble.txt" >size=18000
+#Indirectos triples
+#mkfile >path="/home/b3ple.txt" >size=280000
+#Reporte 8
+rep >id=42YDiscoZ >path="/home/archivos/reports2/reporte8_42YDiscoZ_tree.jpg" >name=tree
+pause 
+
+#Copiar
+#Debe dar error porque destino no existe
+#copy >path=/home/archivos/mia/carpeta3 >destino=/home/archivos/mia/yo/no/existo
+#copy >path=/home/archivos/mia/carpeta3 >destino=/home/archivos/mia/carpeta2
+#Copiar indirectos
+#copy >path=/home/archivos/mia/fase2 >destino=/home/archivos/mia/carpeta2
+#Reporte 9
+rep >id=421disco >path="/home/archivos/reports2/reporte9_42YDiscoZ_tree.jpg" >name=tree
+pause 
+
+#find
+#find >path="/" >name=*
+pause
+#find >path="/" >name="?.*"
+#Debe dar error porque no e42iste path
+#find >path="/no/existo" >name=?
+pause
+
+##edit
+#edit >path="/home/b3ple.txt" >cont="/home/bcont.txt"
+#edit >path="/home/b2ble.txt" >cont="/home/bcont.txt"
+#Reporte 10
+rep >id=421disco >path="/home/archivos/reports2/reporte10_42YDiscoZ_tree.jpg" >name=tree
+
+#CHGRP
+chgrp >user=user1 >grp="Compi 2"
+rep >id=421disco >path="/home/archivos/reports2/usersCHGRP.txt" >ruta="/users.txt" >name=file
+logout
+loGin >user=user1 >pass=user1 >id=421disco
+#Debe marcar error porque no es root
+chgrp >user=user1 >grp=Archivos
+logout
+pause
+
+##chown
+Login >pass=123 >user=root >id=421disco
+#chown >path="/home/archivos/mia/fase2" >user=user >R
+rep >id=421disco >path="/home/archivos/reports2/lschown.pdf" >ruta="/home/archivos/mia/fase2" >name=ls
+pause
+
+#chmod >path=/ >ugo=000 >R
+rep >id=421disco >path="/home/archivos/reports2/lsULTIMO.pdf" >ruta="/" >name=ls
+pause

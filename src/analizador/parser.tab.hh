@@ -58,8 +58,14 @@
    class Mkfs;
    class Login;
    class Logout;
+   class Mkgrp;
+   class Mkusr;
+   class Rmgrp;
+   class Rmusr;
+   class Cat;
+   class Chgrp;
 
-#line 63 "parser.tab.hh"
+#line 69 "parser.tab.hh"
 
 
 # include <cstdlib> // std::abort
@@ -194,7 +200,7 @@
 #endif
 
 namespace yy {
-#line 198 "parser.tab.hh"
+#line 204 "parser.tab.hh"
 
 
 
@@ -2990,7 +2996,7 @@ switch (yykind)
 
 
 } // yy
-#line 2994 "parser.tab.hh"
+#line 3000 "parser.tab.hh"
 
 
 

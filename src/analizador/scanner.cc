@@ -1351,7 +1351,7 @@ YY_RULE_SETUP
 case 79:
 YY_RULE_SETUP
 #line 107 "lexico.l"
-{printf("XXXXXXXXXXXX Caracter no reconocido: XXXXXXXXXXXX%s\n",yytext);}
+{printf("\e[1;31m[ERROR]:\e[1;37m Caracter NO reconocido: \e[m%s\n",yytext);}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 #line 108 "lexico.l"

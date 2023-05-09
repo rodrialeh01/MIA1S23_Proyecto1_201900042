@@ -1,6 +1,5 @@
-
-#ifndef LOGIN_H
-#define LOGIN_H
+#ifndef MKUSR_H
+#define MKUSR_H
 
 #include "vector"
 #include "string"
@@ -8,6 +7,11 @@
 #include <iostream>
 #include <unistd.h>
 #include <dirent.h>
+#include <cmath>
+#include <iomanip>
+#include "time.h"
+#include <typeinfo>
+#include <string.h>
 
 #include "../Estructuras.h"
 #include "../RAM/ListaDoble.h"
@@ -19,17 +23,22 @@ extern bool logueado;
 extern string userlogueado;
 extern string idlogueado;
 
-class Login {
+class Mkusr {
     public:
-        Login();
+        Mkusr();
         string user = "";
         string password = "";
-        string id = "";
-        void IniciarSesion(Login *login);
+        string group = "";
+        void CrearUsuario(Mkusr *mkusr);
         vector<EBR> ListadoEBRS(Particion extendida, string path);
         bool cadenaVacia(char cadena[]);
         vector<string> split(string texto, char  parametro);
         string toLowerCase(string palabra);
+        int NumeroUsuario();
+        bool ExisteUsuario(string name);
+        void CreateUsuario(string name, string pass, string group);
+        bool ExisteGrupo(string group);
+        int tamanio_disponible(BloqueArchivo contenido);
 };
 
 #endif

@@ -23,6 +23,12 @@
    class Mkfs;
    class Login;
    class Logout;
+   class Mkgrp;
+   class Mkusr;
+   class Rmgrp;
+   class Rmusr;
+   class Cat;
+   class Chgrp;
 }
 
 %{
@@ -42,6 +48,12 @@
    #include "../Comandos/Mkfs.h"
    #include "../Comandos/Login.h"
    #include "../Comandos/Logout.h"
+   #include "../Comandos/Mkgrp.h"
+   #include "../Comandos/Mkusr.h"
+   #include "../Comandos/Rmgrp.h"
+   #include "../Comandos/Rmusr.h"
+   #include "../Comandos/Cat.h"
+   #include "../Comandos/Chgrp.h"
 
    std::string dsk_size = "";
    std::string path = "";
@@ -56,6 +68,8 @@
    std::string fs = "";
    std::string user = "";
    std::string pass = "";
+   std::string grp = "";
+   std::string file = "";
 %}
 
 
@@ -181,22 +195,32 @@
       }
       | MKGRP NAME IGUAL CADENA
       {
-         std::cout << "COMANDO MKGRP" << std::endl;
-         std::cout << "NAME: "<< $4 << std::endl;
+         Mkgrp *grupo = new Mkgrp();
+         grupo->name = $4;
+         grupo->CrearGrupo(grupo);
       }
       | RMGRP NAME IGUAL CADENA
       {
-         std::cout << "COMANDO RMGRP" << std::endl;
-         std::cout << "NAME: "<< $4 << std::endl;
+         Rmgrp *grupo = new Rmgrp();
+         grupo->name = $4;
+         grupo->EliminarGrupo(grupo);
       }
       | RMUSR USER IGUAL CADENA
       {
-         std::cout << "COMANDO RMUSR" << std::endl;
-         std::cout << "USER: "<< $4 << std::endl;
+         Rmusr *usuario = new Rmusr();
+         usuario->user = $4;
+         usuario->EliminarUsuario(usuario);
       }
       | MKUSR Lista_mkusr
       {
-         std::cout << "COMANDO MKUSR" << std::endl;
+         Mkusr *usuario = new Mkusr();
+         usuario->user = user;
+         usuario->password = pass;
+         usuario->group = grp;
+         usuario->CrearUsuario(usuario);
+         user = "";
+         pass = "";
+         grp = "";
       }
       | MKFILE Lista_mkfile
       {
@@ -204,7 +228,10 @@
       }
       | CAT Lista_cat
       {
-         std::cout << "COMANDO CAT" << std::endl;
+         Cat *archivo = new Cat();
+         archivo->file = file;
+         archivo->LeerArchivo(archivo);
+         file="";
       }
       | REMOVE PATH IGUAL RUTA
       {
@@ -294,15 +321,17 @@
       }
       | CHGRP USER IGUAL CADENA GRP IGUAL CADENA
       {
-         std::cout << "COMANDO CHRGP" << std::endl;
-         std::cout << "USER: "<< $4 << std::endl;
-         std::cout << "GRP: "<< $7 << std::endl;
+         Chgrp *grupo = new Chgrp();
+         grupo->user = $4;
+         grupo->group = $7;
+         grupo->CambiarGrupo(grupo);
       }
       | CHGRP GRP IGUAL CADENA USER IGUAL CADENA
       {
-         std::cout << "COMANDO CHRGP" << std::endl;
-         std::cout << "USER: "<< $7 << std::endl;
-         std::cout << "GRP: "<< $4 << std::endl;
+         Chgrp *grupo = new Chgrp();
+         grupo->user = $7;
+         grupo->group = $4;
+         grupo->CambiarGrupo(grupo);
       }
       | CHMOD Lista_chmod
       {
@@ -322,7 +351,6 @@
       {
          std::string filename($4);
          std::string linea;
-
          ifstream input_file(filename);
          if (!input_file.is_open()) {
             std::cout << "No se pudo abrir el archivo" << filename << "'" << endl;
@@ -510,19 +538,19 @@
    param_mkusr
       : USER IGUAL CADENA
       {
-         std::cout << "USER: " << $3 << std::endl;
+         user = $3;
       }
       | PASS IGUAL CADENA
       {
-         std::cout << "PASS: " << $3 << std::endl;
+         pass = $3;
       }
       | PASS IGUAL NUM
       {
-         std::cout << "PASS: " << $3 << std::endl;
+         pass = $3;
       }
       | GRP IGUAL CADENA
       {
-         std::cout << "GROUP: " << $3 << std::endl;
+         grp = $3;
       }
    ;
 
@@ -558,8 +586,7 @@
    param_cat
       : FILEN IGUAL RUTA
       {
-         std::cout << "RUTA: " << $3 << std::endl;
-         std::cout << "FILE: " << $1 << std::endl;
+         file= $3;
       }
    ;
 
